@@ -83,9 +83,16 @@ type (
 		// Type is the channel type ("channel", "private", "dm",
 		// "group_dm"); used to render a type-aware glyph in the
 		// message-pane header and status bar. May be empty when
-		// callers don't yet know the type \u2014 the UI then falls
+		// callers don't yet know the type — the UI then falls
 		// back to a default `#` glyph.
 		Type string
+		// FromHistory marks navigations synthesized by Ctrl+H /
+		// Ctrl+K. The case ChannelSelectedMsg handler suppresses
+		// pushing onto navHistory when this is true so back/forward
+		// walks don't grow the stack on every step. Visit recording
+		// is unaffected — going back to a channel still updates its
+		// last-visited timestamp.
+		FromHistory bool
 	}
 	MessagesLoadedMsg struct {
 		ChannelID  string

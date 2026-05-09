@@ -2872,3 +2872,21 @@ func TestChannelSelectedInvokesVisitRecorder(t *testing.T) {
 		t.Errorf("want recorded=[C1], got %v", recorded)
 	}
 }
+
+func TestChannelSelectedFromHistoryStillRecordsVisit(t *testing.T) {
+	app := NewApp()
+	app.activeTeamID = "T1"
+
+	var recorded []string
+	app.SetChannelVisitRecorder(func(channelID string) {
+		recorded = append(recorded, channelID)
+	})
+
+	// Even when synthesized by back/forward (FromHistory: true),
+	// recency must update so going back makes that channel "most recent".
+	_, _ = app.Update(ChannelSelectedMsg{ID: "C2", Name: "ops", Type: "channel", FromHistory: true})
+
+	if len(recorded) != 1 || recorded[0] != "C2" {
+		t.Errorf("want recorded=[C2], got %v", recorded)
+	}
+}
