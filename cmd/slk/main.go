@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	tea "charm.land/bubbletea/v2"
@@ -146,6 +147,30 @@ type WorkspaceContext struct {
 	// updated on every ChannelSelectedMsg via the visit recorder.
 	// Used to populate channelfinder.Item.LastVisited for sort.
 	LastVisitedByChannel map[string]int64
+}
+
+// workspaceRouter holds the program-wide "active workspace" pointer.
+// wireCallbacks(router) is invoked ONCE at startup. Every workspace-
+// scoped callback reads router.Active() at invocation time so the
+// effective workspace tracks the user's current Ctrl-N selection
+// without any closure rebinding.
+//
+// The `all` map is populated only during the connect-workspaces phase
+// (before p.Run); subsequent reads from p.Send-invoked callbacks are
+// race-free without a mutex.
+type workspaceRouter struct {
+	active atomic.Pointer[WorkspaceContext]
+	all    map[string]*WorkspaceContext
+}
+
+func newWorkspaceRouter() *workspaceRouter {
+	return &workspaceRouter{all: map[string]*WorkspaceContext{}}
+}
+
+func (r *workspaceRouter) Active() *WorkspaceContext  { return r.active.Load() }
+func (r *workspaceRouter) Set(wctx *WorkspaceContext) { r.active.Store(wctx) }
+func (r *workspaceRouter) ByID(teamID string) *WorkspaceContext {
+	return r.all[teamID]
 }
 
 func main() {
