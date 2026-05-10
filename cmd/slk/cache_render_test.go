@@ -81,7 +81,7 @@ func TestLoadCachedMessagesEnrichesFromCache(t *testing.T) {
 
 	userNames := map[string]string{"UAUTHOR": "alice"}
 
-	got := loadCachedMessages(db, selfUserID, channelID, userNames, "3:04 PM")
+	got := loadCachedMessages(db, selfUserID, channelID, userNames, "3:04 PM", nil)
 	if got == nil {
 		t.Fatal("loadCachedMessages returned nil; expected one message")
 	}
@@ -139,7 +139,7 @@ func TestLoadCachedMessagesEnrichesFromCache(t *testing.T) {
 func TestLoadCachedMessagesReturnsNilOnEmptyChannel(t *testing.T) {
 	db := newCacheForTest(t)
 
-	got := loadCachedMessages(db, "USELF", "C-empty", map[string]string{}, "3:04 PM")
+	got := loadCachedMessages(db, "USELF", "C-empty", map[string]string{}, "3:04 PM", nil)
 	if got != nil {
 		t.Errorf("expected nil for channel with no cached rows, got %d items", len(got))
 	}
@@ -170,7 +170,7 @@ func TestLoadCachedMessagesHandlesMissingRawJSON(t *testing.T) {
 		t.Fatalf("UpsertMessage: %v", err)
 	}
 
-	got := loadCachedMessages(db, "USELF", channelID, map[string]string{"UAUTHOR": "alice"}, "3:04 PM")
+	got := loadCachedMessages(db, "USELF", channelID, map[string]string{"UAUTHOR": "alice"}, "3:04 PM", nil)
 	if got == nil {
 		t.Fatal("expected one cached message, got nil")
 	}
@@ -212,7 +212,7 @@ func TestLoadCachedThreadRepliesEnrichesFromCache(t *testing.T) {
 		}
 	}
 
-	items := loadCachedThreadReplies(db, "USELF", "C1", "100.0", nil, "3:04 PM")
+	items := loadCachedThreadReplies(db, "USELF", "C1", "100.0", nil, "3:04 PM", nil)
 	if len(items) != 3 {
 		t.Fatalf("want 3 thread items, got %d", len(items))
 	}
