@@ -44,19 +44,23 @@ type ImageContext struct {
 // ImageReadyMsg is dispatched by the prefetcher when an image
 // attachment has finished downloading and decoding. The host panel
 // uses Channel + TS to identify the affected message; Key clears the
-// in-flight bit on the renderer that was tracking the fetch.
+// in-flight bit on the renderer that was tracking the fetch. ReqID
+// is the debuglog correlator threaded from the enqueue site.
 type ImageReadyMsg struct {
 	Channel string
 	TS      string
 	Key     string
+	ReqID   uint64
 }
 
 // ImageFailedMsg is dispatched when all auth attempts for an image
 // have failed. Carries the cache key only; hosts use it to mark the
 // key as permanently failed so RenderBlock won't re-spawn a fetch
-// goroutine until the channel is switched.
+// goroutine until the channel is switched. ReqID is the debuglog
+// correlator threaded from the enqueue site.
 type ImageFailedMsg struct {
-	Key string
+	Key   string
+	ReqID uint64
 }
 
 // ThumbSpec describes a single available thumbnail for an image.
