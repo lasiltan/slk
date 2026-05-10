@@ -705,6 +705,10 @@ func run() error {
 			return loadCachedMessages(db, wctx.Client.UserID(), channelID, wctx.UserNames, tsFormat)
 		})
 
+		app.SetChannelSyncedAtReader(func(channelID string) int64 {
+			return db.GetChannelSyncedAt(channelID)
+		})
+
 		app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
 			wctx := router.Active()
 			if wctx == nil {
