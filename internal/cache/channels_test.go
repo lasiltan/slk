@@ -112,3 +112,45 @@ func TestUpdateLastReadTS_RoundTrip(t *testing.T) {
 		t.Errorf("expected backward roll to '1234567890.000050', got %q", got)
 	}
 }
+
+func TestGetChannelSyncedAt_DefaultsToZero(t *testing.T) {
+	db := setupDBWithWorkspace(t)
+	defer db.Close()
+
+	db.UpsertChannel(Channel{ID: "C1", WorkspaceID: "T1", Name: "general", Type: "channel", IsMember: true})
+
+	if got := db.GetChannelSyncedAt("C1"); got != 0 {
+		t.Errorf("default synced_at = %d, want 0", got)
+	}
+}
+
+func TestGetChannelSyncedAt_MissingChannelReturnsZero(t *testing.T) {
+	db := setupDBWithWorkspace(t)
+	defer db.Close()
+
+	if got := db.GetChannelSyncedAt("C-nonexistent"); got != 0 {
+		t.Errorf("missing channel synced_at = %d, want 0", got)
+	}
+}
+
+func TestSetChannelSyncedAt_RoundTrip(t *testing.T) {
+	db := setupDBWithWorkspace(t)
+	defer db.Close()
+
+	db.UpsertChannel(Channel{ID: "C1", WorkspaceID: "T1", Name: "general", Type: "channel", IsMember: true})
+
+	if err := db.SetChannelSyncedAt("C1", 1700000000); err != nil {
+		t.Fatal(err)
+	}
+	if got := db.GetChannelSyncedAt("C1"); got != 1700000000 {
+		t.Errorf("synced_at = %d, want 1700000000", got)
+	}
+
+	// Overwrite.
+	if err := db.SetChannelSyncedAt("C1", 1800000000); err != nil {
+		t.Fatal(err)
+	}
+	if got := db.GetChannelSyncedAt("C1"); got != 1800000000 {
+		t.Errorf("synced_at after overwrite = %d, want 1800000000", got)
+	}
+}
