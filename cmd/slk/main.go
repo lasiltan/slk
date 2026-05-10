@@ -1192,7 +1192,10 @@ func connectWorkspace(ctx context.Context, token slackclient.Token, db *cache.DB
 	}
 
 	// Fetch unread counts
-	unreadCounts, threadsAgg, _ := client.GetUnreadCounts()
+	unreadCounts, threadsAgg, ucErr := client.GetUnreadCounts()
+	if ucErr != nil {
+		debuglog.Cache("workspace_unread_bootstrap: team=%s GetUnreadCounts failed: %v", token.TeamName, ucErr)
+	}
 	wctx.ThreadsHasUnreads = threadsAgg.HasUnreads
 	unreadMap := make(map[string]int)
 	for _, u := range unreadCounts {
@@ -1219,6 +1222,35 @@ func connectWorkspace(ctx context.Context, token slackclient.Token, db *cache.DB
 		}
 	}
 	log.Printf("workspace %s: %d/%d channel items marked IsMuted after build", token.TeamName, mutedItemCount, len(wctx.Channels))
+
+	// Bootstrap-time unread/mute summary so a user can grep
+	// `[cache] workspace_unread_bootstrap` after launch and see what
+	// slk learned from client.counts vs. what the official Slack
+	// desktop client shows. Only per-channel-detail-log the unread
+	// ones; the muted-vs-unread aggregates are sufficient baseline
+	// for everything else.
+	if debuglog.Enabled() {
+		var unreadChans, mutedChans, unreadAndUnmuted int
+		for _, ch := range wctx.Channels {
+			if ch.UnreadCount > 0 {
+				unreadChans++
+				if !ch.IsMuted {
+					unreadAndUnmuted++
+				}
+			}
+			if ch.IsMuted {
+				mutedChans++
+			}
+		}
+		debuglog.Cache("workspace_unread_bootstrap: team=%s total=%d unread_count_>0=%d muted=%d unread_unmuted=%d threads_has_unreads=%v threads_unread=%d",
+			token.TeamName, len(wctx.Channels), unreadChans, mutedChans, unreadAndUnmuted, threadsAgg.HasUnreads, threadsAgg.UnreadCount)
+		for _, ch := range wctx.Channels {
+			if ch.UnreadCount > 0 {
+				debuglog.Cache("workspace_unread_bootstrap: team=%s channel=%s name=%q type=%s unread=%d last_read=%s muted=%v",
+					token.TeamName, ch.ID, ch.Name, ch.Type, ch.UnreadCount, ch.LastReadTS, ch.IsMuted)
+			}
+		}
+	}
 
 	// Finder items are built alongside the sidebar items in the loop above
 	// (see buildChannelItem). The user is a member of every channel returned
