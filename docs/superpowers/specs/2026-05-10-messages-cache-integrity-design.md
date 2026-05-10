@@ -592,6 +592,49 @@ Expected new behavior:
 4. Switch back. `synced_at` was just bumped, so Tier 1 fires: instant
    cache render, no fetch, no indicator.
 
+### Smoke-test checklist (evaluate after Plan B implementation lands)
+
+Once the changes are running end-to-end, drive these scenarios and
+revisit the calibration decisions:
+
+- **Tier thresholds.** 30 s / 5 min are round-number guesses.
+  - Does Tier 1 (no fetch) feel correct for typical back-to-back
+    revisits? Try the j/k channel-finder cycle on a workspace with
+    20+ channels and confirm the lack of network noise feels right,
+    not stale.
+  - Does Tier 3 (spinner-only) kick in too aggressively? Sit on a
+    workspace > 5 min and re-enter a channel; if the spinner feels
+    jarring for what's actually still-fresh data (no new WS messages
+    since you left it), consider raising to 15 min or making the
+    threshold depend on whether the WS has received any messages
+    for the channel since the last sync.
+- **`channelReadMarker` vs always-fire-fetcher.** With async user
+  resolution making fetches ~300 ms, the perf win of Tier 1 skipping
+  GetHistory is small. If `channelReadMarker` adds friction in code
+  review or testing, fold it back and have Tier 1 always fire the
+  fetcher (which already does mark-as-read). Decide based on real
+  fetch latency observed in `slk-debug.log` post-merge.
+- **Indicator visibility timing.** The `○` glyph appears immediately on
+  Tier 2 entry. If the fetch consistently returns under ~100 ms (cached
+  users on a small workspace), the indicator may flash too briefly to
+  read. Consider a delay-before-show (e.g. only show if fetch hasn't
+  returned within 150 ms).
+- **`userResolver` parallelism.** Watch `slk-debug.log` for
+  `users.info` calls during the first channel-select on a busy
+  workspace. If you see Slack rate-limit responses (HTTP 429) or
+  unusually slow profile fetches due to contention, add a per-resolver
+  buffered semaphore (~8 concurrent).
+- **Reconnect freshness.** Disconnect (e.g. toggle wifi), wait > 5 min,
+  reconnect. Confirm the first channel-select after reconnect falls
+  into Tier 3 (spinner-only) due to `synced_at` aging out. If it
+  doesn't, add explicit `synced_at = 0` clearing for the workspace's
+  channels inside `OnConnect`.
+- **`OnMessage`-driven `synced_at` bumps.** Verify via debug log that
+  WS messages for the active workspace bump `synced_at`, and that a
+  subsequent channel revisit therefore correctly takes the Tier 1
+  fast-path. If the bump isn't happening reliably, the cache-fresh
+  optimization silently degrades to Tier 2.
+
 ## File-by-file summary
 
 | File | Changes |
