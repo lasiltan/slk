@@ -27,7 +27,7 @@ type ThreadSummary struct {
 // (selfUserID) authored the parent, posted a reply, or was @-mentioned
 // (`<@UID>`) anywhere in the thread.
 //
-// Ordering: unread first, then newest LastReplyTS first.
+// Ordering: newest LastReplyTS first.
 //
 // Unread heuristic: LastReplyTS > channel.last_read_ts AND LastReplyBy != self.
 // This is approximate; v2 will replace it with subscriptions.thread state.
@@ -100,11 +100,16 @@ GROUP BY m.channel_id, m.thread_ts
 		return nil, err
 	}
 
-	// Order: unread DESC, last_reply_ts DESC.
+	// Order: newest LastReplyTS first. The Unread field is still
+	// computed and returned so the UI can render the dot indicator,
+	// but it no longer participates in ordering. The previous
+	// "unread first" tier produced confusing results when
+	// channels.last_read_ts was empty (string compare LastReplyTS >
+	// "" was always true), pushing genuinely-recent activity below
+	// older activity. See
+	// docs/superpowers/specs/2026-05-11-reconnect-backfill-and-threads-sort-design.md
+	// for context.
 	sort.SliceStable(out, func(i, j int) bool {
-		if out[i].Unread != out[j].Unread {
-			return out[i].Unread
-		}
 		return out[i].LastReplyTS > out[j].LastReplyTS
 	})
 	return out, nil
