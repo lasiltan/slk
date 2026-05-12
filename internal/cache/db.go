@@ -128,11 +128,23 @@ func (db *DB) migrate() error {
 		PRIMARY KEY (workspace_id, channel_id)
 	);
 
+	CREATE TABLE IF NOT EXISTS thread_subscriptions (
+		workspace_id TEXT NOT NULL,
+		channel_id   TEXT NOT NULL,
+		thread_ts    TEXT NOT NULL,
+		last_read    TEXT NOT NULL DEFAULT '',
+		active       INTEGER NOT NULL DEFAULT 1,
+		updated_at   INTEGER NOT NULL DEFAULT 0,
+		PRIMARY KEY (workspace_id, channel_id, thread_ts)
+	);
+
 	CREATE INDEX IF NOT EXISTS idx_messages_channel ON messages(channel_id, ts);
 	CREATE INDEX IF NOT EXISTS idx_messages_thread ON messages(thread_ts, channel_id);
 	CREATE INDEX IF NOT EXISTS idx_channels_workspace ON channels(workspace_id);
 	CREATE INDEX IF NOT EXISTS idx_users_workspace ON users(workspace_id);
 	CREATE INDEX IF NOT EXISTS idx_channel_visits_recent ON channel_visits(workspace_id, last_visited DESC);
+	CREATE INDEX IF NOT EXISTS idx_thread_subs_workspace
+		ON thread_subscriptions(workspace_id, active);
 	`
 
 	if _, err := db.conn.Exec(schema); err != nil {

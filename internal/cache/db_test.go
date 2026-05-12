@@ -149,3 +149,25 @@ func TestMigrateAddsChannelsSyncedAtColumn(t *testing.T) {
 		t.Error("channels table missing synced_at column")
 	}
 }
+
+func TestMigrate_CreatesThreadSubscriptionsTable(t *testing.T) {
+	db := setupDBWithWorkspace(t)
+	// PRAGMA table_info returns one row per column on an existing
+	// table, zero rows if the table doesn't exist.
+	rows, err := db.conn.Query("PRAGMA table_info(thread_subscriptions)")
+	if err != nil {
+		t.Fatalf("PRAGMA table_info: %v", err)
+	}
+	defer rows.Close()
+	count := 0
+	for rows.Next() {
+		count++
+	}
+	if count == 0 {
+		t.Fatalf("thread_subscriptions table missing after migrate()")
+	}
+	const wantCols = 6 // workspace_id, channel_id, thread_ts, last_read, active, updated_at
+	if count != wantCols {
+		t.Fatalf("thread_subscriptions: want %d cols, got %d", wantCols, count)
+	}
+}
