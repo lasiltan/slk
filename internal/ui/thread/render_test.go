@@ -34,7 +34,7 @@ func TestRenderThreadMessageAttachmentLinesFit(t *testing.T) {
 			{Kind: "file", Name: "specright_roi_-_final_data_-_704193", URL: "https://userevidence.slack.com/files/U05AZM7KJ1H/F0ATTEVCLUC/specright_roi_-_final_data_-_704193"},
 		},
 	}
-	got, _ := m.renderThreadMessage(msg, width, nil, nil, false)
+	got, _, _ := m.renderThreadMessage(msg, width, nil, nil, false)
 	if got == "" {
 		t.Fatal("renderThreadMessage returned empty output")
 	}

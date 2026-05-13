@@ -532,3 +532,78 @@ func TestThreadPatchUserName_InvalidatesCacheEvenWithNoMatchingRows(t *testing.T
 		t.Errorf("userNamesV should bump after PatchUserName (chromeCache depends on it); before=%d after=%d", verBefore, m.userNamesV)
 	}
 }
+
+// TestHitTestReaction_OnPill asserts that the thread panel records a
+// hit rect for every rendered reaction pill, and that HitTestReaction
+// returns the correct (replyIdx, emoji) when a click lands inside the
+// pill's pane-local coordinates (which include the chromeHeight offset
+// for the thread chrome above the replies).
+func TestHitTestReaction_OnPill(t *testing.T) {
+	m := New()
+	parent := messages.MessageItem{TS: "1.0", UserID: "alice", UserName: "alice", Text: "p"}
+	replies := []messages.MessageItem{
+		{
+			TS:        "1.001",
+			UserID:    "bob",
+			UserName:  "bob",
+			Text:      "hello",
+			Timestamp: "10:30 AM",
+			Reactions: []messages.ReactionItem{
+				{Emoji: "thumbsup", Count: 1, HasReacted: false},
+				{Emoji: "tada", Count: 2, HasReacted: true},
+			},
+		},
+	}
+	m.SetThread(parent, replies, "C1", "1.0")
+	// Render at a generous size so the reactions fit without wrap.
+	_ = m.View(30, 80)
+
+	if len(m.lastReactionHits) != 2 {
+		t.Fatalf("expected 2 reaction hit rects, got %d", len(m.lastReactionHits))
+	}
+
+	h := m.lastReactionHits[0]
+	if h.rowEnd <= h.rowStart || h.colEnd <= h.colStart {
+		t.Fatalf("reaction hit rect is degenerate: rows=[%d,%d) cols=[%d,%d)", h.rowStart, h.rowEnd, h.colStart, h.colEnd)
+	}
+	// Rows should be at or below the chromeHeight (replies area).
+	if h.rowStart < m.chromeHeight {
+		t.Errorf("reaction hit rowStart=%d should be >= chromeHeight=%d", h.rowStart, m.chromeHeight)
+	}
+
+	rowMid := (h.rowStart + h.rowEnd) / 2
+	colMid := (h.colStart + h.colEnd) / 2
+	replyIdx, emoji, ok := m.HitTestReaction(rowMid, colMid)
+	if !ok {
+		t.Fatalf("HitTestReaction(%d,%d) returned ok=false inside recorded rect", rowMid, colMid)
+	}
+	if emoji != "thumbsup" {
+		t.Errorf("emoji got %q want %q", emoji, "thumbsup")
+	}
+	if replyIdx != 0 {
+		t.Errorf("replyIdx got %d want 0", replyIdx)
+	}
+
+	// Click on a column outside the pill must not register.
+	if _, _, ok := m.HitTestReaction(rowMid, 0); ok {
+		t.Error("HitTestReaction at col=0 (border) should return ok=false")
+	}
+}
+
+// TestHitTestReaction_NoHitsWithoutReactions asserts that a thread
+// reply without reactions records zero reaction hits.
+func TestHitTestReaction_NoHitsWithoutReactions(t *testing.T) {
+	m := New()
+	parent := messages.MessageItem{TS: "1.0", UserID: "alice", UserName: "alice", Text: "p"}
+	replies := []messages.MessageItem{
+		{TS: "1.001", UserID: "bob", UserName: "bob", Text: "no reactions"},
+	}
+	m.SetThread(parent, replies, "C1", "1.0")
+	_ = m.View(20, 80)
+	if len(m.lastReactionHits) != 0 {
+		t.Errorf("expected 0 reaction hits, got %d", len(m.lastReactionHits))
+	}
+	if _, _, ok := m.HitTestReaction(0, 0); ok {
+		t.Error("HitTestReaction with no reactions should always return ok=false")
+	}
+}

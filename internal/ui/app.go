@@ -1117,7 +1117,19 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		// Determine which panel was clicked
 		if x < a.layoutRailWidth {
-			// Workspace rail — ignore for now
+			// Workspace rail: clicking a workspace tile switches to
+			// that workspace (same code path as the 1-9 keybinds and
+			// the workspace finder). The rail has no border above, so
+			// the panel-local y is just msg.Y.
+			if item, ok := a.workspaceRail.ClickAt(msg.Y); ok {
+				if a.workspaceSwitcher != nil && item.ID != a.workspaceRail.SelectedID() {
+					switcher := a.workspaceSwitcher
+					teamID := item.ID
+					return a, func() tea.Msg {
+						return switcher(teamID)
+					}
+				}
+			}
 		} else if a.sidebarVisible && x < a.layoutSidebarEnd {
 			a.focusedPanel = PanelSidebar
 			sidebarY := msg.Y - 1 // account for top border
@@ -1138,15 +1150,24 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.focusedPanel = PanelMessages
 			panel, px, py, ok := a.panelAt(msg.X, msg.Y)
 			if ok && panel == PanelMessages && py >= 0 {
-				// Hit-test inline images first: a click that lands
-				// inside an image's footprint opens the full-screen
-				// preview instead of beginning a drag-to-copy
-				// selection. lastHits is keyed in pane-local
-				// content coordinates (chrome already stripped),
-				// so subtract chromeHeight here, mirroring the
+				// Hit-test reactions and inline images first: a click
+				// that lands inside a pill toggles the user's
+				// reaction; a click inside an image footprint opens
+				// the full-screen preview. Either takes precedence
+				// over the drag-to-copy selection and the click-to-
+				// select-message behavior on this panel. lastHits /
+				// lastReactionHits are keyed in pane-local content
+				// coordinates (chrome already stripped), so we
+				// subtract chromeHeight here, mirroring the
 				// convention used by ClickAt / BeginSelectionAt.
 				contentY := py - a.messagepane.ChromeHeight()
 				if contentY >= 0 {
+					if hitMsgIdx, emojiName, hit := a.messagepane.HitTestReaction(contentY, px); hit && emojiName != "" {
+						msgs := a.messagepane.Messages()
+						if hitMsgIdx >= 0 && hitMsgIdx < len(msgs) {
+							return a, a.toggleReactionOnMessageItem(a.activeChannelID, msgs[hitMsgIdx], emojiName)
+						}
+					}
 					if hitMsgIdx, attIdx, fileID, hit := a.messagepane.HitTest(contentY, px); hit && fileID != "" {
 						msgs := a.messagepane.Messages()
 						if hitMsgIdx >= 0 && hitMsgIdx < len(msgs) {
@@ -1171,6 +1192,16 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.focusedPanel = PanelThread
 			panel, px, py, ok := a.panelAt(msg.X, msg.Y)
 			if ok && panel == PanelThread && py >= 0 {
+				// Hit-test reactions first on the thread pane too.
+				// HitTestReaction's rows are pane-local (already
+				// inclusive of the thread chromeHeight), matching the
+				// frame returned by panelAt.
+				if hitReplyIdx, emojiName, hit := a.threadPanel.HitTestReaction(py, px); hit && emojiName != "" {
+					replies := a.threadPanel.Replies()
+					if hitReplyIdx >= 0 && hitReplyIdx < len(replies) {
+						return a, a.toggleReactionOnMessageItem(a.threadPanel.ChannelID(), replies[hitReplyIdx], emojiName)
+					}
+				}
 				a.drag = dragState{panel: PanelThread, pressX: px, pressY: py, lastX: px, lastY: py}
 				a.threadPanel.BeginSelectionAt(py, px)
 				a.threadPanel.ClickAt(py)
@@ -3396,6 +3427,40 @@ func (a *App) toggleReactionOnSelectedThread(emojiName string) tea.Cmd {
 	channelID := a.threadPanel.ChannelID()
 	a.updateReactionOnMessage(channelID, reply.TS, emojiName, a.currentUserID, remove)
 	ts := reply.TS
+	if remove {
+		if a.reactionRemoveFn != nil {
+			return func() tea.Msg {
+				err := a.reactionRemoveFn(channelID, ts, emojiName)
+				return ReactionSentMsg{Err: err}
+			}
+		}
+	} else {
+		if a.reactionAddFn != nil {
+			return func() tea.Msg {
+				err := a.reactionAddFn(channelID, ts, emojiName)
+				return ReactionSentMsg{Err: err}
+			}
+		}
+	}
+	return nil
+}
+
+// toggleReactionOnMessageItem toggles the current user's reaction on
+// an arbitrary message (not necessarily the selected one). Used by the
+// click-on-pill path, which identifies the target message by its
+// rendered hit rect rather than by selection. Behavior matches
+// toggleReactionOnSelectedMessage: optimistic in-memory update + an
+// async tea.Cmd that issues the Slack add/remove call.
+func (a *App) toggleReactionOnMessageItem(channelID string, msg messages.MessageItem, emojiName string) tea.Cmd {
+	remove := false
+	for _, r := range msg.Reactions {
+		if r.Emoji == emojiName && r.HasReacted {
+			remove = true
+			break
+		}
+	}
+	a.updateReactionOnMessage(channelID, msg.TS, emojiName, a.currentUserID, remove)
+	ts := msg.TS
 	if remove {
 		if a.reactionRemoveFn != nil {
 			return func() tea.Msg {

@@ -133,6 +133,26 @@ type viewEntry struct {
 	// appends to Model.lastHits per frame so the app-level mouse handler
 	// can route clicks to the click-to-preview overlay (Phase 7).
 	imageHits []entryHit
+
+	// reactionHits records the column extents of each rendered
+	// reaction pill on this message, in coordinates relative to
+	// linesNormal (same frame as imageHits). View() translates these
+	// to viewport-absolute coordinates and appends to
+	// Model.lastReactionHits per frame so the app-level mouse handler
+	// can route clicks to a toggle-reaction command.
+	reactionHits []reactionEntryHit
+}
+
+// reactionEntryHit is one reaction-pill hit-rect, expressed in
+// coordinates relative to a single viewEntry's linesNormal. Identical
+// shape to entryHit but carries the emoji name (rather than a file
+// ID / attachment index) so the click handler can dispatch a toggle.
+type reactionEntryHit struct {
+	rowStartInEntry int
+	rowEndInEntry   int // exclusive
+	colStart        int
+	colEnd          int // exclusive
+	emoji           string
 }
 
 // entryHit is one inline-image hit-rect, expressed in coordinates
@@ -164,6 +184,19 @@ type hitRect struct {
 	fileID   string
 	msgIdx   int
 	attIdx   int
+}
+
+// reactionHitRect is one clickable reaction pill footprint in the
+// messages pane, in the same viewport-absolute frame as hitRect.
+// emoji is the Slack reaction name (no colons), suitable for passing
+// directly to ReactionAddFunc / ReactionRemoveFunc.
+type reactionHitRect struct {
+	rowStart int
+	rowEnd   int // exclusive
+	colStart int
+	colEnd   int // exclusive
+	msgIdx   int
+	emoji    string
 }
 
 // sixelEntry holds the pre-computed sixel bytes for one inline image,
@@ -292,6 +325,13 @@ type Model struct {
 	// consumed by the app-level mouse handler via HitTest. See Phase 7
 	// (click-to-preview) for the consumer.
 	lastHits []hitRect
+
+	// lastReactionHits holds the reaction-pill hit rects captured
+	// during the most recent View() call, in the same viewport-
+	// absolute coordinate frame as lastHits. Consumed by
+	// HitTestReaction so the app-level mouse handler can toggle a
+	// reaction when the user clicks a pill.
+	lastReactionHits []reactionHitRect
 
 	// focused tracks whether this panel currently has user focus. When
 	// false, the selected-message "▌" border dims from Accent to
@@ -1183,7 +1223,7 @@ func (m *Model) renderMessageEntry(i int, width int, cs cacheStyles) viewEntry {
 	if m.avatarFn != nil {
 		avatarStr = m.avatarFn(msg.UserID)
 	}
-	rendered, attachFlushes, attachSixel, attachHits := m.renderMessagePlain(msg, width, avatarStr, m.userNames, m.channelNames, i == m.selected)
+	rendered, attachFlushes, attachSixel, attachHits, reactHits := m.renderMessagePlain(msg, width, avatarStr, m.userNames, m.channelNames, i == m.selected)
 	// Two filled variants: borderFill (Background) for the unselected
 	// pre-render, and the SelectionTintColor for the selected pre-render.
 	// Without per-variant fills, the trailing whitespace of every wrapped
@@ -1229,6 +1269,7 @@ func (m *Model) renderMessageEntry(i int, width int, cs cacheStyles) viewEntry {
 		flushes:          attachFlushes,
 		sixelRows:        attachSixel,
 		imageHits:        attachHits,
+		reactionHits:     reactHits,
 	}
 }
 
@@ -1410,18 +1451,19 @@ func (m *Model) blockkitContext(msg MessageItem, userNames, channelNames map[str
 // renderMessagePlain renders a message without selection highlight.
 //
 // Returns the message content (multi-line string), per-frame flushes
-// (kitty image upload callbacks), a row-keyed map of sixel bytes, and
-// the per-image hit rects for the rendered attachments. Row indices in
-// sixelRows AND in the returned hits are relative to linesNormal AFTER
-// the surrounding buildCache wraps (avatar+border) are applied — the
-// avatar gutter adds columns but no rows, and the border adds 1 column
-// (col 0) but no rows, so row indices computed pre-wrap stay valid.
-// Column extents in the returned hits are absolute display columns
-// within linesNormal, including the border (col 0) and the avatar
-// gutter (5 cols when an avatar is present), so View() can translate
-// directly to pane-local mouse columns.
+// (kitty image upload callbacks), a row-keyed map of sixel bytes, the
+// per-image hit rects for the rendered attachments, and the per-pill
+// hit rects for the rendered reactions. Row indices in sixelRows AND
+// in the returned hits are relative to linesNormal AFTER the
+// surrounding buildCache wraps (avatar+border) are applied — the
+// avatar gutter adds columns but no rows, and the border adds 1
+// column (col 0) but no rows, so row indices computed pre-wrap stay
+// valid. Column extents in the returned hits are absolute display
+// columns within linesNormal, including the border (col 0) and the
+// avatar gutter (5 cols when an avatar is present), so View() can
+// translate directly to pane-local mouse columns.
 func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string, userNames map[string]string, channelNames map[string]string, isSelected bool) (
-	content string, flushes []func(io.Writer) error, sixelRows map[int]sixelEntry, hits []entryHit,
+	content string, flushes []func(io.Writer) error, sixelRows map[int]sixelEntry, hits []entryHit, reactionHits []reactionEntryHit,
 ) {
 	line := styles.Username.Render(msg.UserName) + lipgloss.NewStyle().Background(styles.Background).Render("  ") + styles.Timestamp.Render(msg.Timestamp)
 
@@ -1447,8 +1489,28 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 	}
 
 	var reactionLine string
+	// reactionLineCount is the number of rendered reaction rows below
+	// the body / attachments. Used downstream (after the row layout is
+	// known) to translate per-pill specs into absolute row indices.
+	reactionLineCount := 0
+	// pillSpecs captures one entry per real (non-"+") reaction pill in
+	// rendering order, with line index and column extents relative to
+	// the reaction-line block. Converted into absolute reactionEntryHit
+	// rects below (once we know the row offset of the reaction block).
+	type pillSpec struct {
+		lineIdx  int
+		colStart int
+		colEnd   int
+		emoji    string
+	}
+	var pillSpecs []pillSpec
 	if len(msg.Reactions) > 0 {
 		var pills []string
+		// pillEmojis parallels pills; empty string marks the trailing
+		// "+" pill that appears only in reaction nav mode (no toggle
+		// target). Tracked separately because the index in pills can
+		// exceed len(msg.Reactions).
+		var pillEmojis []string
 		for i, r := range msg.Reactions {
 			// Drop any skin-tone modifier suffix so the pill renders the
 			// base emoji at a well-known width. Skin-toned glyphs render
@@ -1465,6 +1527,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 				style = styles.ReactionPillOther
 			}
 			pills = append(pills, style.Render(pillText))
+			pillEmojis = append(pillEmojis, r.Emoji)
 		}
 		if isSelected && m.reactionNavActive {
 			plusStyle := styles.ReactionPillPlus
@@ -1472,6 +1535,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 				plusStyle = styles.ReactionPillSelected
 			}
 			pills = append(pills, plusStyle.Render("+"))
+			pillEmojis = append(pillEmojis, "")
 		}
 		// Join pills with wrapping. emojiutil.Width() consults the
 		// terminal-probed width cache so wrapping decisions match what
@@ -1479,16 +1543,39 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 		bgSpace := lipgloss.NewStyle().Background(styles.Background).Render(" ")
 		var reactionLines []string
 		currentLine := ""
+		lineIdx := 0
 		for i, pill := range pills {
 			candidate := currentLine
+			sepWidth := 0
 			if i > 0 {
 				candidate += bgSpace
+				sepWidth = 1
 			}
 			candidate += pill
+			pillW := emojiutil.Width(pill)
 			if emojiutil.Width(candidate) > contentWidth && currentLine != "" {
 				reactionLines = append(reactionLines, currentLine)
+				lineIdx++
 				currentLine = pill
+				// After wrap the pill starts at col 0 of the new line.
+				if pillEmojis[i] != "" {
+					pillSpecs = append(pillSpecs, pillSpec{
+						lineIdx:  lineIdx,
+						colStart: 0,
+						colEnd:   pillW,
+						emoji:    pillEmojis[i],
+					})
+				}
 			} else {
+				colStart := emojiutil.Width(currentLine) + sepWidth
+				if pillEmojis[i] != "" {
+					pillSpecs = append(pillSpecs, pillSpec{
+						lineIdx:  lineIdx,
+						colStart: colStart,
+						colEnd:   colStart + pillW,
+						emoji:    pillEmojis[i],
+					})
+				}
 				currentLine = candidate
 			}
 		}
@@ -1496,6 +1583,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 			reactionLines = append(reactionLines, currentLine)
 		}
 		reactionLine = "\n" + strings.Join(reactionLines, "\n")
+		reactionLineCount = len(reactionLines)
 	}
 
 	var editedMark string
@@ -1627,15 +1715,41 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 		}
 	}
 	var attachmentLines string
+	attachmentLineCount := 0
 	if len(attachLineSlices) > 0 {
 		flat := make([]string, 0)
 		for _, ls := range attachLineSlices {
 			flat = append(flat, ls...)
 		}
 		attachmentLines = "\n" + strings.Join(flat, "\n")
+		attachmentLineCount = len(flat)
 	}
 
 	msgContent := broadcastLabel + line + editedMark + "\n" + text + bkBlock + attachmentLines + threadLine + reactionLine
+
+	// Translate per-pill specs into entry-relative reaction hit rects.
+	// reactionRowBase is the row index (within linesNormal) where the
+	// first reaction line lands. Row layout:
+	//   preAttachmentRows = broadcast + username + body + bk
+	//   + attachmentLineCount (each attachment line is 1 row)
+	//   + 1 if threadLine is present
+	// (placeAvatarBeside does not change row counts.)
+	if len(pillSpecs) > 0 && reactionLineCount > 0 {
+		reactionRowBase := preAttachmentRows + attachmentLineCount
+		if threadLine != "" {
+			reactionRowBase++
+		}
+		for _, ps := range pillSpecs {
+			row := reactionRowBase + ps.lineIdx
+			reactionHits = append(reactionHits, reactionEntryHit{
+				rowStartInEntry: row,
+				rowEndInEntry:   row + 1,
+				colStart:        contentColBase + ps.colStart,
+				colEnd:          contentColBase + ps.colEnd,
+				emoji:           ps.emoji,
+			})
+		}
+	}
 
 	// Place avatar next to message content (avatar is side-by-side, no
 	// extra rows; row indices for sixelRows remain valid).
@@ -1646,7 +1760,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 	if len(allSixel) == 0 {
 		allSixel = nil
 	}
-	return msgContent, allFlushes, allSixel, hits
+	return msgContent, allFlushes, allSixel, hits, reactionHits
 }
 
 
@@ -1775,6 +1889,20 @@ func (m *Model) HitTest(row, col int) (msgIdx, attIdx int, fileID string, ok boo
 		}
 	}
 	return 0, 0, "", false
+}
+
+// HitTestReaction returns the (message index, reaction emoji name) at
+// (row, col) within the messages-pane content area, or ok=false when
+// no reaction pill covers that cell. Coordinate frame mirrors HitTest
+// (the app-level mouse handler subtracts chromeHeight before calling).
+// Hits are populated from the most recent View() call.
+func (m *Model) HitTestReaction(row, col int) (msgIdx int, emoji string, ok bool) {
+	for _, h := range m.lastReactionHits {
+		if row >= h.rowStart && row < h.rowEnd && col >= h.colStart && col < h.colEnd {
+			return h.msgIdx, h.emoji, true
+		}
+	}
+	return 0, "", false
 }
 
 var thickLeftBorder = lipgloss.Border{Left: "▌"}
@@ -2216,6 +2344,7 @@ func (m *Model) View(height, width int) string {
 	// common case (a few visible images at most) reuses the underlying
 	// array without reallocation.
 	m.lastHits = m.lastHits[:0]
+	m.lastReactionHits = m.lastReactionHits[:0]
 
 	visible := make([]string, 0, msgAreaHeight)
 	want := msgAreaHeight
@@ -2312,6 +2441,35 @@ func (m *Model) View(height, width int) string {
 				fileID:   h.fileID,
 				msgIdx:   e.msgIdx,
 				attIdx:   h.attIdx,
+			})
+		}
+
+		// Translate reaction-pill hits into the same viewport-absolute
+		// coordinate frame as lastHits. Pills are always exactly one
+		// row tall; clipping logic mirrors the image hit-test above so
+		// pills straddling the top/bottom edge of the visible window
+		// still register a click target for their visible row.
+		for _, h := range e.reactionHits {
+			absStart := entryStart + h.rowStartInEntry
+			absEnd := entryStart + h.rowEndInEntry
+			if absEnd <= m.yOffset || absStart >= m.yOffset+msgAreaHeight {
+				continue
+			}
+			clipStart := absStart - m.yOffset
+			if clipStart < 0 {
+				clipStart = 0
+			}
+			clipEnd := absEnd - m.yOffset
+			if clipEnd > msgAreaHeight {
+				clipEnd = msgAreaHeight
+			}
+			m.lastReactionHits = append(m.lastReactionHits, reactionHitRect{
+				rowStart: clipStart,
+				rowEnd:   clipEnd,
+				colStart: h.colStart,
+				colEnd:   h.colEnd,
+				msgIdx:   e.msgIdx,
+				emoji:    h.emoji,
 			})
 		}
 

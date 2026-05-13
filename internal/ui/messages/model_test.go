@@ -924,3 +924,89 @@ func TestPatchUserName_InvalidatesCacheEvenWithNoMatchingMessages(t *testing.T) 
 		t.Error("PatchUserName should have invalidated m.cache so the mention re-resolves")
 	}
 }
+
+// TestHitTestReaction_OnPill asserts that View() captures a hit
+// rect for each reaction pill on the rendered message and that
+// HitTestReaction returns the correct (msgIdx, emoji) pair when a
+// click lands inside the pill, and ok=false elsewhere.
+//
+// Reaction pills are rendered on a line below the message body (see
+// renderMessagePlain). The exact column extents depend on
+// emojiutil.Width() for the emoji glyph, so we don't assert specific
+// coordinates — we just confirm the rect is non-empty and the center
+// of the rect maps back to the expected emoji name.
+func TestHitTestReaction_OnPill(t *testing.T) {
+	msgs := []MessageItem{
+		{
+			TS:       "1700000001.000000",
+			UserID:   "U1",
+			UserName: "alice",
+			Text:     "hello",
+			Timestamp: "10:30 AM",
+			Reactions: []ReactionItem{
+				{Emoji: "thumbsup", Count: 1, HasReacted: false},
+				{Emoji: "tada", Count: 2, HasReacted: true},
+			},
+		},
+	}
+	m := New(msgs, "general")
+
+	// Drive a render to populate hit rects.
+	_ = m.View(30, 60)
+
+	if len(m.lastReactionHits) != 2 {
+		t.Fatalf("expected 2 reaction hit rects, got %d", len(m.lastReactionHits))
+	}
+
+	// First pill is :thumbsup:.
+	h := m.lastReactionHits[0]
+	if h.rowEnd <= h.rowStart || h.colEnd <= h.colStart {
+		t.Fatalf("reaction hit rect is degenerate: rows=[%d,%d) cols=[%d,%d)", h.rowStart, h.rowEnd, h.colStart, h.colEnd)
+	}
+	rowMid := (h.rowStart + h.rowEnd) / 2
+	colMid := (h.colStart + h.colEnd) / 2
+	msgIdx, emoji, ok := m.HitTestReaction(rowMid, colMid)
+	if !ok {
+		t.Fatalf("HitTestReaction(%d,%d) returned ok=false for a coordinate inside the recorded rect", rowMid, colMid)
+	}
+	if emoji != "thumbsup" {
+		t.Errorf("HitTestReaction emoji got %q want %q", emoji, "thumbsup")
+	}
+	if msgIdx != 0 {
+		t.Errorf("HitTestReaction msgIdx got %d want 0", msgIdx)
+	}
+
+	// Second pill is :tada:.
+	h2 := m.lastReactionHits[1]
+	row2 := (h2.rowStart + h2.rowEnd) / 2
+	col2 := (h2.colStart + h2.colEnd) / 2
+	_, emoji2, ok := m.HitTestReaction(row2, col2)
+	if !ok {
+		t.Fatalf("HitTestReaction did not register inside second pill")
+	}
+	if emoji2 != "tada" {
+		t.Errorf("second pill emoji got %q want %q", emoji2, "tada")
+	}
+
+	// A row clearly above the reaction line (row 0 is the username
+	// row) must not register as a hit.
+	if _, _, ok := m.HitTestReaction(0, colMid); ok {
+		t.Error("HitTestReaction at username row should return ok=false")
+	}
+}
+
+// TestHitTestReaction_NoHitsWithoutReactions asserts that a model
+// rendering a message with NO reactions records zero reaction hits.
+func TestHitTestReaction_NoHitsWithoutReactions(t *testing.T) {
+	msgs := []MessageItem{
+		{TS: "1.0", UserID: "U1", UserName: "alice", Text: "no reactions", Timestamp: "10:30 AM"},
+	}
+	m := New(msgs, "general")
+	_ = m.View(20, 60)
+	if len(m.lastReactionHits) != 0 {
+		t.Errorf("expected 0 reaction hits, got %d", len(m.lastReactionHits))
+	}
+	if _, _, ok := m.HitTestReaction(0, 0); ok {
+		t.Error("HitTestReaction with no reactions should always return ok=false")
+	}
+}

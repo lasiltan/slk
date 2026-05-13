@@ -121,6 +121,30 @@ func (m Model) View(height int) string {
 	return rail
 }
 
+// ClickAt returns the workspace item rendered at rail-local row y,
+// or ok=false when the click landed on a padding row, a gap between
+// items, or past the last item.
+//
+// Row layout mirrors View(): Padding(1,0) puts blank padding at row 0,
+// and items are "\n\n"-joined so they occupy rows 1, 3, 5, ... with
+// blank gap rows at 2, 4, 6, .... There is no horizontal column check
+// because the rail has no border and uses its full 6-col width as the
+// click target.
+func (m Model) ClickAt(y int) (WorkspaceItem, bool) {
+	if y < 1 || len(m.items) == 0 {
+		return WorkspaceItem{}, false
+	}
+	rel := y - 1
+	if rel%2 != 0 {
+		return WorkspaceItem{}, false // gap between items
+	}
+	idx := rel / 2
+	if idx < 0 || idx >= len(m.items) {
+		return WorkspaceItem{}, false
+	}
+	return m.items[idx], true
+}
+
 func (m Model) Width() int {
 	return 6 // 6 content, no border
 }
