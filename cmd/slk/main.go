@@ -196,13 +196,12 @@ func (r *workspaceRouter) ByID(teamID string) *WorkspaceContext {
 // its user ID). Bound to a single workspace because user IDs are
 // workspace-scoped.
 type userResolver struct {
-	teamID    string
-	client    *slackclient.Client
-	db        *cache.DB
-	avatars   *avatar.Cache
-	userNames map[string]string
-	send      func(tea.Msg)
-	inflight  sync.Map // userID -> struct{}
+	teamID   string
+	client   *slackclient.Client
+	db       *cache.DB
+	avatars  *avatar.Cache
+	send     func(tea.Msg)
+	inflight sync.Map // userID -> struct{}
 }
 
 func newUserResolver(
@@ -210,16 +209,14 @@ func newUserResolver(
 	client *slackclient.Client,
 	db *cache.DB,
 	avatars *avatar.Cache,
-	userNames map[string]string,
 	send func(tea.Msg),
 ) *userResolver {
 	return &userResolver{
-		teamID:    teamID,
-		client:    client,
-		db:        db,
-		avatars:   avatars,
-		userNames: userNames,
-		send:      send,
+		teamID:  teamID,
+		client:  client,
+		db:      db,
+		avatars: avatars,
+		send:    send,
 	}
 }
 
@@ -249,7 +246,19 @@ func (r *userResolver) Request(userID string) {
 			name = u.Name
 		}
 		isBot := u.IsBot || u.IsAppUser
-		r.userNames[userID] = name
+		// Persist to the cache DB (its own goroutine-safe SQLite
+		// connection) and the avatar cache (internal RWMutex), but
+		// do NOT write r.userNames[userID] from this goroutine —
+		// userNames is a plain map shared with the UI goroutine and
+		// other code paths, and a direct write here trips Go's
+		// "concurrent map writes" detector under load (two parallel
+		// Request goroutines for different userIDs is enough). The
+		// UserResolvedMsg below is delivered to the bubbletea Update
+		// loop, which calls Model.PatchUserName on the UI goroutine
+		// — that is the single safe writer for in-history rows.
+		// Subsequent resolveUserCached misses fall back to the DB
+		// row we just upserted, so we don't re-fetch on every miss
+		// in the small window before UserResolvedMsg lands.
 		r.avatars.Preload(userID, u.Profile.Image32)
 		_ = r.db.UpsertUser(cache.User{
 			ID:          userID,
@@ -1373,17 +1382,18 @@ func connectWorkspace(ctx context.Context, token slackclient.Token, db *cache.DB
 		avatarCache.Preload(u.ID, u.AvatarURL)
 	}
 
-	// Construct the per-workspace async user resolver. wctx.UserNames
-	// is already initialized (and seeded) above; the resolver shares
-	// that map by reference so subsequent Lookup hits populate it
-	// for future cache-only reads. p may be nil in tests, in which
-	// case the resolver's send callback is a no-op.
+	// Construct the per-workspace async user resolver. It writes
+	// resolved display names to the cache DB and emits
+	// UserResolvedMsg back into the bubbletea program; the UI's
+	// Update handler patches the in-memory userNames map on the
+	// UI goroutine via Model.PatchUserName (the single safe writer
+	// for that shared map). p may be nil in tests, in which case
+	// the resolver's send callback is a no-op.
 	wctx.UserResolver = newUserResolver(
 		wctx.TeamID,
 		wctx.Client,
 		db,
 		avatarCache,
-		wctx.UserNames,
 		func(msg tea.Msg) {
 			if p != nil {
 				p.Send(msg)
