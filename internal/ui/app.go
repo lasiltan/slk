@@ -1786,7 +1786,12 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if !isThreadReply || msg.Message.Subtype == "thread_broadcast" {
 				debuglog.Cache("NewMessageMsg: channel=%s ts=%s decision=mark_unread",
 					msg.ChannelID, msg.Message.TS)
-				a.sidebar.MarkUnread(msg.ChannelID)
+				// The DB write that flips has_unread=true for this
+				// channel already happened in the WS-handler path
+				// (cache.UpdateChannelReadState). Force the sidebar
+				// to re-read read state so the dot appears on the
+				// next render.
+				a.sidebar.Invalidate()
 			} else {
 				debuglog.Cache("NewMessageMsg: channel=%s ts=%s decision=skipped_thread_reply_inactive",
 					msg.ChannelID, msg.Message.TS)
@@ -2096,7 +2101,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case ChannelMarkedReadMsg:
 		debuglog.Cache("ChannelMarkedReadMsg: channel=%s active=%s (optimistic clear)",
 			msg.ChannelID, a.activeChannelID)
-		a.sidebar.ClearUnread(msg.ChannelID)
+		a.sidebar.Invalidate()
 
 	case DMNameResolvedMsg:
 		items := a.sidebar.Items()
@@ -5567,7 +5572,7 @@ func (a *App) applyChannelMark(channelID, ts string, unreadCount int) {
 	if channelID == a.activeChannelID {
 		a.messagepane.SetLastReadTS(ts)
 	}
-	a.sidebar.SetUnreadCount(channelID, unreadCount)
+	a.sidebar.Invalidate()
 }
 
 // applyThreadMark updates local state for a thread-level read-state
