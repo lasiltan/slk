@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -4083,15 +4084,69 @@ func TestChannelMembershipMsgUpdatesPicker(t *testing.T) {
 func TestChannelSelectedInvokesMembershipFetcher(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
+	// The App invokes the fetcher on a goroutine (see ChannelSelectedMsg
+	// handler in app.go), so use a thread-safe record + a done signal.
+	var mu sync.Mutex
 	var fetched []string
-	app.SetChannelMembershipFetcher(func(channelID string) { fetched = append(fetched, channelID) })
+	done := make(chan struct{}, 1)
+	app.SetChannelMembershipFetcher(func(channelID string) {
+		mu.Lock()
+		fetched = append(fetched, channelID)
+		mu.Unlock()
+		done <- struct{}{}
+	})
 
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C42", Name: "general", Type: "channel"})
 
-	if len(fetched) != 1 || fetched[0] != "C42" {
-		t.Errorf("fetcher invoked with %v, want [C42]", fetched)
+	select {
+	case <-done:
+	case <-time.After(time.Second):
+		t.Fatal("fetcher was not invoked within 1s")
+	}
+
+	mu.Lock()
+	got := append([]string(nil), fetched...)
+	mu.Unlock()
+	if len(got) != 1 || got[0] != "C42" {
+		t.Errorf("fetcher invoked with %v, want [C42]", got)
 	}
 	if app.compose.ActiveChannel() != "C42" {
 		t.Errorf("compose active channel = %q, want C42", app.compose.ActiveChannel())
+	}
+}
+
+// TestChannelSelectedReturnsPromptlyEvenIfFetcherBlocks guards against
+// the deadlock that froze the app on first run: the fetcher closure
+// in main.go originally called Membership.EnsureFresh synchronously,
+// which transitively invoked bubbletea's Program.Send (unbuffered
+// channel in bubbletea v2) from inside the Update goroutine — Send
+// blocked waiting for itself to receive. The contract is now that
+// the fetcher must NOT block; the test simulates a misbehaving
+// fetcher that blocks until released, and asserts Update still
+// returns within a short deadline. If a future maintainer changes
+// the wiring to once-again call a blocking fetcher synchronously,
+// this test fails the deadline.
+func TestChannelSelectedReturnsPromptlyEvenIfFetcherBlocks(t *testing.T) {
+	app := NewApp()
+	app.activeTeamID = "T1"
+	release := make(chan struct{})
+	app.SetChannelMembershipFetcher(func(channelID string) {
+		// Simulate a slow fetcher (e.g., blocked on a network call
+		// or a blocking p.Send). Releases when the test allows.
+		<-release
+	})
+	defer close(release)
+
+	done := make(chan struct{})
+	go func() {
+		_, _ = app.Update(ChannelSelectedMsg{ID: "C42", Name: "general", Type: "channel"})
+		close(done)
+	}()
+	select {
+	case <-done:
+		// Update returned promptly — fetcher was not invoked
+		// synchronously on the caller's goroutine.
+	case <-time.After(100 * time.Millisecond):
+		t.Fatal("Update did not return within 100ms; fetcher is being called synchronously on the Update goroutine — risks bubbletea Send-from-Update deadlock")
 	}
 }

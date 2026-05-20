@@ -942,6 +942,14 @@ func run() error {
 			if wctx == nil || wctx.Membership == nil {
 				return
 			}
+			// Note: EnsureFresh synchronously calls pushSnapshot, which
+			// invokes p.Send(ChannelMembershipMsg). bubbletea v2's program
+			// channel is unbuffered (charm.land/bubbletea/v2 tea.go:598),
+			// so p.Send blocks until the Update goroutine receives. The
+			// App invokes this fetcher in a goroutine for exactly that
+			// reason (see app.go ChannelSelectedMsg handler) — we can
+			// call EnsureFresh synchronously here because we're already
+			// off the Update goroutine.
 			wctx.Membership.EnsureFresh(context.Background(), channelID)
 		})
 

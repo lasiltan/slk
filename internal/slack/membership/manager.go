@@ -63,8 +63,17 @@ func New(workspaceID string, api ConversationMemberAPI, db *cache.DB, push PushF
 
 // EnsureFresh loads (if needed) cached membership for a channel,
 // pushes it to the UI, and triggers a background full-fetch if the
-// cache is missing or older than TTL. Returns immediately; fetch is
-// asynchronous.
+// cache is missing or older than TTL. The background fetch is
+// asynchronous, but the initial cache load and PushFunc invocation
+// run synchronously on the caller's goroutine.
+//
+// IMPORTANT: EnsureFresh calls PushFunc synchronously via pushSnapshot.
+// If PushFunc invokes bubbletea's Program.Send (which uses an unbuffered
+// channel in bubbletea v2), DO NOT call EnsureFresh from inside a
+// bubbletea Update handler — Send would deadlock waiting for the
+// Update goroutine to receive. Call EnsureFresh from a separate
+// goroutine in that case. Calling from a WebSocket-reader goroutine
+// or any background goroutine is safe.
 func (m *Manager) EnsureFresh(ctx context.Context, channelID string) {
 	m.loadIntoMemory(channelID)
 	m.pushSnapshot(channelID)

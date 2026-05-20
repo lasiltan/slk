@@ -1603,7 +1603,18 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.compose.SetActiveChannel(msg.ID)
 		a.threadCompose.SetActiveChannel(msg.ID)
 		if a.channelMembershipFetcher != nil {
-			a.channelMembershipFetcher(msg.ID)
+			// Fire the fetcher on a fresh goroutine so it can't block
+			// the Update loop. The fetcher is fire-and-forget — results
+			// arrive later via ChannelMembershipMsg. main.go's fetcher
+			// closure ultimately calls Membership.EnsureFresh which
+			// invokes bubbletea Program.Send via pushSnapshot, and
+			// bubbletea v2's program channel is unbuffered: a Send
+			// from inside Update would deadlock waiting for the same
+			// goroutine to receive. See manager.go's EnsureFresh
+			// docs and the deadlock-regression test in app_test.go.
+			fetcher := a.channelMembershipFetcher
+			channelID := msg.ID
+			go fetcher(channelID)
 		}
 		a.statusbar.SetChannel(msg.Name)
 		a.statusbar.SetChannelType(msg.Type)
