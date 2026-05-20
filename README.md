@@ -70,6 +70,39 @@ slk --add-workspace
 
 Full walkthrough: [Setup wiki page](https://github.com/gammons/slk/wiki/Setup).
 
+## Inline images in tmux
+
+`slk` can render native Kitty graphics inside tmux, but tmux passthrough
+must be enabled. Add this to your tmux config:
+
+```tmux
+set -g allow-passthrough on 
+```
+
+Then fully restart tmux:
+
+```bash
+tmux kill-server
+```
+
+Inside tmux, verify the active setting:
+
+```bash
+tmux show -gv allow-passthrough
+```
+
+Expected output is `all` (or `on`).
+
+To force Kitty image rendering in `slk`, set:
+
+```toml
+[appearance]
+image_protocol = "kitty"
+```
+
+`image_protocol = "auto"` remains conservative inside tmux and falls back
+to half-block rendering.
+
 ## Debugging
 
 Set `SLK_DEBUG=1` to enable a comprehensive debug log written to
