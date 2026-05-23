@@ -854,98 +854,116 @@ func run() error {
 			return ids
 		})
 
-		app.SetChannelVisitRecorder(func(channelID string) {
-			wctx := router.Active()
-			if wctx == nil {
-				return
-			}
-			wctx.LastVisitedByChannel[channelID] = time.Now().Unix()
-			teamID := wctx.TeamID
-			go func() {
-				if err := db.RecordChannelVisit(teamID, channelID); err != nil {
-					log.Printf("warning: recording channel visit %s/%s: %v", teamID, channelID, err)
+		app.SetChannelService(ui.NewChannelService(ui.ChannelServiceFuncs{
+			RecordVisit: func(channelID string) {
+				wctx := router.Active()
+				if wctx == nil {
+					return
 				}
-			}()
-		})
-
-		app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
-			wctx := router.Active()
-			if wctx == nil {
+				wctx.LastVisitedByChannel[channelID] = time.Now().Unix()
+				teamID := wctx.TeamID
+				go func() {
+					if err := db.RecordChannelVisit(teamID, channelID); err != nil {
+						log.Printf("warning: recording channel visit %s/%s: %v", teamID, channelID, err)
+					}
+				}()
+			},
+			Lookup: func(channelID string) (string, string, bool) {
+				wctx := router.Active()
+				if wctx == nil {
+					return "", "", false
+				}
+				// Sidebar (joined channels + Slack-native sections).
+				for _, ch := range wctx.Channels {
+					if ch.ID == channelID {
+						return ch.Name, ch.Type, true
+					}
+				}
+				// Finder items (joined + browseable). Covers DMs/group DMs
+				// that aren't in the sidebar pre-conversation, and any
+				// browseable public channels.
+				for _, it := range wctx.FinderItems {
+					if it.ID == channelID {
+						return it.Name, it.Type, true
+					}
+				}
 				return "", "", false
-			}
-			// Sidebar (joined channels + Slack-native sections).
-			for _, ch := range wctx.Channels {
-				if ch.ID == channelID {
-					return ch.Name, ch.Type, true
+			},
+			ReadCache: func(channelID string) []messages.MessageItem {
+				wctx := router.Active()
+				if wctx == nil {
+					return nil
 				}
-			}
-			// Finder items (joined + browseable). Covers DMs/group DMs
-			// that aren't in the sidebar pre-conversation, and any
-			// browseable public channels.
-			for _, it := range wctx.FinderItems {
-				if it.ID == channelID {
-					return it.Name, it.Type, true
+				return loadCachedMessages(db, wctx.Client.UserID(), channelID, wctx.UserNames, tsFormat, router)
+			},
+			SyncedAt: func(channelID string) int64 {
+				return db.GetChannelSyncedAt(channelID)
+			},
+			MembershipFetch: func(channelID string) {
+				wctx := router.Active()
+				if wctx == nil || wctx.Membership == nil {
+					return
 				}
-			}
-			return "", "", false
-		})
+				// Note: EnsureFresh synchronously calls pushSnapshot, which
+				// invokes p.Send(ChannelMembershipMsg). bubbletea v2's program
+				// channel is unbuffered (charm.land/bubbletea/v2 tea.go:598),
+				// so p.Send blocks until the Update goroutine receives. The
+				// App invokes this fetcher in a goroutine for exactly that
+				// reason (see app.go ChannelSelectedMsg handler) — we can
+				// call EnsureFresh synchronously here because we're already
+				// off the Update goroutine.
+				wctx.Membership.EnsureFresh(context.Background(), channelID)
+			},
+			Fetch: func(channelID, channelName string) tea.Msg {
+				wctx := router.Active()
+				if wctx == nil {
+					return nil
+				}
+				msgItems := fetchChannelMessages(wctx.Client, channelID, db, wctx.UserNames, tsFormat, avatarCache, router)
 
-		app.SetChannelCacheReader(func(channelID string) []messages.MessageItem {
-			wctx := router.Active()
-			if wctx == nil {
-				return nil
-			}
-			return loadCachedMessages(db, wctx.Client.UserID(), channelID, wctx.UserNames, tsFormat, router)
-		})
+				state, _ := db.GetChannelReadState(channelID)
+				lastReadTS := state.LastReadTS
 
-		app.SetChannelSyncedAtReader(func(channelID string) int64 {
-			return db.GetChannelSyncedAt(channelID)
-		})
+				// Mark channel as read up to the latest message
+				if len(msgItems) > 0 {
+					latestTS := msgItems[len(msgItems)-1].TS
+					markChannelReadAsync(ctx, wctx, db, p, channelID, latestTS)
+				}
 
-		app.SetChannelMembershipFetcher(func(channelID string) {
-			wctx := router.Active()
-			if wctx == nil || wctx.Membership == nil {
-				return
-			}
-			// Note: EnsureFresh synchronously calls pushSnapshot, which
-			// invokes p.Send(ChannelMembershipMsg). bubbletea v2's program
-			// channel is unbuffered (charm.land/bubbletea/v2 tea.go:598),
-			// so p.Send blocks until the Update goroutine receives. The
-			// App invokes this fetcher in a goroutine for exactly that
-			// reason (see app.go ChannelSelectedMsg handler) — we can
-			// call EnsureFresh synchronously here because we're already
-			// off the Update goroutine.
-			wctx.Membership.EnsureFresh(context.Background(), channelID)
-		})
-
-		app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
-			wctx := router.Active()
-			if wctx == nil {
-				return nil
-			}
-			msgItems := fetchChannelMessages(wctx.Client, channelID, db, wctx.UserNames, tsFormat, avatarCache, router)
-
-			state, _ := db.GetChannelReadState(channelID)
-			lastReadTS := state.LastReadTS
-
-			// Mark channel as read up to the latest message
-			if len(msgItems) > 0 {
-				latestTS := msgItems[len(msgItems)-1].TS
-				markChannelReadAsync(ctx, wctx, db, p, channelID, latestTS)
-			}
-
-			return ui.MessagesLoadedMsg{
-				ChannelID:  channelID,
-				Messages:   msgItems,
-				LastReadTS: lastReadTS,
-			}
-		})
-
-		app.SetChannelReadMarker(func(channelID, ts string) tea.Msg {
-			wctx := router.Active()
-			markChannelReadAsync(ctx, wctx, db, p, channelID, ts)
-			return nil // ChannelMarkedReadMsg is emitted from inside the goroutine
-		})
+				return ui.MessagesLoadedMsg{
+					ChannelID:  channelID,
+					Messages:   msgItems,
+					LastReadTS: lastReadTS,
+				}
+			},
+			MarkRead: func(channelID, ts string) tea.Msg {
+				wctx := router.Active()
+				markChannelReadAsync(ctx, wctx, db, p, channelID, ts)
+				return nil // ChannelMarkedReadMsg is emitted from inside the goroutine
+			},
+			FetchOlder: func(channelID, oldestTS string) tea.Msg {
+				wctx := router.Active()
+				if wctx == nil {
+					return nil
+				}
+				msgItems := fetchOlderMessages(wctx.Client, channelID, oldestTS, db, wctx.UserNames, tsFormat, avatarCache, router)
+				return ui.OlderMessagesLoadedMsg{
+					ChannelID: channelID,
+					Messages:  msgItems,
+				}
+			},
+			Join: func(channelID, channelName string) tea.Msg {
+				wctx := router.Active()
+				if wctx == nil {
+					return nil
+				}
+				ctx := context.Background()
+				if err := wctx.Client.JoinChannel(ctx, channelID); err != nil {
+					return ui.ChannelJoinFailedMsg{ID: channelID, Name: channelName, Err: err}
+				}
+				return ui.ChannelJoinedMsg{ID: channelID, Name: channelName}
+			},
+		}))
 
 		app.SetMessageService(ui.NewMessageService(ui.MessageServiceFuncs{
 			Send: func(channelID, text string) tea.Msg {
@@ -1091,18 +1109,6 @@ func run() error {
 				}
 				p.Send(ui.UploadProgressMsg{Done: len(attachments), Total: len(attachments)})
 				return ui.UploadResultMsg{Err: nil}
-			}
-		})
-
-		app.SetOlderMessagesFetcher(func(channelID, oldestTS string) tea.Msg {
-			wctx := router.Active()
-			if wctx == nil {
-				return nil
-			}
-			msgItems := fetchOlderMessages(wctx.Client, channelID, oldestTS, db, wctx.UserNames, tsFormat, avatarCache, router)
-			return ui.OlderMessagesLoadedMsg{
-				ChannelID: channelID,
-				Messages:  msgItems,
 			}
 		})
 
@@ -1253,17 +1259,6 @@ func run() error {
 			_ = wctx.Client.SendTyping(channelID)
 		})
 
-		app.SetChannelJoiner(func(channelID, channelName string) tea.Msg {
-			wctx := router.Active()
-			if wctx == nil {
-				return nil
-			}
-			ctx := context.Background()
-			if err := wctx.Client.JoinChannel(ctx, channelID); err != nil {
-				return ui.ChannelJoinFailedMsg{ID: channelID, Name: channelName, Err: err}
-			}
-			return ui.ChannelJoinedMsg{ID: channelID, Name: channelName}
-		})
 	}
 
 	// Bind all callbacks once. They read router.Active() at invocation.

@@ -118,22 +118,11 @@ type App struct {
 	activeTeamID    string // workspace whose data is currently loaded into the side panels
 
 	// Callbacks
-	channelFetcher ChannelFetchFunc
-	// channelReadMarker fires Slack's MarkChannel + cache.UpdateChannelReadState
-	// for the given channel up to ts. Returns a tea.Msg (typically
-	// ChannelMarkedReadMsg). Wired in cmd/slk/main.go's wireCallbacks.
-	// Tier 1 of ChannelSelectedMsg (cache fresh, no GetHistory) uses this
-	// to keep mark-as-read working without firing the full fetcher.
-	channelReadMarker  func(channelID, ts string) tea.Msg
-	channelCacheReader ChannelCacheReadFunc
-	// channelSyncedAtReader returns the unix timestamp (seconds) at which
-	// the channel's cache was last authoritatively replaced from the
-	// network, or 0 if never. Used by ChannelSelectedMsg's three-tier
-	// dispatch to decide between cache-only, cache-and-verify, and
-	// spinner-only render. Nil reader defaults to 0 (spinner-only tier
-	// always).
-	channelSyncedAtReader func(channelID string) int64
-	olderMessagesFetcher  OlderMessagesFetchFunc
+	// channels is the App's ChannelService collaborator (Slack
+	// channels API + local cache + session bookkeeping). See
+	// internal/ui/services.go. Defaulted to a no-op adapter in
+	// NewApp so call sites can dispatch without nil-checks.
+	channels ChannelService
 	// messages is the App's MessageService collaborator (send / edit /
 	// delete / mark-unread / permalink). See internal/ui/services.go.
 	// Defaulted to a no-op adapter in NewApp so call sites can dispatch
@@ -157,7 +146,6 @@ type App struct {
 	// nil-checks.
 	threads ThreadService
 
-	channelJoiner        JoinChannelFunc
 	threadsDirtyDebounce time.Duration
 	fetchingOlder        bool
 
@@ -172,11 +160,6 @@ type App struct {
 	// resolved. Read by SetUserNames when building the mention-picker User
 	// slice so IsExternal is set on each entry.
 	externalUsers map[string]bool
-	// channelMembershipFetcher is invoked on every ChannelSelectedMsg to
-	// prompt the membership.Manager to ensure-fresh the new active channel.
-	// nil-safe.
-	channelMembershipFetcher func(channelID string)
-
 	// Last (channelID, threadTS) auto-opened from the threads view.
 	// openSelectedThreadCmd compares against these to dedup repeat calls
 	// (j/k keystrokes and ThreadsListLoadedMsg refreshes both fire
@@ -208,11 +191,6 @@ type App struct {
 	// editing tracks in-progress message edit state. See
 	// internal/ui/edit.go.
 	editing *editController
-
-	// Channel visit recording (persists SQLite + WorkspaceContext map)
-	channelVisitRecorder ChannelVisitRecorder
-
-	channelLookup ChannelLookupFunc
 
 	// Workspace switching
 	workspaceSwitcher SwitchWorkspaceFunc
@@ -340,6 +318,7 @@ func NewApp() *App {
 		reactions:            noopReactionService,
 		threads:              noopThreadService,
 		messageSvc:           noopMessageService,
+		channels:             noopChannelService,
 		lastChannelByTeam:    map[string]string{},
 		navHistory:           newNavHistoryStore(),
 		clipboardRead:        defaultClipboardReader,
@@ -895,9 +874,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.channelFinder.UpdateLastVisited(msg.ID, now)
 		// Persist the visit (SQLite write + WorkspaceContext map update)
 		// asynchronously via main.go's recorder closure.
-		if a.channelVisitRecorder != nil {
-			a.channelVisitRecorder(msg.ID)
-		}
+		a.channels.RecordVisit(msg.ID)
 		if !msg.FromHistory {
 			a.navHistory.Push(a.activeTeamID, msg.ID)
 		}
@@ -918,31 +895,26 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		a.compose.SetChannel(msg.Name)
 		a.compose.SetActiveChannel(msg.ID)
 		a.threadCompose.SetActiveChannel(msg.ID)
-		if a.channelMembershipFetcher != nil {
-			// Fire the fetcher on a fresh goroutine so it can't block
-			// the Update loop. The fetcher is fire-and-forget — results
-			// arrive later via ChannelMembershipMsg. main.go's fetcher
-			// closure ultimately calls Membership.EnsureFresh which
-			// invokes bubbletea Program.Send via pushSnapshot, and
-			// bubbletea v2's program channel is unbuffered: a Send
-			// from inside Update would deadlock waiting for the same
-			// goroutine to receive. See manager.go's EnsureFresh
-			// docs and the deadlock-regression test in app_test.go.
-			fetcher := a.channelMembershipFetcher
+		// Fire the membership fetcher on a fresh goroutine so it
+		// can't block the Update loop. Fire-and-forget — results
+		// arrive later via ChannelMembershipMsg. main.go's
+		// MembershipFetch closure ultimately calls
+		// Membership.EnsureFresh which invokes bubbletea
+		// Program.Send via pushSnapshot, and bubbletea v2's program
+		// channel is unbuffered: a Send from inside Update would
+		// deadlock waiting for the same goroutine to receive. See
+		// manager.go's EnsureFresh docs and the deadlock-regression
+		// test in app_test.go.
+		{
+			channels := a.channels
 			channelID := msg.ID
-			go fetcher(channelID)
+			go channels.MembershipFetch(channelID)
 		}
 		a.statusbar.SetChannel(msg.Name)
 		a.statusbar.SetChannelType(msg.Type)
 
-		var cached []messages.MessageItem
-		if a.channelCacheReader != nil {
-			cached = a.channelCacheReader(msg.ID)
-		}
-		var syncedAt int64
-		if a.channelSyncedAtReader != nil {
-			syncedAt = a.channelSyncedAtReader(msg.ID)
-		}
+		cached := a.channels.ReadCache(msg.ID)
+		syncedAt := a.channels.SyncedAt(msg.ID)
 		age := time.Duration(0)
 		if syncedAt > 0 {
 			age = time.Since(time.Unix(syncedAt, 0))
@@ -951,14 +923,10 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			msg.ID, msg.Name, len(cached), syncedAt, age.Milliseconds())
 
 		fireFetch := func() {
-			if a.channelFetcher == nil {
-				debuglog.Cache("ChannelSelectedMsg: channel=%s no channelFetcher wired", msg.ID)
-				return
-			}
-			fetcher := a.channelFetcher
+			channels := a.channels
 			chID, chName := msg.ID, msg.Name
 			debuglog.Cache("ChannelSelectedMsg: channel=%s firing background network fetch", msg.ID)
-			cmds = append(cmds, func() tea.Msg { return fetcher(chID, chName) })
+			cmds = append(cmds, func() tea.Msg { return channels.Fetch(chID, chName) })
 		}
 
 		switch {
@@ -970,11 +938,11 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.messagepane.SetLoading(false)
 			a.messagepane.SetMessages(cached)
 			a.statusbar.SetSyncing(false)
-			if a.channelReadMarker != nil && len(cached) > 0 {
-				marker := a.channelReadMarker
+			if len(cached) > 0 {
+				channels := a.channels
 				chID := msg.ID
 				latestTS := cached[len(cached)-1].TS
-				cmds = append(cmds, func() tea.Msg { return marker(chID, latestTS) })
+				cmds = append(cmds, func() tea.Msg { return channels.MarkRead(chID, latestTS) })
 			}
 			debuglog.Cache("ChannelSelectedMsg: channel=%s tier=1_fresh", msg.ID)
 
@@ -2032,7 +2000,7 @@ func (a *App) navigateForward() tea.Cmd {
 // pure result into the ChannelSelectedMsg{FromHistory: true} tea.Cmd
 // the App emits. step must be -1 or +1.
 func (a *App) walkNavCmd(step int) tea.Cmd {
-	id, name, ctype, ok := a.navHistory.Walk(a.activeTeamID, step, a.channelLookup)
+	id, name, ctype, ok := a.navHistory.Walk(a.activeTeamID, step, a.channels.Lookup)
 	if !ok {
 		return nil
 	}
@@ -2489,12 +2457,10 @@ func (a *App) handleChannelFinderMode(msg tea.KeyMsg) tea.Cmd {
 				return ChannelSelectedMsg{ID: result.ID, Name: result.Name, Type: result.Type}
 			}
 		}
-		if a.channelJoiner != nil {
-			joiner := a.channelJoiner
-			id, name := result.ID, result.Name
-			return func() tea.Msg {
-				return joiner(id, name)
-			}
+		channels := a.channels
+		id, name := result.ID, result.Name
+		return func() tea.Msg {
+			return channels.Join(id, name)
 		}
 	}
 
@@ -3094,14 +3060,14 @@ func (a *App) scrollFocusedPanel(delta int) tea.Cmd {
 // Returns nil otherwise. Centralizes the spinner-tick + fetch-cmd batching
 // previously duplicated across handleUp / the mouse-wheel handler / page-up.
 func (a *App) maybeFetchOlderHistory(atTop bool) tea.Cmd {
-	if !atTop || a.fetchingOlder || a.olderMessagesFetcher == nil {
+	if !atTop || a.fetchingOlder {
 		return nil
 	}
 	a.fetchingOlder = true
 	a.messagepane.SetLoading(true)
 	chID := a.activeChannelID
 	oldestTS := a.messagepane.OldestTS()
-	fetcher := a.olderMessagesFetcher
+	channels := a.channels
 	// Kick the spinner tick: if a.loading is already false (workspace
 	// fully loaded), no tick is alive and the glyph would freeze on its
 	// last frame.
@@ -3110,7 +3076,7 @@ func (a *App) maybeFetchOlderHistory(atTop bool) tea.Cmd {
 			return SpinnerTickMsg{}
 		}),
 		func() tea.Msg {
-			return fetcher(chID, oldestTS)
+			return channels.FetchOlder(chID, oldestTS)
 		},
 	)
 }
@@ -3511,35 +3477,14 @@ func (a *App) SetChannels(items []sidebar.ChannelItem) {
 	a.threadsView.SetChannelNames(names)
 }
 
-// SetChannelFetcher sets the callback used to load messages when a channel is selected.
-func (a *App) SetChannelFetcher(fn ChannelFetchFunc) {
-	a.channelFetcher = fn
-}
-
-// SetChannelReadMarker installs the mark-as-read callback. Wired in
-// cmd/slk/main.go alongside SetChannelFetcher (the fetcher keeps its
-// own mark-as-read side-effect for Tier 2/3; this callback exists
-// purely so Tier 1 can mark-as-read without GetHistory).
-func (a *App) SetChannelReadMarker(fn func(channelID, ts string) tea.Msg) {
-	a.channelReadMarker = fn
-}
-
-// SetChannelCacheReader sets the callback consulted synchronously on
-// channel selection to render cached messages before the network fetch
-// completes. Pass nil to disable cache-first rendering.
-func (a *App) SetChannelCacheReader(fn ChannelCacheReadFunc) {
-	a.channelCacheReader = fn
-}
-
-// SetChannelSyncedAtReader installs the cache-freshness reader. Wired
-// in cmd/slk/main.go's wireCallbacks to db.GetChannelSyncedAt.
-func (a *App) SetChannelSyncedAtReader(fn func(channelID string) int64) {
-	a.channelSyncedAtReader = fn
-}
-
-// SetOlderMessagesFetcher sets the callback used to load older messages when scrolling up.
-func (a *App) SetOlderMessagesFetcher(fn OlderMessagesFetchFunc) {
-	a.olderMessagesFetcher = fn
+// SetChannelService wires the App's ChannelService collaborator
+// (Slack channels API + local cache + session bookkeeping). Build
+// one via NewChannelService from a ChannelServiceFuncs bundle.
+func (a *App) SetChannelService(s ChannelService) {
+	if s == nil {
+		s = noopChannelService
+	}
+	a.channels = s
 }
 
 // SetMessageService wires the App's MessageService collaborator
@@ -3598,21 +3543,6 @@ func (a *App) SetReadStateReader(f func() map[string]cache.ReadState) {
 // channel with has_unread=true.
 func (a *App) SetWorkspaceUnreadReader(f func() []string) {
 	a.workspaceRail.SetUnreadReader(f)
-}
-
-// SetChannelVisitRecorder wires the callback that persists a channel
-// visit (SQLite write + WorkspaceContext map update). Called once per
-// ChannelSelectedMsg.
-func (a *App) SetChannelVisitRecorder(fn ChannelVisitRecorder) {
-	a.channelVisitRecorder = fn
-}
-
-// SetChannelLookupFunc wires the callback used by navigateBack /
-// navigateForward to validate channel IDs from the history stack
-// before re-opening them. Stale IDs (return ok=false) are silently
-// dropped and skipped.
-func (a *App) SetChannelLookupFunc(fn ChannelLookupFunc) {
-	a.channelLookup = fn
 }
 
 func (a *App) SetChannelFinderItems(items []channelfinder.Item) {
@@ -3894,13 +3824,6 @@ func (a *App) SetChannelMembership(channelID string, memberIDs []string) {
 	a.threadCompose.SetChannelMembership(channelID, memberIDs)
 }
 
-// SetChannelMembershipFetcher registers a callback invoked on every
-// ChannelSelectedMsg with the newly active channel ID. main.go wires
-// this to membership.Manager.EnsureFresh.
-func (a *App) SetChannelMembershipFetcher(fn func(channelID string)) {
-	a.channelMembershipFetcher = fn
-}
-
 // SetCustomEmoji rebuilds the emoji entry list (built-ins + the active
 // workspace's customs) and pushes it into both compose boxes.
 func (a *App) SetCustomEmoji(customs map[string]string) {
@@ -4044,11 +3967,6 @@ func (a *App) SetSidebarStaleThreshold(d time.Duration) {
 // SetTypingSender sets the callback for sending typing indicators.
 func (a *App) SetTypingSender(fn TypingSendFunc) {
 	a.typingOut.SetSender(fn)
-}
-
-// SetChannelJoiner sets the callback for joining a channel via the Slack API.
-func (a *App) SetChannelJoiner(fn JoinChannelFunc) {
-	a.channelJoiner = fn
 }
 
 // renderTypingLine returns the styled typing indicator for the current

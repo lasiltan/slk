@@ -30,7 +30,7 @@ func TestHandleUp_BackfillEmitsSpinnerTick(t *testing.T) {
 	})
 
 	called := false
-	app.SetOlderMessagesFetcher(func(channelID, oldestTS string) tea.Msg {
+	app.setOlderMessagesFetcherForTest(func(channelID, oldestTS string) tea.Msg {
 		called = true
 		return nil
 	})
@@ -78,7 +78,7 @@ func TestScrollFocusedPanel_BackfillAtViewportTop(t *testing.T) {
 	})
 
 	called := false
-	app.SetOlderMessagesFetcher(func(channelID, oldestTS string) tea.Msg {
+	app.setOlderMessagesFetcherForTest(func(channelID, oldestTS string) tea.Msg {
 		called = true
 		return nil
 	})

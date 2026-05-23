@@ -3229,7 +3229,7 @@ func TestChannelSelectedRendersFromCacheWithoutSpinner(t *testing.T) {
 	cachedItems := []messages.MessageItem{
 		{TS: "1.0", UserID: "U1", UserName: "alice", Text: "from cache"},
 	}
-	app.SetChannelCacheReader(func(channelID string) []messages.MessageItem {
+	app.setChannelCacheReaderForTest(func(channelID string) []messages.MessageItem {
 		if channelID == "C1" {
 			return cachedItems
 		}
@@ -3237,9 +3237,9 @@ func TestChannelSelectedRendersFromCacheWithoutSpinner(t *testing.T) {
 	})
 	// Land in Tier 2 (cache rendered + fetcher fires): synced 2 minutes
 	// ago is >30s (not Tier 1) and <5min (not Tier 3).
-	app.SetChannelSyncedAtReader(func(string) int64 { return time.Now().Unix() - 120 })
+	app.setChannelSyncedAtReaderForTest(func(string) int64 { return time.Now().Unix() - 120 })
 	fetcherCalled := false
-	app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
+	app.setChannelFetcherForTest(func(channelID, channelName string) tea.Msg {
 		fetcherCalled = true
 		return MessagesLoadedMsg{ChannelID: channelID, Messages: nil}
 	})
@@ -3278,13 +3278,13 @@ func TestMessagesLoadedNilDoesNotClobberCachedView(t *testing.T) {
 	cachedItems := []messages.MessageItem{
 		{TS: "1.0", UserID: "U1", UserName: "alice", Text: "from cache"},
 	}
-	app.SetChannelCacheReader(func(channelID string) []messages.MessageItem {
+	app.setChannelCacheReaderForTest(func(channelID string) []messages.MessageItem {
 		return cachedItems
 	})
 	// Tier 2: cache renders + fetcher fires (the network failure path
 	// under test happens after both).
-	app.SetChannelSyncedAtReader(func(string) int64 { return time.Now().Unix() - 120 })
-	app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
+	app.setChannelSyncedAtReaderForTest(func(string) int64 { return time.Now().Unix() - 120 })
+	app.setChannelFetcherForTest(func(channelID, channelName string) tea.Msg {
 		// Simulate a network failure by returning the same shape the
 		// real fetcher uses on error.
 		return MessagesLoadedMsg{ChannelID: channelID, Messages: nil}
@@ -3325,8 +3325,8 @@ func TestMessagesLoadedEmptyClearsView(t *testing.T) {
 	cachedItems := []messages.MessageItem{
 		{TS: "1.0", UserID: "U1", UserName: "alice", Text: "stale cache"},
 	}
-	app.SetChannelCacheReader(func(channelID string) []messages.MessageItem { return cachedItems })
-	app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
+	app.setChannelCacheReaderForTest(func(channelID string) []messages.MessageItem { return cachedItems })
+	app.setChannelFetcherForTest(func(channelID, channelName string) tea.Msg {
 		return MessagesLoadedMsg{ChannelID: channelID, Messages: []messages.MessageItem{}}
 	})
 	app.activeChannelID = "C1"
@@ -3346,8 +3346,8 @@ func TestMessagesLoadedEmptyClearsView(t *testing.T) {
 // back to the loading spinner while the network fetch is in flight.
 func TestChannelSelectedFallsBackToSpinnerOnCacheMiss(t *testing.T) {
 	app := NewApp()
-	app.SetChannelCacheReader(func(channelID string) []messages.MessageItem { return nil })
-	app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
+	app.setChannelCacheReaderForTest(func(channelID string) []messages.MessageItem { return nil })
+	app.setChannelFetcherForTest(func(channelID, channelName string) tea.Msg {
 		return MessagesLoadedMsg{ChannelID: channelID, Messages: nil}
 	})
 
@@ -3366,8 +3366,8 @@ func TestChannelSelectedFallsBackToSpinnerOnCacheMiss(t *testing.T) {
 // intermediate empty-state flash.
 func TestWorkspaceSwitchedQueuesChannelSelected(t *testing.T) {
 	app := NewApp()
-	app.SetChannelCacheReader(func(channelID string) []messages.MessageItem { return nil })
-	app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
+	app.setChannelCacheReaderForTest(func(channelID string) []messages.MessageItem { return nil })
+	app.setChannelFetcherForTest(func(channelID, channelName string) tea.Msg {
 		return MessagesLoadedMsg{ChannelID: channelID, Messages: nil}
 	})
 
@@ -3430,8 +3430,8 @@ func TestWorkspaceSwitchedEmptyClearsPane(t *testing.T) {
 // it clears the messagepane to avoid an empty-state flash.
 func TestWorkspaceReadyFirstChannelSetsLoading(t *testing.T) {
 	app := NewApp()
-	app.SetChannelCacheReader(func(channelID string) []messages.MessageItem { return nil })
-	app.SetChannelFetcher(func(channelID, channelName string) tea.Msg {
+	app.setChannelCacheReaderForTest(func(channelID string) []messages.MessageItem { return nil })
+	app.setChannelFetcherForTest(func(channelID, channelName string) tea.Msg {
 		return MessagesLoadedMsg{ChannelID: channelID, Messages: nil}
 	})
 
@@ -3452,7 +3452,7 @@ func TestChannelSelectedInvokesVisitRecorder(t *testing.T) {
 	app.activeTeamID = "T1"
 
 	var recorded []string
-	app.SetChannelVisitRecorder(func(channelID string) {
+	app.setChannelVisitRecorderForTest(func(channelID string) {
 		recorded = append(recorded, channelID)
 	})
 
@@ -3469,7 +3469,7 @@ func TestChannelSelectedFromHistoryStillRecordsVisit(t *testing.T) {
 	app.activeTeamID = "T1"
 
 	var recorded []string
-	app.SetChannelVisitRecorder(func(channelID string) {
+	app.setChannelVisitRecorderForTest(func(channelID string) {
 		recorded = append(recorded, channelID)
 	})
 
@@ -3611,7 +3611,7 @@ func TestNavStackFromHistoryDoesNotPush(t *testing.T) {
 func TestNavigateBackEmitsChannelSelectedMsg(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		return channelID + "-name", "channel", true
 	})
 
@@ -3641,7 +3641,7 @@ func TestNavigateBackEmitsChannelSelectedMsg(t *testing.T) {
 func TestNavigateForwardEmitsChannelSelectedMsg(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		return channelID + "-name", "channel", true
 	})
 
@@ -3672,7 +3672,7 @@ func TestNavigateForwardEmitsChannelSelectedMsg(t *testing.T) {
 func TestNavigateBackAtStartIsNoop(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		return channelID, "channel", true
 	})
 
@@ -3687,7 +3687,7 @@ func TestNavigateBackAtStartIsNoop(t *testing.T) {
 func TestNavigateForwardAtEndIsNoop(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		return channelID, "channel", true
 	})
 
@@ -3704,7 +3704,7 @@ func TestNavigateBackSkipsStaleAndDropsThem(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
 	// Lookup says "C2 is gone, others valid".
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		if channelID == "C2" {
 			return "", "", false
 		}
@@ -3740,7 +3740,7 @@ func TestNavigateBackSkipsStaleAndDropsThem(t *testing.T) {
 func TestCtrlHTriggersNavBack(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		return channelID, "channel", true
 	})
 
@@ -3764,7 +3764,7 @@ func TestCtrlHTriggersNavBack(t *testing.T) {
 func TestCtrlKTriggersNavForward(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
-	app.SetChannelLookupFunc(func(channelID string) (string, string, bool) {
+	app.setChannelLookupFuncForTest(func(channelID string) (string, string, bool) {
 		return channelID, "channel", true
 	})
 
@@ -3918,17 +3918,17 @@ func drainAllCmds(t *testing.T, cmd tea.Cmd) {
 func TestChannelSelected_Tier1_RenderCacheNoFetch(t *testing.T) {
 	app := NewApp()
 	now := time.Now().Unix()
-	app.SetChannelSyncedAtReader(func(id string) int64 { return now - 10 })
-	app.SetChannelCacheReader(func(id string) []messages.MessageItem {
+	app.setChannelSyncedAtReaderForTest(func(id string) int64 { return now - 10 })
+	app.setChannelCacheReaderForTest(func(id string) []messages.MessageItem {
 		return []messages.MessageItem{{TS: "1.0", UserID: "U", UserName: "u", Text: "hi"}}
 	})
 	fetchCalled := 0
-	app.SetChannelFetcher(func(id, name string) tea.Msg {
+	app.setChannelFetcherForTest(func(id, name string) tea.Msg {
 		fetchCalled++
 		return MessagesLoadedMsg{ChannelID: id, Messages: nil}
 	})
 	markCalled := 0
-	app.SetChannelReadMarker(func(id, ts string) tea.Msg {
+	app.setChannelReadMarkerForTest(func(id, ts string) tea.Msg {
 		markCalled++
 		return nil
 	})
@@ -3947,17 +3947,17 @@ func TestChannelSelected_Tier1_RenderCacheNoFetch(t *testing.T) {
 func TestChannelSelected_Tier2_CacheAndFetch(t *testing.T) {
 	app := NewApp()
 	now := time.Now().Unix()
-	app.SetChannelSyncedAtReader(func(id string) int64 { return now - 120 })
-	app.SetChannelCacheReader(func(id string) []messages.MessageItem {
+	app.setChannelSyncedAtReaderForTest(func(id string) int64 { return now - 120 })
+	app.setChannelCacheReaderForTest(func(id string) []messages.MessageItem {
 		return []messages.MessageItem{{TS: "1.0", UserID: "U", UserName: "u", Text: "hi"}}
 	})
 	fetchCalled := 0
-	app.SetChannelFetcher(func(id, name string) tea.Msg {
+	app.setChannelFetcherForTest(func(id, name string) tea.Msg {
 		fetchCalled++
 		return MessagesLoadedMsg{ChannelID: id, Messages: nil}
 	})
 	markCalled := 0
-	app.SetChannelReadMarker(func(id, ts string) tea.Msg {
+	app.setChannelReadMarkerForTest(func(id, ts string) tea.Msg {
 		markCalled++
 		return nil
 	})
@@ -3975,12 +3975,12 @@ func TestChannelSelected_Tier2_CacheAndFetch(t *testing.T) {
 
 func TestChannelSelected_Tier3_SpinnerOnly(t *testing.T) {
 	app := NewApp()
-	app.SetChannelSyncedAtReader(func(id string) int64 { return 0 })
-	app.SetChannelCacheReader(func(id string) []messages.MessageItem {
+	app.setChannelSyncedAtReaderForTest(func(id string) int64 { return 0 })
+	app.setChannelCacheReaderForTest(func(id string) []messages.MessageItem {
 		return nil // no cache at all → genuine Tier 3
 	})
 	fetchCalled := 0
-	app.SetChannelFetcher(func(id, name string) tea.Msg {
+	app.setChannelFetcherForTest(func(id, name string) tea.Msg {
 		fetchCalled++
 		return MessagesLoadedMsg{ChannelID: id, Messages: nil}
 	})
@@ -4003,11 +4003,11 @@ func TestChannelSelected_UnknownFreshnessWithCache_FallsToTier2(t *testing.T) {
 	// pane with a spinner.
 	app := NewApp()
 	// no SetChannelSyncedAtReader call — leaves it nil
-	app.SetChannelCacheReader(func(id string) []messages.MessageItem {
+	app.setChannelCacheReaderForTest(func(id string) []messages.MessageItem {
 		return []messages.MessageItem{{TS: "1.0", UserID: "U", UserName: "u", Text: "hi"}}
 	})
 	fetchCalled := 0
-	app.SetChannelFetcher(func(id, name string) tea.Msg {
+	app.setChannelFetcherForTest(func(id, name string) tea.Msg {
 		fetchCalled++
 		return MessagesLoadedMsg{ChannelID: id, Messages: nil}
 	})
@@ -4105,7 +4105,7 @@ func TestChannelSelectedInvokesMembershipFetcher(t *testing.T) {
 	var mu sync.Mutex
 	var fetched []string
 	done := make(chan struct{}, 1)
-	app.SetChannelMembershipFetcher(func(channelID string) {
+	app.setChannelMembershipFetcherForTest(func(channelID string) {
 		mu.Lock()
 		fetched = append(fetched, channelID)
 		mu.Unlock()
@@ -4146,7 +4146,7 @@ func TestChannelSelectedReturnsPromptlyEvenIfFetcherBlocks(t *testing.T) {
 	app := NewApp()
 	app.activeTeamID = "T1"
 	release := make(chan struct{})
-	app.SetChannelMembershipFetcher(func(channelID string) {
+	app.setChannelMembershipFetcherForTest(func(channelID string) {
 		// Simulate a slow fetcher (e.g., blocked on a network call
 		// or a blocking p.Send). Releases when the test allows.
 		<-release
