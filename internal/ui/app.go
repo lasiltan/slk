@@ -959,38 +959,7 @@ func (a *App) handleChannelFinderMode(msg tea.KeyMsg) tea.Cmd {
 	return nil
 }
 
-func (a *App) handleWorkspaceFinderMode(msg tea.KeyMsg) tea.Cmd {
-	keyStr := msg.String()
-	switch msg.Key().Code {
-	case tea.KeyEnter:
-		keyStr = "enter"
-	case tea.KeyEscape:
-		keyStr = "esc"
-	case tea.KeyUp:
-		keyStr = "up"
-	case tea.KeyDown:
-		keyStr = "down"
-	case tea.KeyBackspace:
-		keyStr = "backspace"
-	}
-
-	result := a.workspaceFinder.HandleKey(keyStr)
-	if result != nil {
-		a.workspaceFinder.Close()
-		a.SetMode(ModeNormal)
-		if a.workspaceSwitcher != nil && result.ID != a.workspaceRail.SelectedID() {
-			switcher := a.workspaceSwitcher
-			teamID := result.ID
-			return func() tea.Msg {
-				return switcher(teamID)
-			}
-		}
-	}
-	if !a.workspaceFinder.IsVisible() {
-		a.SetMode(ModeNormal)
-	}
-	return nil
-}
+// handleWorkspaceFinderMode moved to mode_workspace_finder.go (Phase 5e).
 
 func (a *App) handleThemeSwitcherMode(msg tea.KeyMsg) tea.Cmd {
 	keyStr := msg.String()

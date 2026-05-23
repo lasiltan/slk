@@ -54,7 +54,7 @@ var modeHandlers = map[Mode]modeHandler{
 	ModeChannelFinder:        (*App).handleChannelFinderMode,
 	ModeReactionPicker:       (*App).handleReactionPickerMode,
 	ModeConfirm:              (*App).handleConfirmMode,
-	ModeWorkspaceFinder:      (*App).handleWorkspaceFinderMode,
+	ModeWorkspaceFinder:      handleWorkspaceFinderMode,
 	ModeThemeSwitcher:        (*App).handleThemeSwitcherMode,
 	ModePresenceMenu:         (*App).handlePresenceMenuMode,
 	ModePresenceCustomSnooze: handlePresenceCustomSnoozeMode,
