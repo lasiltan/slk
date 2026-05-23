@@ -115,6 +115,114 @@ func TestApp_PlainClickDoesNotCopy(t *testing.T) {
 	}
 }
 
+// A plain click (no drag) on a message row opens that message's thread
+// view, mirroring the Enter keypress. Defends the click-to-open-thread
+// behavior so it stays in lockstep with handleEnter's PanelMessages
+// branch via the shared openThreadForSelectedMessage helper.
+func TestApp_PlainClickOnMessageOpensThread(t *testing.T) {
+	a := newTestAppWithMessages(t)
+	a.activeChannelID = "C1"
+
+	fetchedCh := ""
+	fetchedTS := ""
+	a.SetThreadFetcher(func(channelID, threadTS string) tea.Msg {
+		fetchedCh = channelID
+		fetchedTS = threadTS
+		return ThreadRepliesLoadedMsg{ThreadTS: threadTS, Replies: nil}
+	})
+
+	pressX := a.layoutSidebarEnd + 2
+	// pane-local y=3 (terminal y=4 minus 1-row panel border) lands on
+	// the first message row past the 2-row chrome. newTestAppWithMessages
+	// seeds 2 messages with selection at index 1 (the bottom message --
+	// SetMessages defaults selection to the newest); clicking row 3
+	// should select message index 0 and open its thread.
+	pressY := 4
+	_, _ = a.Update(tea.MouseClickMsg{X: pressX, Y: pressY, Button: tea.MouseLeft})
+	_, cmd := a.Update(tea.MouseReleaseMsg{X: pressX, Y: pressY, Button: tea.MouseLeft})
+	if cmd == nil {
+		t.Fatal("click-release on a message must return a non-nil cmd (open-thread fetch)")
+	}
+	_ = drainBatch(cmd)
+
+	if !a.threadVisible {
+		t.Error("threadVisible = false after click; want true")
+	}
+	if a.focusedPanel != PanelThread {
+		t.Errorf("focusedPanel = %v after click; want PanelThread", a.focusedPanel)
+	}
+	if fetchedCh != "C1" {
+		t.Errorf("threadFetcher called with channel %q; want C1", fetchedCh)
+	}
+	// The first message has TS "1.0"; clicking it should open thread with
+	// that TS as the parent.
+	if fetchedTS != "1.0" {
+		t.Errorf("threadFetcher called with threadTS %q; want 1.0", fetchedTS)
+	}
+}
+
+// A click that lands on the channel header chrome (above the first
+// message) must NOT open a thread -- chrome clicks are no-ops. Defends
+// the ClickAt(returns bool) plumbing.
+func TestApp_PlainClickOnChromeDoesNotOpenThread(t *testing.T) {
+	a := newTestAppWithMessages(t)
+	a.activeChannelID = "C1"
+
+	called := false
+	a.SetThreadFetcher(func(channelID, threadTS string) tea.Msg {
+		called = true
+		return ThreadRepliesLoadedMsg{ThreadTS: threadTS, Replies: nil}
+	})
+
+	pressX := a.layoutSidebarEnd + 2
+	// pane-local y=0 (terminal y=1 minus 1-row panel border) lands on
+	// the channel header inside the messages pane chrome -- chrome
+	// occupies pane-local rows 0..chromeHeight-1.
+	pressY := 1
+	_, _ = a.Update(tea.MouseClickMsg{X: pressX, Y: pressY, Button: tea.MouseLeft})
+	_, cmd := a.Update(tea.MouseReleaseMsg{X: pressX, Y: pressY, Button: tea.MouseLeft})
+
+	for _, m := range drainBatch(cmd) {
+		if _, ok := m.(ThreadRepliesLoadedMsg); ok {
+			t.Fatal("click on chrome must not dispatch a thread fetch")
+		}
+	}
+	if called {
+		t.Fatal("threadFetcher called on chrome click")
+	}
+	if a.threadVisible {
+		t.Error("threadVisible = true after chrome click; want false")
+	}
+}
+
+// A drag (motion between press and release) must NOT open a thread --
+// the user is text-selecting, not navigating. Defends the moved-vs-clicked
+// gate in the MouseReleaseMsg handler.
+func TestApp_DragDoesNotOpenThread(t *testing.T) {
+	a := newTestAppWithMessages(t)
+	a.activeChannelID = "C1"
+
+	called := false
+	a.SetThreadFetcher(func(channelID, threadTS string) tea.Msg {
+		called = true
+		return ThreadRepliesLoadedMsg{ThreadTS: threadTS, Replies: nil}
+	})
+
+	pressX := a.layoutSidebarEnd + 2
+	pressY := 4
+	_, _ = a.Update(tea.MouseClickMsg{X: pressX, Y: pressY, Button: tea.MouseLeft})
+	// Any motion between press and release flags a drag.
+	_, _ = a.Update(tea.MouseMotionMsg{X: pressX + 5, Y: pressY, Button: tea.MouseLeft})
+	_, _ = a.Update(tea.MouseReleaseMsg{X: pressX + 5, Y: pressY, Button: tea.MouseLeft})
+
+	if called {
+		t.Fatal("threadFetcher called after a drag; drags must not open threads")
+	}
+	if a.threadVisible {
+		t.Error("threadVisible = true after drag; want false")
+	}
+}
+
 func TestApp_CopiedMsgShowsToastAndSchedulesClear(t *testing.T) {
 	a := newTestAppWithMessages(t)
 	_, cmd := a.Update(statusbar.CopiedMsg{N: 7})

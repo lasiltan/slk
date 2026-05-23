@@ -396,6 +396,12 @@ type dragState struct {
 	lastX, lastY     int
 	moved            bool
 	autoScrollActive bool
+	// clickedMessage is set on press when ClickAt on the messages pane
+	// reported a hit on a real message row (i.e. not chrome / empty
+	// space). MouseReleaseMsg consults it: a plain click (no motion)
+	// that landed on a message opens that message's thread, mirroring
+	// the Enter keypress. Cleared by clearing the whole dragState.
+	clickedMessage bool
 }
 
 // autoScrollTickMsg is dispatched by tea.Tick while a drag is held near
@@ -1297,7 +1303,11 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 				a.drag = dragState{panel: PanelMessages, pressX: px, pressY: py, lastX: px, lastY: py}
 				a.messagepane.BeginSelectionAt(py, px)
-				a.messagepane.ClickAt(py)
+				// Remember whether this press actually landed on a message
+				// row -- MouseReleaseMsg uses this to decide whether a plain
+				// click (no drag) should open the message's thread (mirrors
+				// pressing Enter on the selected message).
+				a.drag.clickedMessage = a.messagepane.ClickAt(py)
 			}
 		} else if a.threadVisible && x < a.layoutThreadEnd {
 			a.focusedPanel = PanelThread
@@ -1444,12 +1454,21 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		moved := a.drag.moved
 		panel := a.drag.panel
+		clickedMessage := a.drag.clickedMessage
 		a.drag = dragState{}
 		if !moved {
 			// Plain click — drop any previous pinned selection.
 			switch panel {
 			case PanelMessages:
 				a.messagepane.ClearSelection()
+				// Treat a click on a real message row as Enter:
+				// open that message's thread. Clicks that missed
+				// (chrome, empty space) leave the panel as-is.
+				if clickedMessage {
+					if cmd := a.openThreadForSelectedMessage(); cmd != nil {
+						cmds = append(cmds, cmd)
+					}
+				}
 			case PanelThread:
 				a.threadPanel.ClearSelection()
 			}
@@ -4093,41 +4112,52 @@ func (a *App) handleEnter() tea.Cmd {
 	}
 
 	if a.focusedPanel == PanelMessages {
-		msg, ok := a.messagepane.SelectedMessage()
-		if ok {
-			// Use the message's own TS as the thread parent.
-			// If it's already a thread reply, use its ThreadTS instead.
-			threadTS := msg.TS
-			if msg.ThreadTS != "" && msg.ThreadTS != msg.TS {
-				threadTS = msg.ThreadTS
-			}
-			a.threadVisible = true
-			a.statusbar.SetInThread(true)
-			a.focusedPanel = PanelThread
-			a.threadPanel.SetThread(msg, nil, a.activeChannelID, threadTS)
-			a.threadCompose.SetChannel("thread")
-			a.applyThreadUnreadBoundary(a.activeChannelID)
-
-			if a.threadFetcher != nil {
-				fetcher := a.threadFetcher
-				chID := a.activeChannelID
-				ts := threadTS
-				var batch []tea.Cmd
-				if a.threadCacheReader != nil {
-					if cached := a.threadCacheReader(chID, ts); len(cached) > 1 {
-						replies := cached[1:] // strip parent; reducer expects replies-only
-						batch = append(batch, func() tea.Msg {
-							return ThreadRepliesLoadedMsg{ThreadTS: ts, Replies: replies}
-						})
-					}
-				}
-				batch = append(batch, func() tea.Msg { return fetcher(chID, ts) })
-				return tea.Batch(batch...)
-			}
-		}
+		return a.openThreadForSelectedMessage()
 	}
 
 	return nil
+}
+
+// openThreadForSelectedMessage opens the thread panel for the message
+// currently selected in the channel messages pane. Mirrors the Enter
+// keypress on PanelMessages; called from both handleEnter and from the
+// click-to-open-thread path so the two entry points stay in lockstep.
+// Returns nil when there is no selected message or no threadFetcher.
+func (a *App) openThreadForSelectedMessage() tea.Cmd {
+	msg, ok := a.messagepane.SelectedMessage()
+	if !ok {
+		return nil
+	}
+	// Use the message's own TS as the thread parent.
+	// If it's already a thread reply, use its ThreadTS instead.
+	threadTS := msg.TS
+	if msg.ThreadTS != "" && msg.ThreadTS != msg.TS {
+		threadTS = msg.ThreadTS
+	}
+	a.threadVisible = true
+	a.statusbar.SetInThread(true)
+	a.focusedPanel = PanelThread
+	a.threadPanel.SetThread(msg, nil, a.activeChannelID, threadTS)
+	a.threadCompose.SetChannel("thread")
+	a.applyThreadUnreadBoundary(a.activeChannelID)
+
+	if a.threadFetcher == nil {
+		return nil
+	}
+	fetcher := a.threadFetcher
+	chID := a.activeChannelID
+	ts := threadTS
+	var batch []tea.Cmd
+	if a.threadCacheReader != nil {
+		if cached := a.threadCacheReader(chID, ts); len(cached) > 1 {
+			replies := cached[1:] // strip parent; reducer expects replies-only
+			batch = append(batch, func() tea.Msg {
+				return ThreadRepliesLoadedMsg{ThreadTS: ts, Replies: replies}
+			})
+		}
+	}
+	batch = append(batch, func() tea.Msg { return fetcher(chID, ts) })
+	return tea.Batch(batch...)
 }
 
 func (a *App) SetMode(mode Mode) {

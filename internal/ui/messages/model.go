@@ -1949,11 +1949,15 @@ func convertSixelMap(in map[int]imgrender.SixelEntry) map[int]sixelEntry {
 // y returned by App.panelAt, which is measured from the panel's top border —
 // so y=0..chromeHeight-1 is the channel header / separator chrome and
 // y=chromeHeight onward is message content). Selects the message at that
-// position; clicks in the chrome are ignored.
-func (m *Model) ClickAt(y int) {
+// position; clicks in the chrome are ignored. Returns true when the click
+// landed on a real message row (selection was either updated or already
+// matched the hit), false when the click missed -- callers use the bool to
+// distinguish "clicked a message" from "clicked empty space" so that
+// click-to-open-thread doesn't fire on chrome / dead-space clicks.
+func (m *Model) ClickAt(y int) bool {
 	contentY := y - m.chromeHeight
 	if contentY < 0 {
-		return // click on chrome (header / separator) — ignore
+		return false // click on chrome (header / separator) — ignore
 	}
 	absoluteY := contentY + m.yOffset
 
@@ -1970,10 +1974,11 @@ func (m *Model) ClickAt(y int) {
 				m.selected = entry.msgIdx
 				m.dirty()
 			}
-			return
+			return true
 		}
 		currentLine += entry.height
 	}
+	return false
 }
 
 // HitTest returns the message index, attachment index, and Slack file
