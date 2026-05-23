@@ -55,19 +55,6 @@ const (
 	PanelThread
 )
 
-// navStack is a per-workspace browser-style back/forward history of
-// channel IDs. cursor points at the current entry; len(entries)==0
-// is the empty state with cursor==-1.
-type navStack struct {
-	entries []string
-	cursor  int
-}
-
-// navStackMax caps the per-workspace history at 50 entries. When a
-// push would exceed the cap, the oldest entry is dropped and the
-// cursor is shifted accordingly.
-const navStackMax = 50
-
 // editState tracks an in-progress message edit. When active, the
 // channel or thread compose box is repurposed: its existing draft is
 // stashed, the message text seeded, and Enter submits an
@@ -346,10 +333,11 @@ type App struct {
 	// channel is no longer in the list.
 	lastChannelByTeam map[string]string
 
-	// navHistory holds the per-workspace ctrl+h / ctrl+k browser-style
-	// jump list. Lazy-initialized on first push for each team. Cleared
-	// only when slk exits — the stack is session-only by design.
-	navHistory map[string]*navStack
+	// navHistory owns the per-workspace ctrl+h / ctrl+k browser-style
+	// jump list. See internal/ui/navhistory.go. Lazy-initialized on
+	// first push for each team. Cleared only when slk exits — the
+	// stacks are session-only by design.
+	navHistory *navHistoryStore
 
 	// Theme switching
 	themeSaveFn    func(name string, scope themeswitcher.ThemeScope)
@@ -491,7 +479,7 @@ func NewApp() *App {
 		externalUsers:        map[string]bool{},
 		statusByTeam:         map[string]workspaceStatus{},
 		lastChannelByTeam:    map[string]string{},
-		navHistory:           make(map[string]*navStack),
+		navHistory:           newNavHistoryStore(),
 		clipboardRead:        defaultClipboardReader,
 	}
 	// Seed the picker with built-in emojis so the autocomplete works even
@@ -1052,7 +1040,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			a.channelVisitRecorder(msg.ID)
 		}
 		if !msg.FromHistory {
-			a.pushNavHistory(a.activeTeamID, msg.ID)
+			a.navHistory.Push(a.activeTeamID, msg.ID)
 		}
 		// Tell the sidebar which channel is active so the staleness
 		// filter never hides it out from under the user.
@@ -2216,135 +2204,31 @@ func (a *App) handleKey(msg tea.KeyMsg) tea.Cmd {
 	}
 }
 
-// pushNavHistory appends channelID onto the team's navigation stack.
-// Behavior:
-//   - Lazy-creates the stack on first push.
-//   - Dedupes consecutive: a no-op if entries[cursor] == channelID.
-//   - Truncates the forward path: cursor < len-1 entries beyond cursor
-//     are dropped (browser-style "new visit kills forward history").
-//   - Caps at navStackMax: drops oldest entries and shifts cursor.
-func (a *App) pushNavHistory(teamID, channelID string) {
-	if teamID == "" || channelID == "" {
-		return
-	}
-	stack, ok := a.navHistory[teamID]
-	if !ok {
-		stack = &navStack{cursor: -1}
-		a.navHistory[teamID] = stack
-	}
-	if stack.cursor >= 0 && stack.cursor < len(stack.entries) && stack.entries[stack.cursor] == channelID {
-		return
-	}
-	if stack.cursor < len(stack.entries)-1 {
-		stack.entries = stack.entries[:stack.cursor+1]
-	}
-	stack.entries = append(stack.entries, channelID)
-	stack.cursor = len(stack.entries) - 1
-	if len(stack.entries) > navStackMax {
-		drop := len(stack.entries) - navStackMax
-		stack.entries = stack.entries[drop:]
-		stack.cursor -= drop
-	}
-}
-
 // navigateBack walks the per-workspace history stack one step
 // backward, skipping any channel IDs that no longer resolve via
 // channelLookup (and dropping them from the stack). Returns a tea.Cmd
 // that synthesizes a ChannelSelectedMsg{FromHistory: true} for the
 // new target, or nil if there's no valid earlier entry.
 func (a *App) navigateBack() tea.Cmd {
-	return a.walkNav(-1)
+	return a.walkNavCmd(-1)
 }
 
 // navigateForward is the symmetric opposite of navigateBack.
 func (a *App) navigateForward() tea.Cmd {
-	return a.walkNav(+1)
+	return a.walkNavCmd(+1)
 }
 
-// walkNav implements the shared logic for navigateBack / navigateForward.
-// step must be -1 or +1.
-func (a *App) walkNav(step int) tea.Cmd {
-	stack, ok := a.navHistory[a.activeTeamID]
-	if !ok || stack.cursor < 0 {
+// walkNavCmd is the shared wrapper that turns navHistoryStore.Walk's
+// pure result into the ChannelSelectedMsg{FromHistory: true} tea.Cmd
+// the App emits. step must be -1 or +1.
+func (a *App) walkNavCmd(step int) tea.Cmd {
+	id, name, ctype, ok := a.navHistory.Walk(a.activeTeamID, step, a.channelLookup)
+	if !ok {
 		return nil
 	}
-
-	// Walk in `step` direction looking for the first valid entry.
-	// As we go, accumulate stale indices to drop afterwards.
-	var stale []int
-	idx := stack.cursor + step
-	var (
-		foundID    string
-		foundName  string
-		foundType  string
-		foundIndex = -1
-	)
-	for idx >= 0 && idx < len(stack.entries) {
-		id := stack.entries[idx]
-		if a.channelLookup != nil {
-			name, ctype, valid := a.channelLookup(id)
-			if valid {
-				foundID, foundName, foundType, foundIndex = id, name, ctype, idx
-				break
-			}
-			stale = append(stale, idx)
-		} else {
-			// No lookup wired (tests/early init): treat all as valid.
-			foundID, foundName, foundType, foundIndex = id, id, "channel", idx
-			break
-		}
-		idx += step
-	}
-
-	if foundIndex < 0 {
-		// No valid target. Still drop the stale entries we discovered
-		// so the stack doesn't keep walking past them next time, and
-		// shift the cursor back to compensate for any drops below it.
-		droppedBeforeCursor := 0
-		for _, s := range stale {
-			if s < stack.cursor {
-				droppedBeforeCursor++
-			}
-		}
-		a.dropStaleStackEntries(stack, stale)
-		stack.cursor -= droppedBeforeCursor
-		return nil
-	}
-
-	// Compute foundIndex's new position after stale drops:
-	// every dropped index < foundIndex shifts foundIndex down by 1.
-	newFoundIndex := foundIndex
-	for _, s := range stale {
-		if s < foundIndex {
-			newFoundIndex--
-		}
-	}
-	a.dropStaleStackEntries(stack, stale)
-	stack.cursor = newFoundIndex
-
-	id, name, ctype := foundID, foundName, foundType
 	return func() tea.Msg {
 		return ChannelSelectedMsg{ID: id, Name: name, Type: ctype, FromHistory: true}
 	}
-}
-
-// dropStaleStackEntries returns a new entries slice with the indices
-// in stale removed. Order of indices in stale doesn't matter.
-func (a *App) dropStaleStackEntries(stack *navStack, stale []int) {
-	if len(stale) == 0 {
-		return
-	}
-	drop := make(map[int]struct{}, len(stale))
-	for _, s := range stale {
-		drop[s] = struct{}{}
-	}
-	out := make([]string, 0, len(stack.entries)-len(stale))
-	for i, e := range stack.entries {
-		if _, ok := drop[i]; !ok {
-			out = append(out, e)
-		}
-	}
-	stack.entries = out
 }
 
 func (a *App) handleNormalMode(msg tea.KeyMsg) tea.Cmd {

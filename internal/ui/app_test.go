@@ -3492,7 +3492,7 @@ func TestNavStackPushOnChannelSelected(t *testing.T) {
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C2", Name: "b", Type: "channel"})
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C3", Name: "c", Type: "channel"})
 
-	stack := app.navHistory["T1"]
+	stack := app.navHistory.Stack("T1")
 	if stack == nil {
 		t.Fatal("expected nav stack for T1 to exist")
 	}
@@ -3513,7 +3513,7 @@ func TestNavStackDedupesConsecutive(t *testing.T) {
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C1", Name: "a", Type: "channel"}) // re-select same
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C2", Name: "b", Type: "channel"})
 
-	stack := app.navHistory["T1"]
+	stack := app.navHistory.Stack("T1")
 	want := []string{"C1", "C2"}
 	if !reflect.DeepEqual(stack.entries, want) {
 		t.Errorf("entries: want %v, got %v", want, stack.entries)
@@ -3534,11 +3534,11 @@ func TestNavStackForwardTruncationOnNewVisit(t *testing.T) {
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C", Name: "c", Type: "channel"})
 
 	// Simulate a back step (cursor moves but entries don't change).
-	app.navHistory["T1"].cursor = 1
+	app.navHistory.Stack("T1").cursor = 1
 
 	_, _ = app.Update(ChannelSelectedMsg{ID: "D", Name: "d", Type: "channel"})
 
-	stack := app.navHistory["T1"]
+	stack := app.navHistory.Stack("T1")
 	want := []string{"A", "B", "D"}
 	if !reflect.DeepEqual(stack.entries, want) {
 		t.Errorf("entries: want %v, got %v", want, stack.entries)
@@ -3555,7 +3555,7 @@ func TestNavStackCapAt50EvictsOldest(t *testing.T) {
 	for i := 0; i < 60; i++ {
 		_, _ = app.Update(ChannelSelectedMsg{ID: fmt.Sprintf("C%d", i), Name: "x", Type: "channel"})
 	}
-	stack := app.navHistory["T1"]
+	stack := app.navHistory.Stack("T1")
 	if len(stack.entries) != 50 {
 		t.Errorf("len: want 50, got %d", len(stack.entries))
 	}
@@ -3578,8 +3578,8 @@ func TestNavStackPerWorkspaceIsolation(t *testing.T) {
 	app.activeTeamID = "T2"
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C2", Name: "b", Type: "channel"})
 
-	t1 := app.navHistory["T1"]
-	t2 := app.navHistory["T2"]
+	t1 := app.navHistory.Stack("T1")
+	t2 := app.navHistory.Stack("T2")
 	if t1 == nil || t2 == nil {
 		t.Fatalf("expected both stacks to exist; t1=%v t2=%v", t1, t2)
 	}
@@ -3601,7 +3601,7 @@ func TestNavStackFromHistoryDoesNotPush(t *testing.T) {
 	// FromHistory navigation should NOT grow the stack.
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C1", Name: "a", Type: "channel", FromHistory: true})
 
-	stack := app.navHistory["T1"]
+	stack := app.navHistory.Stack("T1")
 	if !reflect.DeepEqual(stack.entries, []string{"C1", "C2"}) {
 		t.Errorf("entries should be unchanged; got %v", stack.entries)
 	}
@@ -3635,8 +3635,8 @@ func TestNavigateBackEmitsChannelSelectedMsg(t *testing.T) {
 	if !cs.FromHistory {
 		t.Error("FromHistory must be true on synthesized navigation")
 	}
-	if app.navHistory["T1"].cursor != 0 {
-		t.Errorf("cursor: want 0, got %d", app.navHistory["T1"].cursor)
+	if app.navHistory.Stack("T1").cursor != 0 {
+		t.Errorf("cursor: want 0, got %d", app.navHistory.Stack("T1").cursor)
 	}
 }
 
@@ -3649,7 +3649,7 @@ func TestNavigateForwardEmitsChannelSelectedMsg(t *testing.T) {
 
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C1", Name: "a", Type: "channel"})
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C2", Name: "b", Type: "channel"})
-	app.navHistory["T1"].cursor = 0 // simulate one back
+	app.navHistory.Stack("T1").cursor = 0 // simulate one back
 
 	cmd := app.navigateForward()
 	if cmd == nil {
@@ -3666,8 +3666,8 @@ func TestNavigateForwardEmitsChannelSelectedMsg(t *testing.T) {
 	if !cs.FromHistory {
 		t.Error("FromHistory must be true on synthesized navigation")
 	}
-	if app.navHistory["T1"].cursor != 1 {
-		t.Errorf("cursor: want 1, got %d", app.navHistory["T1"].cursor)
+	if app.navHistory.Stack("T1").cursor != 1 {
+		t.Errorf("cursor: want 1, got %d", app.navHistory.Stack("T1").cursor)
 	}
 }
 
@@ -3731,7 +3731,7 @@ func TestNavigateBackSkipsStaleAndDropsThem(t *testing.T) {
 		t.Errorf("want ID=C1 (skipping stale C2), got %q", cs.ID)
 	}
 	// C2 must have been dropped from entries.
-	stack := app.navHistory["T1"]
+	stack := app.navHistory.Stack("T1")
 	for _, id := range stack.entries {
 		if id == "C2" {
 			t.Errorf("stale C2 should have been dropped from entries; got %v", stack.entries)
@@ -3772,7 +3772,7 @@ func TestCtrlKTriggersNavForward(t *testing.T) {
 
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C1", Name: "a", Type: "channel"})
 	_, _ = app.Update(ChannelSelectedMsg{ID: "C2", Name: "b", Type: "channel"})
-	app.navHistory["T1"].cursor = 0
+	app.navHistory.Stack("T1").cursor = 0
 
 	cmd := app.handleNormalMode(tea.KeyPressMsg{Code: 'k', Mod: tea.ModCtrl})
 	if cmd == nil {
