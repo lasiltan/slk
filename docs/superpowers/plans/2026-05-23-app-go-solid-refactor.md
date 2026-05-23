@@ -1,7 +1,7 @@
 # internal/ui/app.go SOLID Refactor — Implementation Plan
 
-> **Status:** Phases 0–4 complete (10 state extractions + 4 service interfaces + 12 reducer migrations). Phases 5–7 ahead.
-> **Branch:** `refactor/app-phase-2-extract-state-objects` (tip carries Phases 2+3+4; earlier phases on their own branches off main).
+> **Status:** Phases 0–5 complete (10 state extractions + 4 service interfaces + 12 reducer migrations + 11 mode-handler extractions). Phases 6–7 ahead.
+> **Branch:** `refactor/app-phase-2-extract-state-objects` (tip carries Phases 2+3+4+5; earlier phases on their own branches off main).
 > **Working baseline:** `f2defed` (main as of the rebase, includes upstream wheel-scroll + click-to-thread changes).
 
 **Goal:** Apply SOLID principles to the 6,200-line God Object that is `internal/ui/app.go`. The `App` struct previously held ~95 fields and ~120 methods spanning at least a dozen unrelated concerns (mouse FSM, image preview overlay, navigation history, typing indicators, presence/DND, edit state, ...). Reduce App's surface area, separate concerns into self-contained collaborators, and prepare the file for further structural work (reducer split, mode-handler strategy, View region split).
@@ -23,15 +23,16 @@ Confirmed before Phase 0:
 
 ## Running tally vs original baseline
 
-| | Original | After Phase 2 | After Phase 3 | After Phase 4 | Δ from original |
-|---|---|---|---|---|---|
-| `app.go` lines | 6,216 | 5,099 | 4,920 | **3,434** | **−2,782 (−44.7%)** |
-| `Update` body lines | ~1,571 | ~1,571 | ~1,571 | **~85** | **−1,486 (−94.6%)** |
-| `Update` switch arms | ~80 | ~80 | ~80 | **2** (WindowSize, Key) | **−78** |
-| `App` struct fields | ~95 | ~60 | ~40 | ~40 | ~−55, consolidated into 10 controllers + 4 service interfaces |
-| `App` callback `Set*` methods | ~28 | ~28 | 4 | 4 | **−24** (24 collapsed into 4 service setters) |
-| main.go wiring calls | ~40 | ~40 | ~20 | ~20 | **−20** |
-| Cohesive new files under `internal/ui/` | 0 | 12 | 14 | **22** | reducers.go + 7 reducer_*.go (Phase 4) |
+| | Original | After Phase 2 | After Phase 3 | After Phase 4 | After Phase 5 | Δ from original |
+|---|---|---|---|---|---|---|
+| `app.go` lines | 6,216 | 5,099 | 4,920 | 3,434 | **2,733** | **−3,483 (−56.0%)** |
+| `Update` body lines | ~1,571 | ~1,571 | ~1,571 | ~85 | ~85 | **−1,486 (−94.6%)** |
+| `handleKey` mode switch | ~24 lines | ~24 | ~24 | ~24 | **1** (single map lookup) | **−23 (−95.8%)** |
+| `handle*Mode` methods on App | 11 (~700 lines) | 11 | 11 | 11 | **0** | all moved to per-mode files |
+| `App` struct fields | ~95 | ~60 | ~40 | ~40 | ~40 | ~−55, consolidated into 10 controllers + 4 service interfaces |
+| `App` callback `Set*` methods | ~28 | ~28 | 4 | 4 | 4 | **−24** (24 collapsed into 4 service setters) |
+| main.go wiring calls | ~40 | ~40 | ~20 | ~20 | ~20 | **−20** |
+| Cohesive new files under `internal/ui/` | 0 | 12 | 14 | 22 | **34** | + mode_handlers.go + 11 mode_*.go + test shim (Phase 5) |
 
 ---
 
@@ -298,38 +299,91 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 ## Phase 5 — Mode handler strategy
 
-**Goal:** Convert `handleNormalMode`, `handleInsertMode`, `handleChannelFinderMode`, etc. (currently a switch in `handleKey`) into a `ModeHandler` interface with a registration table.
+**Goal:** Convert `handleNormalMode`, `handleInsertMode`, `handleChannelFinderMode`, etc. (currently a switch in `handleKey`) into a dispatch table with a per-mode file for each handler.
 
-**Status:** **NOT STARTED.**
+**Status:** **COMPLETE** — 12 sub-phases (5a–5l) over commits `6923cd7..b7f45b0`.
+
+### Phase 5 design choices (decided at start)
+
+1. **Function-type + map, not interface + struct.** `type modeHandler func(*App, tea.KeyMsg) tea.Cmd; var modeHandlers = map[Mode]modeHandler{...}`. Mirrors the Phase 4 `reducerFunc` adapter. Zero per-mode boilerplate; the free-function signature reads identically to the receiver form (`a *App` is the first parameter either way).
+2. **One file per mode** (e.g. `mode_normal.go`, `mode_insert.go`). Consistency over size optimization — even the 21-line `mode_help.go` and 21-line `mode_command.go` get their own file so the "one mode = one file" grep affordance applies uniformly.
+3. **Same per-sub-phase commit cadence as Phase 4.**
+
+### Phase 5 summary table
+
+| Sub | Mode | Commit | Δ app.go | Handler lines |
+|---|---|---|---|---|
+| 5a | (mechanism) `modeHandlers` map + `dispatchModeKey` | `6923cd7` | −22 | new file 80 lines |
+| 5b | Command | `edd5d30` | −5 | 21 |
+| 5c | Help | `933ae44` | −22 | 33 |
+| 5d | PresenceCustomSnooze | `cb7b09e` | −29 | 51 |
+| 5e | WorkspaceFinder | `ef5830f` | −33 | 47 |
+| 5f | PresenceMenu | `cc01966` | −40 | 59 |
+| 5g | ThemeSwitcher | `9269375` | −40 | 60 |
+| 5h | ChannelFinder | `8127e8c` | −50 | 67 |
+| 5i | ReactionPicker | `46a9475` | −58 | 80 |
+| 5j | Confirm | `17aadca` | −16 | 30 |
+| 5k | Normal | `685e127` | −208 | 233 |
+| 5l | Insert | `b7f45b0` | −206 | 248 |
+| — | **Totals** | — | **−729** | 1,009 lines moved into 11 per-mode files |
+
+### Files added during Phase 5
+
+- `internal/ui/mode_handlers.go` (80 lines) — `modeHandler` type + `modeHandlers` map + `dispatchModeKey`
+- `internal/ui/mode_command.go` (21)
+- `internal/ui/mode_help.go` (33)
+- `internal/ui/mode_presence_snooze.go` (51)
+- `internal/ui/mode_workspace_finder.go` (47)
+- `internal/ui/mode_presence_menu.go` (59)
+- `internal/ui/mode_theme_switcher.go` (60)
+- `internal/ui/mode_channel_finder.go` (67)
+- `internal/ui/mode_reaction_picker.go` (80)
+- `internal/ui/mode_confirm.go` (30)
+- `internal/ui/mode_normal.go` (233)
+- `internal/ui/mode_insert.go` (248)
+- `internal/ui/mode_handlers_helpers_test.go` (35) — test-only method shims (`func (a *App) handleXxxMode(...) tea.Cmd { return handleXxxMode(a, msg) }`) preserving the pre-Phase-5 test API for 4 handlers (`handleChannelFinderMode`, `handleConfirmMode`, `handleNormalMode`, `handleInsertMode`) that had existing test call sites. Mirrors the `services_helpers_test.go` pattern from Phase 3.
+
+### Patterns that emerged during Phase 5
+
+1. **Method-value bootstrap, free-function final state.** Phase 5a populates `modeHandlers` with method values (`(*App).handleNormalMode`, etc.) so the dispatch mechanism lands without any file moves. Phases 5b–5l then swap each entry from a method value to a free function as the body migrates to its own file. The dispatcher contract is unchanged for the entire migration; only the map entries change shape.
+
+2. **Test-only shim file for migrated methods.** Phase 4 services and Phase 5 modes both followed the same rule: when a production method is moved to a free function but tests still reference the method form, add a `func (a *App) handleXxxMode(msg)` shim in a `_test.go` file that delegates to the free function. Production code calls the free function directly; tests keep their pre-refactor API. The `_test.go` suffix keeps shims invisible outside the test binary.
+
+3. **Per-mode file naming uses snake_case for multi-word modes.** `mode_workspace_finder.go`, `mode_presence_snooze.go`, etc. Mirrors the existing `app_xxx_test.go` characterization-test naming from Phase 0.
+
+4. **Compile-time signature anchor.** `mode_handlers.go` has a single `var _ modeHandler = handleNormalMode` at the bottom. If a future change to a handler signature drifts away from the `modeHandler` type, the map literal would still compile (Go's map literal values are checked one at a time) but this anchor catches the drift on the canonical handler. Mirrors the `var _ reducer = ...` pattern from Phase 4.
+
+### Verification after Phase 5
+
+- `go vet ./...` clean · `go build ./...` clean
+- 39/39 packages green, 24/24 in `internal/ui/...`
+- View benchmarks (3-iteration steady-state):
+  - `BenchmarkAppViewCompose ~4.7ms` (Phase 4 was ~4.8ms; within noise, no regression)
+  - `BenchmarkAppViewIdle ~1.88ms` (unchanged)
+- Existing characterization tests cover the new dispatcher via 33 `app.handleXxxMode(...)` call sites that route through the test shim file → free function. If any free function were never registered in `modeHandlers` map or had a stale shim, the existing tests would surface the regression.
+
+### One mid-Phase fix worth noting
+
+Phase 5j initially shipped with the new `mode_confirm.go` file missing from the commit (a `git add -u` instead of `git add` of the new untracked file); Phase 5k swept it up but left 5j broken in isolation (would fail `git bisect`). Fixed via an interactive `rebase -i 46a9475` with an `edit` action on the 5j commit, then re-creating `mode_confirm.go` and `git commit --amend`. 5j now builds and tests standalone (verified at `17aadca`).
+
+### Final shape of `handleKey`
 
 ```go
-type ModeHandler interface {
-    Key(a *App, msg tea.KeyMsg) tea.Cmd
-}
-
-var modeHandlers = map[Mode]ModeHandler{
-    ModeNormal:               normalModeHandler{},
-    ModeInsert:               insertModeHandler{},
-    ModeCommand:              commandModeHandler{},
-    ModeChannelFinder:        channelFinderModeHandler{},
-    ModeReactionPicker:       reactionPickerModeHandler{},
-    ModeConfirm:              confirmModeHandler{},
-    ModeWorkspaceFinder:      workspaceFinderModeHandler{},
-    ModeThemeSwitcher:        themeSwitcherModeHandler{},
-    ModePresenceMenu:         presenceMenuModeHandler{},
-    ModePresenceCustomSnooze: presenceCustomSnoozeModeHandler{},
-    ModeHelp:                 helpModeHandler{},
-}
-
 func (a *App) handleKey(msg tea.KeyMsg) tea.Cmd {
-    if h, ok := modeHandlers[a.mode]; ok {
-        return h.Key(a, msg)
+    if key.Matches(msg, a.keys.Quit) {
+        if a.mode != ModeConfirm {
+            a.openQuitConfirm()
+        }
+        return nil
     }
-    return nil
+    if a.bootstrap.IsLoading() {
+        return nil
+    }
+    return dispatchModeKey(a, msg)
 }
 ```
 
-**Expected gain:** `handleKey` from ~50 lines to ~6. Adding/removing modes is a one-line registration. Each mode handler is an isolated type that can be unit-tested without exercising the full App.
+13 lines including the global Quit handler and the loading-bootstrap gate. The 24-line mode switch is now a single `dispatchModeKey` call.
 
 ---
 
@@ -445,10 +499,23 @@ main (f2defed = merged #26 scroll improvements)
         ├── 5751271  phase 4j — channels reducer
         ├── 9b99659  phase 4k — workspace reducer
         ├── 300adcd  phase 4l — IO / toast / asset-loading reducer
-        └── aa2a504  phase 4m — mouse router reducer (final)
+        ├── aa2a504  phase 4m — mouse router reducer (final)
+        ├── 904cddc  docs — phase 4 complete
+        ├── 6923cd7  phase 5a — mode handler dispatch table
+        ├── edd5d30  phase 5b — Command mode
+        ├── 933ae44  phase 5c — Help mode
+        ├── cb7b09e  phase 5d — PresenceCustomSnooze mode
+        ├── ef5830f  phase 5e — WorkspaceFinder mode
+        ├── cc01966  phase 5f — PresenceMenu mode
+        ├── 9269375  phase 5g — ThemeSwitcher mode
+        ├── 8127e8c  phase 5h — ChannelFinder mode
+        ├── 46a9475  phase 5i — ReactionPicker mode
+        ├── 17aadca  phase 5j — Confirm mode (amended via rebase)
+        ├── 685e127  phase 5k — Normal mode
+        └── b7f45b0  phase 5l — Insert mode (final)
 ```
 
-Phase 4f was deliberately skipped (see Phase 4 summary table for rationale). Phase 0/1 branches still point to their pre-rebase commits. If they need to be PR'd separately to main, re-rebase them onto current main first. The tip branch's name is now stale (it carries Phases 2+3+4, ~30 commits) but the contents are unambiguous.
+Phase 4f was deliberately skipped (see Phase 4 summary table for rationale). Phase 0/1 branches still point to their pre-rebase commits. If they need to be PR'd separately to main, re-rebase them onto current main first. The tip branch's name is now stale (it carries Phases 2+3+4+5, ~42 commits) but the contents are unambiguous.
 
 ---
 
@@ -460,4 +527,4 @@ If picking this up in a new session:
 2. `git fetch origin && git log --oneline HEAD..origin/main` — check for upstream drift.
 3. If there are new commits on main, rebase: `git rebase origin/main`. The conflict surface for any future drift is concentrated in `app.go`'s remaining handler bodies and the per-reducer files in `internal/ui/reducer_*.go`; an upstream change that added a new message arm would land in the `Update` switch where the matching reducer's `Handle` method now is.
 4. Read this doc + skim the most recent phase's commit message for context.
-5. Pick the next phase from the "NOT STARTED" set above. **Phase 5 (mode handler strategy)** is the natural continuation — `handleKey`'s mode switch (~50 lines + ~11 `handle*Mode` helpers) is the remaining concentration of dispatch-by-enum on `App`. Phase 6 (View region split) is the other large remaining item; both are independent of each other.
+5. Pick the next phase from the "NOT STARTED" set above. **Phase 6 (View region split)** is the natural continuation — `View()` is ~470 lines of composition logic that can be broken into per-region renderers (rail, sidebar, messages, thread, statusbar, compose, typing). Phase 7 (Primitive Obsession / ID types) is the other remaining item; it touches every package boundary so it's lowest priority.
