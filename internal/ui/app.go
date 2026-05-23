@@ -1834,17 +1834,8 @@ func (a *App) View() tea.View {
 
 	themeVer := styles.Version()
 
-	// Render workspace rail (uses rail background so empty cells around
-	// the workspace tiles match the rail color, not the message pane).
-	railLayoutKey := themeVer
-	if c := &a.renderCache.rail; !c.hit(a.workspaceRail.Version(), railWidth, contentHeight, railLayoutKey) {
-		out := exactSizeBg(a.workspaceRail.View(contentHeight), railWidth, contentHeight, styles.RailBackground)
-		c.store(out, a.workspaceRail.Version(), railWidth, contentHeight, railLayoutKey)
-	}
-	rail := a.renderCache.rail.output
-
 	var panels []string
-	panels = append(panels, rail)
+	panels = append(panels, a.renderRail(railWidth, contentHeight, themeVer))
 
 	// Render sidebar. Sidebar uses SidebarBackground so themes with a
 	// distinct dark sidebar (e.g. Slack Default) render correctly: both the
