@@ -1852,75 +1852,8 @@ func (a *App) View() tea.View {
 		panels = append(panels, s)
 	}
 
-	// Render thread side panel if visible. Same split-render pattern as
-	// the message panel: bordered top region (replies + sides + top edge)
-	// is cached on threadPanel.Version; bottom region (compose + sides +
-	// bottom edge) is rendered fresh each frame so threadCompose
-	// keystrokes don't invalidate the (much larger) replies render.
 	if a.threadVisible && threadWidth > 0 && !previewActive {
-		threadFocused := a.focusedPanel == PanelThread && a.mode != ModeInsert
-		// Push focus into the thread panel so the selected-reply "▌"
-		// border dims when unfocused. Must happen before the panelCache
-		// hit-check (the cache key includes Version, which SetFocused
-		// bumps via dirty()).
-		a.threadPanel.SetFocused(threadFocused)
-		threadComposeFocused := a.mode == ModeInsert && a.focusedPanel == PanelThread
-		threadLayoutKey := themeVer<<2 | boolToInt(threadFocused)<<1 | boolToInt(threadComposeFocused)
-		a.threadCompose.SetWidth(threadWidth - 2)
-
-		threadComposeView := a.threadCompose.View(threadWidth-2, threadComposeFocused)
-		if pickerView := a.threadCompose.EmojiPickerView(threadWidth - 2); pickerView != "" {
-			threadComposeView = pickerView + "\n" + threadComposeView
-		} else if mentionView := a.threadCompose.MentionPickerView(threadWidth - 2); mentionView != "" {
-			threadComposeView = mentionView + "\n" + threadComposeView
-		} else if channelView := a.threadCompose.ChannelPickerView(threadWidth - 2); channelView != "" {
-			threadComposeView = channelView + "\n" + threadComposeView
-		}
-		threadComposeSpacer := lipgloss.NewStyle().Background(styles.Background).Width(threadWidth - 2).Render("")
-		threadComposeView = threadComposeSpacer + "\n" + threadComposeView
-		threadComposeHeight := lipgloss.Height(threadComposeView)
-		threadContentHeight := contentHeight - 2 - threadComposeHeight
-		a.layout.SetThreadHeight(threadContentHeight)
-		if threadContentHeight < 3 {
-			threadContentHeight = 3
-		}
-
-		// Cached top region.
-		threadTopVersion := a.threadPanel.Version()
-		threadTopLayoutKey := threadLayoutKey | int64(threadComposeHeight)<<16
-		threadTopHeight := threadContentHeight + 1 // +1 top border edge
-		if c := &a.renderCache.thread; !c.hit(threadTopVersion, threadWidth, threadTopHeight, threadTopLayoutKey) {
-			// See lipgloss/v2 quirk note on the message-pane top region.
-			topBorderStyle := styles.UnfocusedBorder.Width(threadWidth).
-				BorderTop(true).BorderLeft(true).BorderRight(true).BorderBottom(false)
-			if threadFocused {
-				topBorderStyle = styles.FocusedBorder.Width(threadWidth).
-					BorderTop(true).BorderLeft(true).BorderRight(true).BorderBottom(false)
-			}
-			threadView := a.threadPanel.View(threadContentHeight, threadWidth-2)
-			threadView = messages.ReapplyBgAfterResets(threadView, messages.BgANSI())
-			out := exactSize(
-				topBorderStyle.Render(threadView),
-				threadWidth+threadBorder, threadTopHeight,
-			)
-			c.store(out, threadTopVersion, threadWidth, threadTopHeight, threadTopLayoutKey)
-		}
-		threadTopBordered := a.renderCache.thread.output
-
-		// Fresh bottom region.
-		bottomBorderStyle := styles.UnfocusedBorder.Width(threadWidth).
-			BorderTop(false).BorderLeft(true).BorderRight(true).BorderBottom(true)
-		if threadFocused {
-			bottomBorderStyle = styles.FocusedBorder.Width(threadWidth).
-				BorderTop(false).BorderLeft(true).BorderRight(true).BorderBottom(true)
-		}
-		threadBottomInner := messages.ReapplyBgAfterResets(threadComposeView, messages.BgANSI())
-		threadBottomBordered := exactSize(
-			bottomBorderStyle.Render(threadBottomInner),
-			threadWidth+threadBorder, threadComposeHeight+1, // +1 bottom border edge
-		)
-
-		panels = append(panels, threadTopBordered+"\n"+threadBottomBordered)
+		panels = append(panels, a.renderThreadRegion(frame, themeVer))
 	}
 
 	// Substitute the preview panel for the messages+thread region.
