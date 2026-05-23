@@ -20,7 +20,7 @@ func TestHandleUp_BackfillEmitsSpinnerTick(t *testing.T) {
 	app.activeChannelID = "C1"
 	app.focusedPanel = PanelMessages
 	app.view = ViewChannels
-	app.loading = false
+	app.bootstrap.loading = false
 	app.fetchingOlder = false
 
 	// Two messages with selection at index 0 -> AtTop() == true.

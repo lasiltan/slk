@@ -85,11 +85,6 @@ const (
 	cacheFreshThreshold = 30 * time.Second
 )
 
-type loadingEntry struct {
-	TeamName string
-	Status   string // "connecting", "ready", "failed"
-}
-
 // workspaceStatus caches the latest StatusChangeMsg per team so the
 // status bar can refresh on workspace switch without round-tripping.
 type workspaceStatus struct {
@@ -216,12 +211,6 @@ type App struct {
 	// Current context
 	activeChannelID string
 	activeTeamID    string // workspace whose data is currently loaded into the side panels
-
-	// bootstrapActiveClaimed flips on the first WorkspaceReadyMsg whose
-	// InitialActive=true is observed. Subsequent InitialActive=true
-	// messages (defensive — main.go's sync.Once should prevent them) are
-	// ignored.
-	bootstrapActiveClaimed bool
 
 	// Callbacks
 	channelFetcher ChannelFetchFunc
@@ -380,10 +369,15 @@ type App struct {
 	// Falls back to time.Now().Format("3:04 PM") when unset.
 	nowTimestampFormatter func() string
 
-	// Loading overlay
-	loading       bool
-	loadingStates []loadingEntry
-	spinnerFrame  int
+	// bootstrap owns the multi-workspace startup overlay (loading flag,
+	// per-workspace status entries, initial-active claim guard, and the
+	// overlay's render). See internal/ui/bootstrap.go.
+	bootstrap *workspaceBootstrap
+
+	// spinnerFrame is the global tick counter for the loading spinner
+	// glyph. Shared by the bootstrap overlay and the messages pane's
+	// in-channel load spinner; advanced by SpinnerTickMsg.
+	spinnerFrame int
 
 	// Mouse drag selection FSM (set by MouseClickMsg, advanced by
 	// MouseMotionMsg, drained by MouseReleaseMsg).
@@ -446,6 +440,7 @@ func NewApp() *App {
 		keys:                 DefaultKeyMap(),
 		typingUsers:          make(map[string]map[string]time.Time),
 		selfSend:             newSelfSendDedup(),
+		bootstrap:            newWorkspaceBootstrap(),
 		threadsDirtyDebounce: 150 * time.Millisecond,
 		mouseWheelLines:      3,
 		userNames:            map[string]string{},
@@ -478,7 +473,7 @@ func NewApp() *App {
 }
 
 func (a *App) Init() tea.Cmd {
-	if a.loading {
+	if a.bootstrap.IsLoading() {
 		return tea.Batch(
 			tea.Tick(100*time.Millisecond, func(time.Time) tea.Msg {
 				return SpinnerTickMsg{}
@@ -544,7 +539,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.MouseWheelMsg:
-		if a.loading {
+		if a.bootstrap.IsLoading() {
 			break
 		}
 		// Wheel notches scroll the viewport of the panel under the cursor
@@ -610,7 +605,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.MouseClickMsg:
-		if a.loading {
+		if a.bootstrap.IsLoading() {
 			break
 		}
 		if msg.Button != tea.MouseLeft {
@@ -735,7 +730,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case tea.MouseMotionMsg:
-		if a.loading {
+		if a.bootstrap.IsLoading() {
 			break
 		}
 		if msg.Button != tea.MouseLeft {
@@ -1915,7 +1910,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return a, nil
 
 	case SpinnerTickMsg:
-		if a.loading || a.messagepane.IsLoading() {
+		if a.bootstrap.IsLoading() || a.messagepane.IsLoading() {
 			a.spinnerFrame = (a.spinnerFrame + 1) % len(styles.SpinnerChars)
 			a.messagepane.SetSpinnerFrame(a.spinnerFrame)
 			return a, tea.Tick(100*time.Millisecond, func(time.Time) tea.Msg {
@@ -1924,25 +1919,17 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case LoadingTimeoutMsg:
-		if a.loading {
-			for i := range a.loadingStates {
-				if a.loadingStates[i].Status == "connecting" {
-					a.loadingStates[i].Status = "failed"
-				}
-			}
-			a.loading = false
-		}
+		a.bootstrap.TimeoutPendingAsFailed()
 
 	case WorkspaceReadyMsg:
-		a.MarkWorkspaceReady(msg.TeamName)
+		a.bootstrap.MarkReady(msg.TeamName)
 		// Only the workspace flagged InitialActive auto-claims active state.
 		// main.go computes this deterministically (default_workspace match,
 		// else first to connect) so two simultaneous WorkspaceReadyMsgs
 		// can no longer race on (activeChannelID == "") and both claim.
 		// bootstrapActiveClaimed is a defensive one-shot guard against any
 		// future bug that delivers InitialActive=true twice.
-		if msg.InitialActive && !a.bootstrapActiveClaimed {
-			a.bootstrapActiveClaimed = true
+		if msg.InitialActive && a.bootstrap.ClaimInitialActive() {
 			a.view = ViewChannels
 			a.sidebar.SetThreadsActive(false)
 			a.threadsView.SetSummaries(nil)
@@ -2047,7 +2034,7 @@ func (a *App) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 
 	case WorkspaceFailedMsg:
-		a.MarkWorkspaceFailed(msg.TeamName)
+		a.bootstrap.MarkFailed(msg.TeamName)
 
 	case UserTypingMsg:
 		if !a.typingEnabled {
@@ -2146,7 +2133,7 @@ func (a *App) handleKey(msg tea.KeyMsg) tea.Cmd {
 		return nil
 	}
 
-	if a.loading {
+	if a.bootstrap.IsLoading() {
 		return nil
 	}
 
@@ -3692,84 +3679,18 @@ func (a *App) userNameFor(userID string) string {
 	return userID
 }
 
-// Loading overlay methods
-
+// SetLoadingWorkspaces seeds the startup overlay. Called from
+// cmd/slk/main.go at program start. Delegates to workspaceBootstrap;
+// kept as an App method for backwards-compatible wiring.
 func (a *App) SetLoadingWorkspaces(names []string) {
-	a.loading = true
-	a.loadingStates = nil
-	for _, name := range names {
-		a.loadingStates = append(a.loadingStates, loadingEntry{
-			TeamName: name,
-			Status:   "connecting",
-		})
-	}
+	a.bootstrap.SetWorkspaces(names)
 }
 
-func (a *App) MarkWorkspaceReady(teamName string) {
-	for i := range a.loadingStates {
-		if a.loadingStates[i].TeamName == teamName {
-			a.loadingStates[i].Status = "ready"
-			break
-		}
-	}
-	a.checkLoadingDone()
-}
-
-func (a *App) MarkWorkspaceFailed(teamName string) {
-	for i := range a.loadingStates {
-		if a.loadingStates[i].TeamName == teamName {
-			a.loadingStates[i].Status = "failed"
-			break
-		}
-	}
-	a.checkLoadingDone()
-}
-
-func (a *App) checkLoadingDone() {
-	// Dismiss loading as soon as at least one workspace is ready.
-	// Other workspaces continue connecting in the background.
-	for _, e := range a.loadingStates {
-		if e.Status == "ready" {
-			a.loading = false
-			return
-		}
-	}
-	// If none ready, check if all are failed/done
-	for _, e := range a.loadingStates {
-		if e.Status == "connecting" {
-			return
-		}
-	}
-	a.loading = false
-}
-
-func (a *App) renderLoadingOverlay(width, height int) string {
-	var rows []string
-	spinner := string(styles.SpinnerChars[a.spinnerFrame])
-
-	for _, entry := range a.loadingStates {
-		switch entry.Status {
-		case "ready":
-			rows = append(rows, lipgloss.NewStyle().Foreground(styles.Accent).Render("✓")+" "+entry.TeamName)
-		case "failed":
-			rows = append(rows, lipgloss.NewStyle().Foreground(styles.Error).Render("✗")+" "+entry.TeamName+" (failed)")
-		default:
-			rows = append(rows, lipgloss.NewStyle().Foreground(styles.Primary).Render(spinner)+" Connecting to "+entry.TeamName+"...")
-		}
-	}
-
-	content := lipgloss.JoinVertical(lipgloss.Left, rows...)
-	box := lipgloss.NewStyle().
-		Border(lipgloss.RoundedBorder()).
-		BorderForeground(styles.Primary).
-		Padding(1, 2).
-		Render(content)
-
-	return lipgloss.Place(width, height,
-		lipgloss.Center, lipgloss.Center,
-		box,
-		lipgloss.WithWhitespaceStyle(lipgloss.NewStyle().Background(styles.SurfaceDark)),
-	)
+// spinnerGlyph returns the current spinner character for both the
+// bootstrap overlay and the messages-pane in-channel spinner. Sourced
+// from styles.SpinnerChars indexed by the shared spinnerFrame counter.
+func (a *App) spinnerGlyph() string {
+	return string(styles.SpinnerChars[a.spinnerFrame])
 }
 
 // SetInitialLastReadTS sets the last read timestamp for the initial channel load.
@@ -4539,12 +4460,12 @@ func (a *App) View() tea.View {
 	// while workspaces connect.
 	if a.width == 0 || a.height == 0 {
 		var screen string
-		if a.loading {
+		if a.bootstrap.IsLoading() {
 			// Use a generous default canvas so the centered overlay
 			// lands roughly where the user's eye expects it. The
 			// real WindowSizeMsg arrives within a frame and the
 			// overlay re-renders correctly.
-			screen = a.renderLoadingOverlay(80, 24)
+			screen = a.bootstrap.Render(80, 24, a.spinnerGlyph())
 		} else {
 			screen = "Initializing..."
 		}
@@ -4961,8 +4882,8 @@ func (a *App) View() tea.View {
 		screen = presencemenu.CustomSnoozeView(a.width, a.height, screen, a.presenceCustomBuf)
 	}
 
-	if a.loading {
-		screen = a.renderLoadingOverlay(a.width, a.height)
+	if a.bootstrap.IsLoading() {
+		screen = a.bootstrap.Render(a.width, a.height, a.spinnerGlyph())
 	}
 
 	// All panels are wrapped in exactSize / exactSizeBg before joining, so
@@ -4981,7 +4902,7 @@ func (a *App) View() tea.View {
 		a.themeSwitcher.IsVisible() ||
 		a.presenceMenu.IsVisible() ||
 		a.mode == ModePresenceCustomSnooze ||
-		a.loading
+		a.bootstrap.IsLoading()
 	if overlayActive {
 		finalScreen = lipgloss.NewStyle().
 			Width(a.width).
