@@ -908,12 +908,7 @@ func (a *App) handleInsertMode(msg tea.KeyMsg) tea.Cmd {
 	return cmd
 }
 
-func (a *App) handleCommandMode(msg tea.KeyMsg) tea.Cmd {
-	if key.Matches(msg, a.keys.Escape) {
-		a.SetMode(ModeNormal)
-	}
-	return nil
-}
+// handleCommandMode moved to mode_command.go (Phase 5b).
 
 func (a *App) handleChannelFinderMode(msg tea.KeyMsg) tea.Cmd {
 	// Map tea.KeyMsg to string for the finder

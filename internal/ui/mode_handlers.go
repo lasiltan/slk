@@ -50,7 +50,7 @@ type modeHandler func(a *App, msg tea.KeyMsg) tea.Cmd
 var modeHandlers = map[Mode]modeHandler{
 	ModeNormal:               (*App).handleNormalMode,
 	ModeInsert:               (*App).handleInsertMode,
-	ModeCommand:              (*App).handleCommandMode,
+	ModeCommand:              handleCommandMode,
 	ModeChannelFinder:        (*App).handleChannelFinderMode,
 	ModeReactionPicker:       (*App).handleReactionPickerMode,
 	ModeConfirm:              (*App).handleConfirmMode,
