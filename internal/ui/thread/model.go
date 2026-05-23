@@ -133,8 +133,6 @@ type Model struct {
 	chromeCacheValid    bool
 	chromeWidth         int
 	chromeReplyCount    int
-	chromeParentTS      string
-	chromeParentText    string
 	chromeUserNamesV    uint64 // version of the userNames map at build time
 	chromeChannelNamesV uint64 // version of the channelNames map at build time
 
@@ -1154,8 +1152,8 @@ func (m *Model) View(height, width int) string {
 	// at the top of m.viewContent so it scrolls with the replies (a long
 	// parent must not pin and block the reply area). Chrome is only the
 	// header line + a single border separator; everything else moved into
-	// the viewport. chromeParentTS/chromeParentText are kept on the struct
-	// for legacy callers but no longer participate in the cache key.
+	// the viewport, so parent identity no longer participates in the
+	// chrome cache key.
 	if !m.chromeCacheValid ||
 		m.chromeWidth != width ||
 		m.chromeReplyCount != chromeReplyCount ||
