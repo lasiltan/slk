@@ -343,17 +343,41 @@ type Model struct {
 }
 
 // SetFocused records whether the messages pane currently holds user focus
-// and invalidates the render cache so the selected-message border re-renders
-// with the appropriate color (Accent when focused, TextMuted when not). The
-// cache is dropped only when the value actually flips, to avoid spurious
-// rebuilds on every render.
+// and arranges for the selected-message border to re-render with the
+// appropriate color (Accent when focused, TextMuted when not).
+//
+// Perf: m.focused only affects the SELECTED row's cached `linesSelected`
+// (via cs.borderSelect, the selectedFill background, RepaintBgToSelectionTint,
+// and renderMessagePlain's isSelected branch -- see buildCacheStyles at
+// model.go:1292 and renderMessageEntry at model.go:1338). Every other
+// row's `linesNormal` is focus-independent and the flatten loop at
+// model.go:2548 picks linesSelected ONLY for the entry where
+// e.msgIdx == m.selected.
+//
+// So instead of dropping the entire cache (which forced a full per-message
+// re-render of every loaded message -- ~600ms for 50 msgs in real traces,
+// ~150ms for 200 msgs in BenchmarkViewFocusFlip), we mark only the selected
+// message's TS as stale and let View()'s partialRebuild path re-render that
+// one slot. This collapses the cost of `i` / Left / Right / open-thread
+// from O(N) per-message rendering work to O(1).
+//
+// If there is no current selection (m.selected out of range -- e.g. an
+// empty channel), there is nothing to invalidate -- the next render will
+// pick up the new m.focused value naturally because no row uses linesSelected.
 func (m *Model) SetFocused(focused bool) {
 	if m.focused == focused {
 		return
 	}
 	m.focused = focused
-	m.cache = nil
+	if m.selected >= 0 && m.selected < len(m.messages) {
+		if m.staleEntries == nil {
+			m.staleEntries = make(map[string]struct{})
+		}
+		m.staleEntries[m.messages[m.selected].TS] = struct{}{}
+	}
 	m.dirty()
+	debuglog.Perf("messages.SetFocused flip focused=%v msgs=%d selected-row-marked-stale",
+		focused, len(m.messages))
 }
 
 // HandleImageReady is invoked by the host (App.Update) when an
@@ -2409,9 +2433,31 @@ func (m *Model) View(height, width int) string {
 	// entry verbatim -- the perf invariant for image bursts.
 	switch {
 	case m.cache == nil || m.cacheWidth != width || m.cacheMsgLen != len(m.messages):
+		// Perf instrumentation: classify which predicate fired so we
+		// can attribute focus-flip churn vs width-resize vs new-message
+		// rebuilds in slk-debug.log. SLK_DEBUG=1 only; zero cost
+		// otherwise (debuglog.Enabled() is an atomic.Bool load).
+		var reason string
+		if debuglog.Enabled() {
+			switch {
+			case m.cache == nil:
+				reason = "cache-nil"
+			case m.cacheWidth != width:
+				reason = fmt.Sprintf("width-changed %d->%d", m.cacheWidth, width)
+			default:
+				reason = fmt.Sprintf("len-changed %d->%d", m.cacheMsgLen, len(m.messages))
+			}
+		}
+		start := time.Now()
 		m.buildCache(width)
+		debuglog.Perf("messages.buildCache N=%d width=%d took=%s reason=%s",
+			len(m.messages), width, time.Since(start), reason)
 	case len(m.staleEntries) > 0:
+		stale := len(m.staleEntries)
+		start := time.Now()
 		m.partialRebuild(width)
+		debuglog.Perf("messages.partialRebuild N=%d stale=%d width=%d took=%s",
+			len(m.messages), stale, width, time.Since(start))
 	}
 
 	entries := m.cache

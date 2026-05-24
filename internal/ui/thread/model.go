@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"time"
 
 	"charm.land/bubbles/v2/viewport"
 	"charm.land/lipgloss/v2"
@@ -502,6 +503,8 @@ func (m *Model) SetFocused(focused bool) {
 		m.focused = focused
 		m.viewCacheValid = false
 		m.dirty()
+		debuglog.Perf("thread.SetFocused flip focused=%v replies=%d viewCache=invalidated",
+			focused, len(m.replies))
 	}
 }
 
@@ -1253,6 +1256,19 @@ func (m *Model) View(height, width int) string {
 	// predicate. Adding to the predicate forces a full cache rebuild on the
 	// transition, which defeats the j/k speedup — prefer invalidation.
 	if m.cache == nil || m.cacheWidth != width || m.cacheReplyLen != len(m.replies) {
+		var perfReason string
+		var perfStart time.Time
+		if debuglog.Enabled() {
+			switch {
+			case m.cache == nil:
+				perfReason = "cache-nil"
+			case m.cacheWidth != width:
+				perfReason = fmt.Sprintf("width-changed %d->%d", m.cacheWidth, width)
+			default:
+				perfReason = fmt.Sprintf("len-changed %d->%d", m.cacheReplyLen, len(m.replies))
+			}
+			perfStart = time.Now()
+		}
 		m.cache = m.cache[:0]
 		if m.replyIDToIdx == nil {
 			m.replyIDToIdx = make(map[string]int, len(m.replies))
@@ -1323,10 +1339,30 @@ func (m *Model) View(height, width int) string {
 		m.cacheWidth = width
 		m.cacheReplyLen = len(m.replies)
 		m.viewCacheValid = false
+		if debuglog.Enabled() {
+			debuglog.Perf("thread.buildCache N=%d width=%d took=%s reason=%s",
+				len(m.replies), width, time.Since(perfStart), perfReason)
+		}
 	}
 
 	// Check if view-level cache (bordered content) can be reused
-	if !m.viewCacheValid || m.viewSelected != m.selected || m.viewWidth != width || m.viewHeight != replyAreaHeight {
+	var viewPerfReason string
+	var viewPerfStart time.Time
+	viewPerfRebuild := !m.viewCacheValid || m.viewSelected != m.selected || m.viewWidth != width || m.viewHeight != replyAreaHeight
+	if viewPerfRebuild && debuglog.Enabled() {
+		switch {
+		case !m.viewCacheValid:
+			viewPerfReason = "invalidated"
+		case m.viewSelected != m.selected:
+			viewPerfReason = fmt.Sprintf("selected-changed %d->%d", m.viewSelected, m.selected)
+		case m.viewWidth != width:
+			viewPerfReason = fmt.Sprintf("width-changed %d->%d", m.viewWidth, width)
+		default:
+			viewPerfReason = fmt.Sprintf("height-changed %d->%d", m.viewHeight, replyAreaHeight)
+		}
+		viewPerfStart = time.Now()
+	}
+	if viewPerfRebuild {
 		// Visible separator drawn between replies. Uses the panel border color
 		// over the themed background so it reads as a divider but doesn't
 		// fight with the panel's outer border. Falls through full content
@@ -1450,6 +1486,10 @@ func (m *Model) View(height, width int) string {
 		m.selectedEndLine = endLine
 		m.totalLines = currentLine
 		m.viewCacheValid = true
+		if debuglog.Enabled() {
+			debuglog.Perf("thread.viewCache rebuild N=%d width=%d took=%s reason=%s",
+				len(m.replies), width, time.Since(viewPerfStart), viewPerfReason)
+		}
 	}
 
 	// Configure viewport
