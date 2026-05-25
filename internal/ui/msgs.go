@@ -485,7 +485,7 @@ type previewSpinnerTickMsg struct{}
 type editEmptyToastMsg struct{}
 
 // EnterNewMessageMsg is dispatched when the user presses Ctrl+N in
-// ModeNormal. The reducer (reduceNewMessage) handles it by snapshotting
+// ModeNormal. The reducer (reduceNewMessagePicker) handles it by snapshotting
 // the workspace user list, opening the newmessagepicker, and switching
 // to ModeNewMessage.
 type EnterNewMessageMsg struct{}
@@ -502,7 +502,7 @@ type EnterNewMessageMsg struct{}
 // mpim_open / im_created events (channel side-effect of someone
 // being added to a conversation). The new-message flow has its own
 // type because it carries the in-flight RequestID and we need
-// per-message routing in reduceNewMessage.
+// per-message routing in reduceNewMessagePicker.
 type NewMessageOpenedMsg struct {
 	ChannelID   string
 	AlreadyOpen bool
