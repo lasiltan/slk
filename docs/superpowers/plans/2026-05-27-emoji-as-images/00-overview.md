@@ -105,6 +105,14 @@ These are noted in the spec as "resolved during implementation":
 2. **Density perf** — measured during Phase 6 manual smoke on a heavy-reaction channel. If transmission throughput is a bottleneck, the existing fetcher's `prerender` machinery already off-loads encoding; only transmit scheduling would need adjustment.
 3. **Picker prefetch** — left lazy in Phase 8 per the spec's cold-cache UX choice. If open-to-render latency is bad in practice, a follow-up adds eager prefetch on picker-open.
 
+## Known Deviations From Spec
+
+Surfaced during plan self-review. Both are minor and acknowledged in the affected phase files:
+
+1. **URL 404 negative-caching deferred.** The spec describes "negative-cache with TTL ~24h" for URLs that 404. Phase 5's `spawnEmojiFetch` has only in-process inflight dedup — a 404'd URL will be re-fetched on the next process start (within a session, the disk-cache hit / inflight gate prevents re-fetch). v1 accepts this; a future Phase adds a small in-process negative-cache set if 404 retry traffic becomes measurable. The downside is bounded (each 404 retries once per session, not per render) so this is a deferred optimization, not a correctness bug.
+
+2. **Yank/clipboard does not preserve `:name:` form in v1.** Spec verification criterion #4 expects yanked text to match today's plain-text representation. Phase 10's implementation discovery: maintaining selection-rectangle column accuracy requires `linesPlain` widths to match `linesNormal` widths per line, which a 10-char `:thumbsup:` substitution would violate against a 2-cell kitty placement. v1 substitutes same-width spaces. The richer mapping (custom column→byte tracking that treats placement runs as fixed-cell variable-byte clusters) is post-v1 work, documented in the spec addendum added in Phase 10 Task 10.4.
+
 ---
 
 Continue to `01-config.md`.
