@@ -147,6 +147,21 @@ func TestConfig_ImageDefaults(t *testing.T) {
 	if d.Cache.MaxImageCacheMB != 200 {
 		t.Errorf("Default() max_image_cache_mb = %d, want 200", d.Cache.MaxImageCacheMB)
 	}
+
+	if cfg.Appearance.EmojiImages != "on" {
+		t.Errorf("expected default emoji_images 'on', got %q", cfg.Appearance.EmojiImages)
+	}
+	if cfg.Appearance.EmojiCells != 2 {
+		t.Errorf("expected default emoji_cells 2, got %d", cfg.Appearance.EmojiCells)
+	}
+
+	// Default() directly should also yield these values.
+	if d.Appearance.EmojiImages != "on" {
+		t.Errorf("Default() emoji_images = %q, want 'on'", d.Appearance.EmojiImages)
+	}
+	if d.Appearance.EmojiCells != 2 {
+		t.Errorf("Default() emoji_cells = %d, want 2", d.Appearance.EmojiCells)
+	}
 }
 
 // MouseWheelLines: default is 3, an unset/zero value is coerced to 3 on

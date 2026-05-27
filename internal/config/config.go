@@ -56,6 +56,16 @@ type Appearance struct {
 	// mouse-wheel notch. Higher = faster scroll. Defaults to 3 (typical
 	// terminal behavior). Clamped to >= 1 at load time.
 	MouseWheelLines int `toml:"mouse_wheel_lines"`
+	// EmojiImages controls whether emoji are rendered as PNG images
+	// (from Slack's CDN) via the kitty graphics protocol. One of:
+	// "on" (default) or "off". On non-kitty terminals this is silently
+	// treated as "off"; see internal/emoji/place.go.
+	EmojiImages string `toml:"emoji_images"`
+	// EmojiCells is the terminal-cell footprint reserved for each
+	// emoji image (cells wide x 1 row tall). 2 (default) matches the
+	// East-Asian-Wide convention; 1 is an escape hatch if 2 looks too
+	// large in a given font. Clamped to {1, 2} at load time.
+	EmojiCells int `toml:"emoji_cells"`
 }
 
 type Animations struct {
@@ -133,6 +143,8 @@ func Default() Config {
 			MaxImageRows:    20,
 			MaxImageCols:    60,
 			MouseWheelLines: 3,
+			EmojiImages:     "on",
+			EmojiCells:      2,
 		},
 		Animations: Animations{
 			Enabled:          true,
