@@ -76,7 +76,25 @@ func ResolveEmojiToTokens(text string, customs map[string]string) []Token {
 	// advance into the running text buffer.
 	i := 0
 	for i < len(text) {
-		// (a) Shortcode pass — implemented in Task 3.5.
+		// (a) Shortcode pass.
+		if text[i] == ':' {
+			if end, name, ok := tryShortcodeAt(text, i); ok {
+				if url, urlOK := URLForShortcode(name, customs); urlOK {
+					flushText()
+					tokens = append(tokens, Token{
+						Kind: TokenEmoji,
+						Text: ":" + name + ":",
+						URL:  url,
+					})
+					i = end
+					continue
+				}
+				// Known to be a syntactically valid shortcode but not
+				// resolvable. Fall through to default rune-consume so
+				// the literal ":name:" appears verbatim in the next
+				// text run.
+			}
+		}
 		// (b) Emoji-cluster pass — implemented in Task 3.7.
 
 		// Default: consume one rune into the text buffer.
@@ -86,4 +104,44 @@ func ResolveEmojiToTokens(text string, customs map[string]string) []Token {
 	}
 	flushText()
 	return tokens
+}
+
+// tryShortcodeAt attempts to read a ":name:" shortcode starting at
+// text[i]. Returns (endByte, name, true) on success — endByte is the
+// byte index immediately past the closing colon. Returns (0, "", false)
+// if text[i] is not ':', if no closing colon is found before the next
+// non-shortcode rune, or if the name is empty.
+//
+// The name character class matches shortcodeRe in render.go:
+// [A-Za-z0-9_+-]. Mismatched chars terminate the scan with ok=false.
+func tryShortcodeAt(text string, i int) (int, string, bool) {
+	if i >= len(text) || text[i] != ':' {
+		return 0, "", false
+	}
+	j := i + 1
+	for j < len(text) {
+		c := text[j]
+		if c == ':' {
+			break
+		}
+		if !isShortcodeChar(c) {
+			return 0, "", false
+		}
+		j++
+	}
+	if j >= len(text) || text[j] != ':' {
+		return 0, "", false
+	}
+	name := text[i+1 : j]
+	if name == "" {
+		return 0, "", false
+	}
+	return j + 1, name, true
+}
+
+func isShortcodeChar(c byte) bool {
+	return (c >= 'A' && c <= 'Z') ||
+		(c >= 'a' && c <= 'z') ||
+		(c >= '0' && c <= '9') ||
+		c == '_' || c == '+' || c == '-'
 }
