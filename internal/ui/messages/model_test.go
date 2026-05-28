@@ -1156,3 +1156,50 @@ func TestModel_SetEmojiContext_InvalidatesCache(t *testing.T) {
 		t.Errorf("cache should be nil after SetEmojiContext (forces re-render)")
 	}
 }
+
+func TestModel_RenderMessageWithImageEmoji_WarmCache(t *testing.T) {
+	emojiutil.SetImageMode(true, 2)
+	t.Cleanup(func() { emojiutil.SetImageMode(false, 2) })
+
+	thumbURL := emojiutil.CDNBaseURL + "1f44d.png"
+	heartURL := emojiutil.CDNBaseURL + "2764.png"
+
+	ff := newFakePlaceFetcher() // defined in render_test.go
+	ff.setPrerendered(emojiutil.EmojiCacheKey(thumbURL), stdimage.Pt(2, 1), imgpkg.Render{
+		Cells: stdimage.Pt(2, 1),
+		Lines: []string{"\U0010EEEE\U0010EEEE"},
+	})
+	ff.setPrerendered(emojiutil.EmojiCacheKey(heartURL), stdimage.Pt(2, 1), imgpkg.Render{
+		Cells: stdimage.Pt(2, 1),
+		Lines: []string{"\U0010EEEE\U0010EEEE"},
+	})
+
+	msgs := []MessageItem{{
+		TS:        "1.0",
+		UserName:  "alice",
+		UserID:    "U1",
+		Text:      "hi :thumbsup: and \u2764\uFE0F",
+		Timestamp: "10:30 AM",
+		Reactions: []ReactionItem{
+			{Emoji: "thumbsup", Count: 3, HasReacted: false},
+		},
+	}}
+	m := New(msgs, "general")
+	m.SetEmojiContext(EmojiContext{
+		PlaceCtx: emojiutil.PlaceContext{Fetcher: ff},
+		Cells:    2,
+		Customs:  nil,
+	})
+
+	out := m.View(24, 80)
+
+	// The rendered output should contain kitty placeholder runes
+	// (from the warm-path Place calls), NOT the literal ":thumbsup:"
+	// text or the bare unicode glyph.
+	if !strings.Contains(out, "\U0010EEEE") {
+		t.Errorf("rendered view does not contain kitty placeholder runes; image mode appears inactive\noutput=%q", out)
+	}
+	if strings.Contains(out, ":thumbsup:") {
+		t.Errorf("rendered view contains literal :thumbsup: text; image mode did not replace it\noutput=%q", out)
+	}
+}
