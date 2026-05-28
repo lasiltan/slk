@@ -1720,6 +1720,16 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 	if len(msg.Reactions) > 0 {
 		var pills []string
 		var pillEmojis []string
+		// Image-aware emoji-as-image path is active only when the
+		// process-global ImageMode is on AND a fetcher has been
+		// installed via SetEmojiContext. Otherwise the legacy
+		// glyph/shortcode-text branch renders. Mirrors the
+		// messages-pane reaction-pill loop.
+		imageOK := emojiutil.ImageModeActive() && m.emojiCtx.PlaceCtx.Fetcher != nil
+		pillCells := m.emojiCtx.Cells
+		if pillCells <= 0 {
+			pillCells = 2
+		}
 		for i, r := range msg.Reactions {
 			// Drop any skin-tone modifier suffix so the pill renders the
 			// base emoji at a well-known width. Skin-toned glyphs render
@@ -1735,12 +1745,25 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 			// :shortcode: text instead. Mirror of the message-pane
 			// fix; see internal/emoji/shouldrender.go.
 			nameForLookup := emojiutil.StripSkinTone(r.Emoji)
-			resolved := kyoemoji.Sprint(":" + nameForLookup + ":")
 			var emojiStr string
-			if emojiutil.ShouldRenderUnicode(resolved) {
-				emojiStr = resolved
-			} else {
-				emojiStr = ":" + nameForLookup + ":"
+			var placedFlush func(io.Writer) error
+			if imageOK {
+				if url, ok := emojiutil.URLForShortcode(nameForLookup, m.emojiCtx.Customs); ok {
+					if placement, flush, ok := emojiutil.Place(m.emojiCtx.PlaceCtx, url, pillCells); ok {
+						emojiStr = placement
+						placedFlush = flush
+					}
+				}
+			}
+			if emojiStr == "" {
+				// Legacy fallback path (image mode off, no URL, or
+				// Place returned false).
+				resolved := kyoemoji.Sprint(":" + nameForLookup + ":")
+				if emojiutil.ShouldRenderUnicode(resolved) {
+					emojiStr = resolved
+				} else {
+					emojiStr = ":" + nameForLookup + ":"
+				}
 			}
 			pillText := fmt.Sprintf("%s%d", emojiStr, r.Count)
 			var style lipgloss.Style
@@ -1753,6 +1776,11 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 			}
 			pills = append(pills, style.Render(pillText))
 			pillEmojis = append(pillEmojis, r.Emoji)
+			// Image emoji in reaction pills land in the same per-frame
+			// flush list as body text and inline image attachments.
+			if placedFlush != nil {
+				flushes = append(flushes, placedFlush)
+			}
 		}
 		if isSelected && m.reactionNavActive {
 			plusStyle := styles.ReactionPillPlus
