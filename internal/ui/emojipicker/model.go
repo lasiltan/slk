@@ -21,7 +21,34 @@ type Model struct {
 	query    string
 	selected int
 	visible  bool
+	emojiCtx EmojiContext
 }
+
+// EmojiContext bundles the emoji-image rendering dependencies for
+// the compose autocomplete dropdown. Mirrors the picker's version
+// in shape and purpose. The Customs field is unused here because the
+// entries the dropdown searches already include workspace customs
+// (see emoji.BuildEntries); it's kept for shape parity with the
+// other emoji-context types so all callers use the same setter
+// signature.
+type EmojiContext struct {
+	PlaceCtx emoji.PlaceContext
+	Cells    int
+	Customs  map[string]string
+}
+
+// SetEmojiContext configures emoji-image rendering for the autocomplete
+// dropdown. Mirrors the same setter on other UI surfaces.
+func (m *Model) SetEmojiContext(ctx EmojiContext) {
+	if ctx.Cells != 1 && ctx.Cells != 2 {
+		ctx.Cells = 2
+	}
+	m.emojiCtx = ctx
+}
+
+// HandleEmojiImageReady is a no-op hook for shape parity with other
+// surfaces. The dropdown has no render cache.
+func (m *Model) HandleEmojiImageReady(_ string) {}
 
 func New() Model { return Model{} }
 
