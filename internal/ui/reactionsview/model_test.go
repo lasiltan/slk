@@ -7,10 +7,18 @@ import (
 
 func sampleTabs() []EmojiTab {
 	return []EmojiTab{
-		{Emoji: "thumbsup", Count: 2, Users: []string{"alice", "bob"}},
-		{Emoji: "tada", Count: 1, Users: []string{"carol"}},
+		{Emoji: "thumbsup", Count: 2, Users: []Reactor{{ID: "U1", Name: "alice"}, {ID: "U2", Name: "bob"}}},
+		{Emoji: "tada", Count: 1, Users: []Reactor{{ID: "U3", Name: "carol"}}},
 		{Emoji: "eyes", Count: 0, Users: nil},
 	}
+}
+
+func reactors(names ...string) []Reactor {
+	out := make([]Reactor, len(names))
+	for i, n := range names {
+		out[i] = Reactor{ID: n, Name: n}
+	}
+	return out
 }
 
 func TestOpenSetsVisibleAndDefaultsToFirstTab(t *testing.T) {
@@ -93,13 +101,13 @@ func TestHandleKeyTabShiftTabAlsoCyclesTabs(t *testing.T) {
 }
 
 func TestSwitchingTabsResetsUserOffset(t *testing.T) {
-	users := make([]string, 30)
+	users := make([]Reactor, 30)
 	for i := range users {
-		users[i] = "u"
+		users[i] = Reactor{ID: "u", Name: "u"}
 	}
 	tabs := []EmojiTab{
 		{Emoji: "a", Count: 30, Users: users},
-		{Emoji: "b", Count: 1, Users: []string{"x"}},
+		{Emoji: "b", Count: 1, Users: reactors("x")},
 	}
 	m := New()
 	m.Open("msg", tabs)
@@ -116,9 +124,9 @@ func TestSwitchingTabsResetsUserOffset(t *testing.T) {
 }
 
 func TestScrollDownClampsAtMax(t *testing.T) {
-	users := make([]string, 20)
+	users := make([]Reactor, 20)
 	for i := range users {
-		users[i] = "u"
+		users[i] = Reactor{ID: "u", Name: "u"}
 	}
 	tabs := []EmojiTab{{Emoji: "a", Count: 20, Users: users}}
 	m := New()
@@ -148,9 +156,9 @@ func TestScrollDoesNotMoveWhenListFits(t *testing.T) {
 }
 
 func TestGAndShiftGJumpToEnds(t *testing.T) {
-	users := make([]string, 30)
+	users := make([]Reactor, 30)
 	for i := range users {
-		users[i] = "u"
+		users[i] = Reactor{ID: "u", Name: "u"}
 	}
 	tabs := []EmojiTab{{Emoji: "a", Count: 30, Users: users}}
 	m := New()
@@ -176,7 +184,7 @@ func TestRenderBoxNonEmptyWithTabs(t *testing.T) {
 
 func TestTabStripRendersUnicodeGlyph(t *testing.T) {
 	m := New()
-	m.Open("hi", []EmojiTab{{Emoji: "thumbsup", Count: 2, Users: []string{"alice"}}})
+	m.Open("hi", []EmojiTab{{Emoji: "thumbsup", Count: 2, Users: reactors("alice")}})
 	out := m.View(80)
 	// image mode is off in tests; fallback path should resolve :thumbsup: to 👍.
 	if !strings.Contains(out, "👍") {

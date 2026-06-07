@@ -1740,7 +1740,7 @@ func (m *Model) blockkitContext(msg MessageItem, userNames, channelNames map[str
 func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string, userNames map[string]string, channelNames map[string]string, isSelected bool, stats *entryPerfStats) (
 	content string, flushes []func(io.Writer) error, sixelRows map[int]sixelEntry, hits []entryHit, reactionHits []reactionEntryHit,
 ) {
-	line := styles.Username.Render(msg.UserName) + lipgloss.NewStyle().Background(styles.Background).Render("  ") + styles.Timestamp.Render(msg.Timestamp)
+	line := styles.UsernameStyleFor(msg.UserID).Render(msg.UserName) + lipgloss.NewStyle().Background(styles.Background).Render("  ") + styles.Timestamp.Render(msg.Timestamp)
 
 	// If we have an avatar, reserve space on the left for it
 	contentWidth := width - 4

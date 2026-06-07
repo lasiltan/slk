@@ -35,12 +35,20 @@ type EmojiContext struct {
 	Customs  map[string]string
 }
 
+// Reactor is one entry in EmojiTab.Users: the user ID (used to derive a
+// stable per-user color) and the resolved display name (or the raw ID
+// again if the name was not known at snapshot time).
+type Reactor struct {
+	ID   string
+	Name string
+}
+
 // EmojiTab is one entry in the tab strip: an emoji name and the
 // pre-resolved display names of users who reacted with it.
 type EmojiTab struct {
-	Emoji string   // emoji name without colons, e.g. "thumbsup"
-	Count int      // total reactor count (may exceed len(Users) if some IDs missing)
-	Users []string // display names (or raw user IDs if unresolved), in arrival order
+	Emoji string    // emoji name without colons, e.g. "thumbsup"
+	Count int       // total reactor count (may exceed len(Users) if some IDs missing)
+	Users []Reactor // reactors in arrival order
 }
 
 // Model is the reactions view overlay.
@@ -286,13 +294,16 @@ func (m *Model) renderBox(termWidth int) string {
 
 	var rows []string
 	for i := start; i < end; i++ {
-		name := users[i]
+		r := users[i]
+		name := r.Name
 		if lipgloss.Width(name) > rowWidth {
 			name = truncate.StringWithTail(name, uint(rowWidth), "…")
 		}
+		fg := styles.UserColor(r.ID)
 		row := lipgloss.NewStyle().
 			Background(bg).
-			Foreground(styles.TextPrimary).
+			Foreground(fg).
+			Bold(true).
 			Width(rowWidth).
 			MaxWidth(rowWidth).
 			Render(name)

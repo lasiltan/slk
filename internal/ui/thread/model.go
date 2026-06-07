@@ -1646,7 +1646,7 @@ func (m *Model) HitTestReaction(row, col int) (replyIdx int, emoji string, ok bo
 // imgrender are discarded — click-to-preview from a thread reply and
 // inline sixel emission are out of scope.
 func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNames map[string]string, channelNames map[string]string, isSelected bool) (string, []func(io.Writer) error, []reactionEntryHit) {
-	line := styles.Username.Render(msg.UserName) + lipgloss.NewStyle().Background(styles.Background).Render("  ") + styles.Timestamp.Render(msg.Timestamp)
+	line := styles.UsernameStyleFor(msg.UserID).Render(msg.UserName) + lipgloss.NewStyle().Background(styles.Background).Render("  ") + styles.Timestamp.Render(msg.Timestamp)
 
 	contentWidth := width - 4
 	if contentWidth < 20 {
