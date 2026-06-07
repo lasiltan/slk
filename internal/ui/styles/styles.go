@@ -350,6 +350,7 @@ func Apply(themeName string, overrides config.Theme) {
 	// avoids recomputing on every render; resetDerivedTints clears them so
 	// the next SelectionTintColor() call repopulates from the new theme.
 	resetDerivedTints()
+	resetUserColorCache()
 	if colors.SelectionBgFocused != "" {
 		selectionBgFocused = lipgloss.Color(colors.SelectionBgFocused)
 	}

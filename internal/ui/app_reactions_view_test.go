@@ -39,7 +39,7 @@ func TestR_OpensReactionsViewFromMessage(t *testing.T) {
 	if tabs[0].Emoji != "thumbsup" || tabs[1].Emoji != "tada" {
 		t.Fatalf("tab order = [%q, %q], want [thumbsup, tada]", tabs[0].Emoji, tabs[1].Emoji)
 	}
-	if got := tabs[0].Users; len(got) != 2 || got[0] != "alice" || got[1] != "bob" {
+	if got := tabs[0].Users; len(got) != 2 || got[0].Name != "alice" || got[1].Name != "bob" {
 		t.Fatalf("tab[0].Users = %v, want [alice, bob]", got)
 	}
 }
@@ -81,8 +81,8 @@ func TestR_UnknownUserIDFallsBackToRawID(t *testing.T) {
 		t.Fatal("reactionsView should be visible")
 	}
 	tabs := app.reactionsView.Tabs()
-	if len(tabs) != 1 || len(tabs[0].Users) != 1 || tabs[0].Users[0] != "U_UNKNOWN" {
-		t.Fatalf("tabs[0].Users = %v, want [U_UNKNOWN]", tabs[0].Users)
+	if len(tabs) != 1 || len(tabs[0].Users) != 1 || tabs[0].Users[0].ID != "U_UNKNOWN" || tabs[0].Users[0].Name != "U_UNKNOWN" {
+		t.Fatalf("tabs[0].Users = %v, want [{U_UNKNOWN, U_UNKNOWN}]", tabs[0].Users)
 	}
 }
 

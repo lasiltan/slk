@@ -619,13 +619,13 @@ func reactionPreview(text string) string {
 func (a *App) reactionTabsFor(reactions []messages.ReactionItem) []reactionsview.EmojiTab {
 	tabs := make([]reactionsview.EmojiTab, 0, len(reactions))
 	for _, r := range reactions {
-		users := make([]string, 0, len(r.UserIDs))
+		users := make([]reactionsview.Reactor, 0, len(r.UserIDs))
 		for _, uid := range r.UserIDs {
-			if name, ok := a.userNames[uid]; ok && name != "" {
-				users = append(users, name)
-			} else {
-				users = append(users, uid)
+			name := uid
+			if resolved, ok := a.userNames[uid]; ok && resolved != "" {
+				name = resolved
 			}
+			users = append(users, reactionsview.Reactor{ID: uid, Name: name})
 		}
 		tabs = append(tabs, reactionsview.EmojiTab{
 			Emoji: r.Emoji,
