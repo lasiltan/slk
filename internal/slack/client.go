@@ -46,6 +46,7 @@ type SlackAPI interface {
 	GetDNDInfoContext(ctx context.Context, user *string, options ...slack.ParamOption) (*slack.DNDStatus, error)
 	UploadFileContext(ctx context.Context, params slack.UploadFileParameters) (*slack.FileSummary, error)
 	OpenConversationContext(ctx context.Context, params *slack.OpenConversationParameters) (*slack.Channel, bool, bool, error)
+	GetUserGroupsContext(ctx context.Context, options ...slack.GetUserGroupsOption) ([]slack.UserGroup, error)
 }
 
 // defaultAPIBaseURL is the canonical Slack Web API root used as a fallback
@@ -624,6 +625,19 @@ func (c *Client) GetUsers(ctx context.Context) ([]slack.User, error) {
 		return nil, fmt.Errorf("getting users: %w", err)
 	}
 	return users, nil
+}
+
+// GetUserGroups retrieves the workspace's user groups (a.k.a. subteams)
+// so the renderer can resolve <!subteam^Sxxx> mentions to their @handle.
+// Returns an empty slice (no error) on workspaces where the API is
+// disabled or the token lacks usergroups:read — group mentions then
+// render with the fallback "@group" label rather than crashing startup.
+func (c *Client) GetUserGroups(ctx context.Context) ([]slack.UserGroup, error) {
+	groups, err := c.api.GetUserGroupsContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("getting user groups: %w", err)
+	}
+	return groups, nil
 }
 
 // ListCustomEmoji fetches the workspace's custom emoji list via Slack's

@@ -143,6 +143,12 @@ var reduceWorkspace reducerFunc = func(a *App, msg tea.Msg) (tea.Cmd, bool) {
 			a.SetCustomEmoji(m.CustomEmoji)
 		}
 		return nil, true
+
+	case UsergroupsLoadedMsg:
+		if m.TeamID == a.activeTeamID {
+			a.SetGroupNames(m.GroupNames)
+		}
+		return nil, true
 	}
 	return nil, false
 }
@@ -186,6 +192,7 @@ func reduceWorkspaceReady(a *App, m WorkspaceReadyMsg) tea.Cmd {
 		// SetUserNames last is the canonical state.
 		a.SetExternalUsers(m.ExternalUsers)
 		a.SetUserNames(m.UserNames)
+		a.SetGroupNames(m.GroupNames)
 		a.SetCustomEmoji(m.CustomEmoji)
 		a.currentUserID = m.UserID
 		a.activeTeamID = m.TeamID
@@ -257,6 +264,7 @@ func reduceWorkspaceSwitched(a *App, m WorkspaceSwitchedMsg) tea.Cmd {
 	// last is the canonical state.
 	a.SetExternalUsers(m.ExternalUsers)
 	a.SetUserNames(m.UserNames)
+	a.SetGroupNames(m.GroupNames)
 	a.SetCustomEmoji(m.CustomEmoji)
 	a.currentUserID = m.UserID
 	a.activeTeamID = m.TeamID

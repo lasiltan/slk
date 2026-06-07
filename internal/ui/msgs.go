@@ -187,6 +187,12 @@ type (
 		Channels    []sidebar.ChannelItem
 		FinderItems []channelfinder.Item
 		UserNames   map[string]string
+		// GroupNames maps usergroup ID -> @handle for resolving
+		// <!subteam^Sxxx> mentions delivered without an embedded label
+		// (the rich-text-block path). Populated by main.go from the
+		// background usergroups.list fetch; may be empty if the API is
+		// disabled or the token lacks usergroups:read.
+		GroupNames map[string]string
 		// ExternalUsers maps userID -> true for users this workspace
 		// considers Slack Connect / shared-channel guests. Hydrated from
 		// cache.User.IsExternal so the mention picker can flag externals
@@ -246,6 +252,12 @@ type (
 		Channels    []sidebar.ChannelItem
 		FinderItems []channelfinder.Item
 		UserNames   map[string]string
+		// GroupNames maps usergroup ID -> @handle for resolving
+		// <!subteam^Sxxx> mentions delivered without an embedded label
+		// (the rich-text-block path). Populated by main.go from the
+		// background usergroups.list fetch; may be empty if the API is
+		// disabled or the token lacks usergroups:read.
+		GroupNames map[string]string
 		// ExternalUsers maps userID -> true for users this workspace
 		// considers Slack Connect / shared-channel guests. Hydrated from
 		// cache.User.IsExternal so the mention picker can flag externals
@@ -275,6 +287,16 @@ type (
 	CustomEmojisLoadedMsg struct {
 		TeamID      string
 		CustomEmoji map[string]string
+	}
+	// UsergroupsLoadedMsg is sent when the workspace's usergroup list
+	// finishes loading in the background, after WorkspaceReadyMsg has
+	// already fired with whatever the goroutine had written so far. App
+	// pushes the map down to every panel that renders message text so
+	// rich-text-block <!subteam^Sxxx> mentions show "@handle" instead
+	// of the fallback "@group" label.
+	UsergroupsLoadedMsg struct {
+		TeamID     string
+		GroupNames map[string]string
 	}
 	WorkspaceFailedMsg struct {
 		TeamName string

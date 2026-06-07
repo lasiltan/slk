@@ -116,6 +116,16 @@ type WorkspaceContext struct {
 	// without an `@`) to a display name. Used to resolve participant
 	// handles in mpdm channel names like `mpdm-grant--myles--ray-1`.
 	UserNamesByHandle map[string]string
+	// GroupNames maps a usergroup (subteam) ID (e.g. "S0PLATFORM") to
+	// its @handle (e.g. "platform"). Populated by the background
+	// usergroups.list fetch in connectWorkspace and consumed by the
+	// renderer to resolve <!subteam^Sxxx> mentions delivered without
+	// an embedded label (the rich-text-block path; see
+	// internal/ui/messages/blockkit/richtext.go). Reads happen on the
+	// bubbletea Update goroutine after the workspace is ready; the map
+	// is replaced atomically by SetGroupNames so callers can range
+	// safely without locks.
+	GroupNames map[string]string
 	// BotUserIDs is the set of user IDs known to be Slack apps or bots.
 	// Populated from the local cache on startup and refreshed by the
 	// background users.list fetch and any on-demand resolveUser calls.
@@ -1383,6 +1393,7 @@ func run() error {
 			Channels:         wctx.Channels,
 			FinderItems:      wctx.FinderItems,
 			UserNames:        wctx.UserNames,
+			GroupNames:       wctx.GroupNames,
 			ExternalUsers:    external,
 			UserID:           wctx.UserID,
 			CustomEmoji:      wctx.CustomEmoji,
@@ -1535,6 +1546,7 @@ func run() error {
 				Channels:         wctx.Channels,
 				FinderItems:      wctx.FinderItems,
 				UserNames:        wctx.UserNames,
+				GroupNames:       wctx.GroupNames, // empty at this point; filled by the goroutine below
 				ExternalUsers:    external,
 				UserID:           wctx.UserID,
 				CustomEmoji:      wctx.CustomEmoji, // empty at this point; filled by the goroutine below
@@ -1555,6 +1567,31 @@ func run() error {
 				p.Send(ui.CustomEmojisLoadedMsg{
 					TeamID:      teamID,
 					CustomEmoji: emojis,
+				})
+			}(wctx.TeamID)
+
+			// Fetch usergroups (subteams) in the background so the
+			// renderer can resolve <!subteam^Sxxx|@handle> mentions
+			// in rich-text blocks, which arrive without an embedded
+			// label. Best-effort: tokens without usergroups:read or
+			// workspaces where the API is disabled silently leave
+			// the fallback "@group" label in place.
+			go func(teamID string) {
+				groups, err := wctx.Client.GetUserGroups(ctx)
+				if err != nil {
+					return
+				}
+				names := make(map[string]string, len(groups))
+				for _, g := range groups {
+					if g.ID == "" || g.Handle == "" {
+						continue
+					}
+					names[g.ID] = g.Handle
+				}
+				wctx.GroupNames = names
+				p.Send(ui.UsergroupsLoadedMsg{
+					TeamID:     teamID,
+					GroupNames: names,
 				})
 			}(wctx.TeamID)
 
@@ -1627,6 +1664,7 @@ func connectWorkspace(ctx context.Context, token slackclient.Token, db *cache.DB
 		UserNames:            make(map[string]string),
 		AvatarURLs:           &sync.Map{},
 		UserNamesByHandle:    make(map[string]string),
+		GroupNames:           make(map[string]string),
 		BotUserIDs:           make(map[string]bool),
 		CustomEmoji:          make(map[string]string),
 		LastVisitedByChannel: make(map[string]int64),
