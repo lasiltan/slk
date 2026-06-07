@@ -46,6 +46,9 @@ func (a *App) applyOverlays(screen string) string {
 	if a.reactionPicker.IsVisible() {
 		screen = a.reactionPicker.ViewOverlay(a.width, a.height, screen)
 	}
+	if a.reactionsView.IsVisible() {
+		screen = a.reactionsView.ViewOverlay(a.width, a.height, screen)
+	}
 	if a.confirmPrompt.IsVisible() {
 		screen = a.confirmPrompt.ViewOverlay(a.width, a.height, screen)
 	}
@@ -78,6 +81,7 @@ func (a *App) overlayActive() bool {
 	return a.channelFinder.IsVisible() ||
 		a.newMessagePicker.IsVisible() ||
 		a.reactionPicker.IsVisible() ||
+		a.reactionsView.IsVisible() ||
 		a.confirmPrompt.IsVisible() ||
 		a.workspaceFinder.IsVisible() ||
 		a.themeSwitcher.IsVisible() ||

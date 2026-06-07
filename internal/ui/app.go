@@ -37,6 +37,7 @@ import (
 	"github.com/gammons/slk/internal/ui/newmessagepicker"
 	"github.com/gammons/slk/internal/ui/presencemenu"
 	"github.com/gammons/slk/internal/ui/reactionpicker"
+	"github.com/gammons/slk/internal/ui/reactionsview"
 	"github.com/gammons/slk/internal/ui/sidebar"
 	"github.com/gammons/slk/internal/ui/statusbar"
 	"github.com/gammons/slk/internal/ui/styles"
@@ -197,7 +198,9 @@ type App struct {
 
 	// Reaction picker
 	reactionPicker *reactionpicker.Model
-	confirmPrompt  *confirmprompt.Model
+	// Reactions list overlay (R)
+	reactionsView *reactionsview.Model
+	confirmPrompt *confirmprompt.Model
 	// reactions is the App's ReactionService collaborator (add/remove
 	// reactions on Slack + load/record frecent emoji history). See
 	// internal/ui/services.go. Defaulted to a no-op adapter in NewApp
@@ -327,6 +330,7 @@ func NewApp() *App {
 		threadCompose:        compose.New("thread"),
 		threadsView:          threadsview.New(nil, ""),
 		reactionPicker:       reactionpicker.New(),
+		reactionsView:        reactionsview.New(),
 		confirmPrompt:        confirmprompt.New(),
 		mode:                 ModeNormal,
 		focusedPanel:         PanelSidebar,
@@ -561,46 +565,6 @@ func (a *App) updateReactionOnMessage(channelID, messageTS, emojiName, userID st
 	a.threadPanel.UpdateReaction(messageTS, emojiName, userID, remove)
 }
 
-func (a *App) handleReactionNav(msg tea.KeyMsg) tea.Cmd {
-	switch {
-	case key.Matches(msg, a.keys.Left):
-		a.messagepane.ReactionNavLeft()
-	case key.Matches(msg, a.keys.Right):
-		a.messagepane.ReactionNavRight()
-	case key.Matches(msg, a.keys.Enter):
-		emojiName, isPlus := a.messagepane.SelectedReaction()
-		if isPlus {
-			return a.openPickerFromMessage()
-		}
-		return a.toggleReactionOnSelectedMessage(emojiName)
-	case key.Matches(msg, a.keys.Reaction):
-		return a.openPickerFromMessage()
-	case key.Matches(msg, a.keys.Escape):
-		a.messagepane.ExitReactionNav()
-	}
-	return nil
-}
-
-func (a *App) handleThreadReactionNav(msg tea.KeyMsg) tea.Cmd {
-	switch {
-	case key.Matches(msg, a.keys.Left):
-		a.threadPanel.ReactionNavLeft()
-	case key.Matches(msg, a.keys.Right):
-		a.threadPanel.ReactionNavRight()
-	case key.Matches(msg, a.keys.Enter):
-		emojiName, isPlus := a.threadPanel.SelectedReaction()
-		if isPlus {
-			return a.openPickerFromThread()
-		}
-		return a.toggleReactionOnSelectedThread(emojiName)
-	case key.Matches(msg, a.keys.Reaction):
-		return a.openPickerFromThread()
-	case key.Matches(msg, a.keys.Escape):
-		a.threadPanel.ExitReactionNav()
-	}
-	return nil
-}
-
 func (a *App) openPickerFromMessage() tea.Cmd {
 	msg, ok := a.messagepane.SelectedMessage()
 	if !ok {
@@ -612,7 +576,6 @@ func (a *App) openPickerFromMessage() tea.Cmd {
 			existing = append(existing, r.Emoji)
 		}
 	}
-	a.messagepane.ExitReactionNav()
 	a.reactionPicker.SetFrecentEmoji(a.reactions.LoadFrecent(10))
 	a.reactionPicker.Open(a.activeChannelID, msg.TS, existing)
 	a.SetMode(ModeReactionPicker)
@@ -630,10 +593,66 @@ func (a *App) openPickerFromThread() tea.Cmd {
 			existing = append(existing, r.Emoji)
 		}
 	}
-	a.threadPanel.ExitReactionNav()
 	a.reactionPicker.SetFrecentEmoji(a.reactions.LoadFrecent(10))
 	a.reactionPicker.Open(a.threadPanel.ChannelID(), reply.TS, existing)
 	a.SetMode(ModeReactionPicker)
+	return nil
+}
+
+// reactionPreview returns a single-line, ANSI-free summary of a message
+// suitable for the reactions-view overlay header. Falls back to "(no
+// text)" for blocks-only / attachment-only messages.
+func reactionPreview(text string) string {
+	t := strings.TrimSpace(text)
+	t = strings.ReplaceAll(t, "\r", " ")
+	t = strings.ReplaceAll(t, "\n", " ")
+	t = strings.ReplaceAll(t, "\t", " ")
+	for strings.Contains(t, "  ") {
+		t = strings.ReplaceAll(t, "  ", " ")
+	}
+	if t == "" {
+		return "(no text)"
+	}
+	return t
+}
+
+func (a *App) reactionTabsFor(reactions []messages.ReactionItem) []reactionsview.EmojiTab {
+	tabs := make([]reactionsview.EmojiTab, 0, len(reactions))
+	for _, r := range reactions {
+		users := make([]string, 0, len(r.UserIDs))
+		for _, uid := range r.UserIDs {
+			if name, ok := a.userNames[uid]; ok && name != "" {
+				users = append(users, name)
+			} else {
+				users = append(users, uid)
+			}
+		}
+		tabs = append(tabs, reactionsview.EmojiTab{
+			Emoji: r.Emoji,
+			Count: r.Count,
+			Users: users,
+		})
+	}
+	return tabs
+}
+
+func (a *App) openReactionsViewFromMessage() tea.Cmd {
+	msg, ok := a.messagepane.SelectedMessage()
+	if !ok || len(msg.Reactions) == 0 {
+		return nil
+	}
+	a.reactionsView.Open(reactionPreview(msg.Text), a.reactionTabsFor(msg.Reactions))
+	a.SetMode(ModeReactionsView)
+	return nil
+}
+
+func (a *App) openReactionsViewFromThread() tea.Cmd {
+	reply := a.threadPanel.SelectedReply()
+	if reply == nil || len(reply.Reactions) == 0 {
+		return nil
+	}
+	a.reactionsView.Open(reactionPreview(reply.Text), a.reactionTabsFor(reply.Reactions))
+	a.SetMode(ModeReactionsView)
 	return nil
 }
 
@@ -1492,6 +1511,11 @@ func (a *App) SetEmojiContext(ctx messages.EmojiContext) {
 		Cells:    ctx.Cells,
 		Customs:  ctx.Customs,
 	})
+	a.reactionsView.SetEmojiContext(reactionsview.EmojiContext{
+		PlaceCtx: ctx.PlaceCtx,
+		Cells:    ctx.Cells,
+		Customs:  ctx.Customs,
+	})
 	a.compose.SetEmojiContext(emojipicker.EmojiContext{
 		PlaceCtx: ctx.PlaceCtx,
 		Cells:    ctx.Cells,
@@ -1827,6 +1851,7 @@ func (a *App) SetCustomEmoji(customs map[string]string) {
 	a.messagepane.SetEmojiCustoms(customs)
 	a.threadPanel.SetEmojiCustoms(customs)
 	a.reactionPicker.SetEmojiCustoms(customs)
+	a.reactionsView.SetEmojiCustoms(customs)
 	// Compose autocomplete dropdowns (main + thread) also need the
 	// customs map for View()-time URL resolution; without this, custom
 	// emoji rows fall back to the placeholder glyph. See

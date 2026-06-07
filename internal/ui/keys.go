@@ -29,7 +29,7 @@ type KeyMap struct {
 	QuitConfirm         key.Binding
 	CloseThreadView     key.Binding
 	Reaction            key.Binding
-	ReactionNav         key.Binding
+	ReactionsView       key.Binding
 	Edit                key.Binding
 	Delete              key.Binding
 	CopyPermalink       key.Binding
@@ -74,7 +74,7 @@ func DefaultKeyMap() KeyMap {
 		QuitConfirm:         key.NewBinding(key.WithKeys("Q"), key.WithHelp("Q", "quit (confirm)")),
 		CloseThreadView:     key.NewBinding(key.WithKeys("q"), key.WithHelp("q", "close thread view")),
 		Reaction:            key.NewBinding(key.WithKeys("r"), key.WithHelp("r", "add reaction")),
-		ReactionNav:         key.NewBinding(key.WithKeys("R"), key.WithHelp("R", "navigate reactions")),
+		ReactionsView:       key.NewBinding(key.WithKeys("R"), key.WithHelp("R", "list reactions")),
 		Edit:                key.NewBinding(key.WithKeys("E"), key.WithHelp("E", "edit message")),
 		Delete:              key.NewBinding(key.WithKeys("D"), key.WithHelp("D", "delete message")),
 		CopyPermalink:       key.NewBinding(key.WithKeys("Y", "C"), key.WithHelp("Y/C", "copy permalink")),

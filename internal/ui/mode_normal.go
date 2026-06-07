@@ -5,22 +5,16 @@
 // The bulk of slk's keybinding surface lives here:
 //   - mode entry: i (insert), Ctrl-T (channel finder), Ctrl-W
 //     (workspace finder), Ctrl-T (theme switcher), ? (help),
-//     S (presence menu), R (reaction picker)
+//     S (presence menu), r (reaction picker), R (reactions list)
 //   - navigation: j/k (selection), Ctrl-D/U (half-page), C-f/b
 //     (page), G (bottom), Tab/h/l (focus next/prev), Ctrl-o/i
 //     (nav back/forward through visited channels)
 //   - layout toggles: s (sidebar), t (thread)
 //   - message ops: y (copy permalink), E (edit), D (delete),
 //     M (mark unread), O (open image preview)
-//   - reaction nav sub-state: r enters; arrows + Enter select
-//     (delegated to handleReactionNav / handleThreadReactionNav)
 //   - workspace switch: 1-9 number keys (handled in default arm)
 //   - quit confirm: q (close thread if visible, else no-op),
 //     Q (quit confirm)
-//
-// Reaction-nav sub-state is intercepted FIRST: while in it, only
-// a narrow set of keys (arrows / Enter / r / Esc) is handled,
-// everything else falls back to normal key handling.
 package ui
 
 import (
@@ -32,14 +26,6 @@ import (
 )
 
 func handleNormalMode(a *App, msg tea.KeyMsg) tea.Cmd {
-	// Reaction-nav sub-state (intercept before normal keys).
-	if a.focusedPanel == PanelMessages && a.messagepane.ReactionNavActive() {
-		return a.handleReactionNav(msg)
-	}
-	if a.focusedPanel == PanelThread && a.threadPanel.ReactionNavActive() {
-		return a.handleThreadReactionNav(msg)
-	}
-
 	switch {
 	case key.Matches(msg, a.keys.InsertMode):
 		a.SetMode(ModeInsert)
@@ -180,11 +166,11 @@ func handleNormalMode(a *App, msg tea.KeyMsg) tea.Cmd {
 			return a.openPickerFromThread()
 		}
 
-	case key.Matches(msg, a.keys.ReactionNav):
+	case key.Matches(msg, a.keys.ReactionsView):
 		if a.focusedPanel == PanelMessages {
-			a.messagepane.EnterReactionNav()
+			return a.openReactionsViewFromMessage()
 		} else if a.focusedPanel == PanelThread {
-			a.threadPanel.EnterReactionNav()
+			return a.openReactionsViewFromThread()
 		}
 
 	case key.Matches(msg, a.keys.SaveThread):
