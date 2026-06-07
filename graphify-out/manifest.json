@@ -1,0 +1,2397 @@
+{
+  "/Users/siltala/dev/personal/slk/.claude/settings.local.json": {
+    "mtime": 1780841718.6419952,
+    "ast_hash": "e0f114279bf1c5d10ede03b0dca6abe4",
+    "semantic_hash": "e0f114279bf1c5d10ede03b0dca6abe4"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/add_workspace_config.go": {
+    "mtime": 1779967147.8023338,
+    "ast_hash": "a2b766de2c6334f1d9397a065a8f6106",
+    "semantic_hash": "a2b766de2c6334f1d9397a065a8f6106"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/add_workspace_config_test.go": {
+    "mtime": 1779967147.802435,
+    "ast_hash": "8f08beaf3c54f68cccfac27c2c371beb",
+    "semantic_hash": "8f08beaf3c54f68cccfac27c2c371beb"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/attachments_test.go": {
+    "mtime": 1779967147.8025393,
+    "ast_hash": "884dd5810f5e228223a6f90f22d33f4e",
+    "semantic_hash": "884dd5810f5e228223a6f90f22d33f4e"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/cache_render_test.go": {
+    "mtime": 1779967147.802872,
+    "ast_hash": "8545682e65e75defb45a83ee8ef4bd83",
+    "semantic_hash": "8545682e65e75defb45a83ee8ef4bd83"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/channelitem.go": {
+    "mtime": 1780036938.6058016,
+    "ast_hash": "ee2711b1088dfe1555fb32236a558558",
+    "semantic_hash": "ee2711b1088dfe1555fb32236a558558"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/channelitem_test.go": {
+    "mtime": 1780036938.6062014,
+    "ast_hash": "bc6bd568a2495ccd8ac2be0dfe2326be",
+    "semantic_hash": "bc6bd568a2495ccd8ac2be0dfe2326be"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/event_handler_marked_test.go": {
+    "mtime": 1779967147.8032746,
+    "ast_hash": "4bfa4b11bdfc5f0f08483b3dfa38fc9c",
+    "semantic_hash": "4bfa4b11bdfc5f0f08483b3dfa38fc9c"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/event_handler_test.go": {
+    "mtime": 1779967147.8034854,
+    "ast_hash": "8b80723900163fd491a3309749ed9ff8",
+    "semantic_hash": "8b80723900163fd491a3309749ed9ff8"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/main.go": {
+    "mtime": 1780820538.4289844,
+    "ast_hash": "b1451a604c5d94b0871e85005da545da",
+    "semantic_hash": "b1451a604c5d94b0871e85005da545da"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/onboarding.go": {
+    "mtime": 1779967147.80397,
+    "ast_hash": "35d35565999a5c55e681e9e4a9fe7d03",
+    "semantic_hash": "35d35565999a5c55e681e9e4a9fe7d03"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/reconnect_backfill.go": {
+    "mtime": 1779967147.8042042,
+    "ast_hash": "256ff3c1dd7c7454761b64f0a7868b4f",
+    "semantic_hash": "256ff3c1dd7c7454761b64f0a7868b4f"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/reconnect_backfill_test.go": {
+    "mtime": 1779967147.8043587,
+    "ast_hash": "f4853945e98abcffd4573afa3633b99b",
+    "semantic_hash": "f4853945e98abcffd4573afa3633b99b"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/remove_workspace.go": {
+    "mtime": 1779967147.8044715,
+    "ast_hash": "5b4eb7bb4a5ca85dd8f79dca87155604",
+    "semantic_hash": "5b4eb7bb4a5ca85dd8f79dca87155604"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/save_theme.go": {
+    "mtime": 1779967147.8046103,
+    "ast_hash": "9e4fa72c055c7e2f7dbff573e93a8aa4",
+    "semantic_hash": "9e4fa72c055c7e2f7dbff573e93a8aa4"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/save_theme_test.go": {
+    "mtime": 1779967147.8047576,
+    "ast_hash": "3fa16075d65ed53a587e49afeea623c4",
+    "semantic_hash": "3fa16075d65ed53a587e49afeea623c4"
+  },
+  "/Users/siltala/dev/personal/slk/cmd/slk/summarize_test.go": {
+    "mtime": 1779967147.8048537,
+    "ast_hash": "294ca458758dc416476114b6c92e13fc",
+    "semantic_hash": "294ca458758dc416476114b6c92e13fc"
+  },
+  "/Users/siltala/dev/personal/slk/internal/avatar/avatar.go": {
+    "mtime": 1779967147.8368876,
+    "ast_hash": "ae63ffa12dad0e4cb1b3c19c20286bdc",
+    "semantic_hash": "ae63ffa12dad0e4cb1b3c19c20286bdc"
+  },
+  "/Users/siltala/dev/personal/slk/internal/avatar/avatar_test.go": {
+    "mtime": 1779967147.837145,
+    "ast_hash": "a49711fa64de7a2e595e6756b6539b7d",
+    "semantic_hash": "a49711fa64de7a2e595e6756b6539b7d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/avatar/kitty_test.go": {
+    "mtime": 1779967147.8372657,
+    "ast_hash": "529e344de9e0c06e62555d0fe21ce774",
+    "semantic_hash": "529e344de9e0c06e62555d0fe21ce774"
+  },
+  "/Users/siltala/dev/personal/slk/internal/avatar/parity_test.go": {
+    "mtime": 1779967147.8373866,
+    "ast_hash": "1ef67e2ed8467eeac6692f8746ffaf23",
+    "semantic_hash": "1ef67e2ed8467eeac6692f8746ffaf23"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channel_members.go": {
+    "mtime": 1779967147.837635,
+    "ast_hash": "0e3ac2c9cd09c42c727c9a052dd6f4e6",
+    "semantic_hash": "0e3ac2c9cd09c42c727c9a052dd6f4e6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channel_members_test.go": {
+    "mtime": 1779967147.8377955,
+    "ast_hash": "6e6d15355de4501f498da5b1fd1502d0",
+    "semantic_hash": "6e6d15355de4501f498da5b1fd1502d0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channels.go": {
+    "mtime": 1779967147.837961,
+    "ast_hash": "47781fb1338da3b93239795debd5b807",
+    "semantic_hash": "47781fb1338da3b93239795debd5b807"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channels_read_state.go": {
+    "mtime": 1779967147.838128,
+    "ast_hash": "a99ded89094ceb6166271937541ea45b",
+    "semantic_hash": "a99ded89094ceb6166271937541ea45b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channels_read_state_test.go": {
+    "mtime": 1779967147.8383095,
+    "ast_hash": "d77dd1fa430c92a609e8f0be92eb05a8",
+    "semantic_hash": "d77dd1fa430c92a609e8f0be92eb05a8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channels_sync.go": {
+    "mtime": 1779967147.8384469,
+    "ast_hash": "8662c7c95911ec3eef11ad89637c455c",
+    "semantic_hash": "8662c7c95911ec3eef11ad89637c455c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channels_sync_test.go": {
+    "mtime": 1779967147.8386154,
+    "ast_hash": "b7c5d0585c1b51052c6362e4c272c416",
+    "semantic_hash": "b7c5d0585c1b51052c6362e4c272c416"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channels_test.go": {
+    "mtime": 1779967147.838766,
+    "ast_hash": "495dd3b5a0ec5e8536f24bfe3990855c",
+    "semantic_hash": "495dd3b5a0ec5e8536f24bfe3990855c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channelvisits.go": {
+    "mtime": 1779967147.8390543,
+    "ast_hash": "692ecef3d44eac1058d12f06b53f4b06",
+    "semantic_hash": "692ecef3d44eac1058d12f06b53f4b06"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/channelvisits_test.go": {
+    "mtime": 1779967147.8391926,
+    "ast_hash": "0e859adf21b85af38c9628abd80442de",
+    "semantic_hash": "0e859adf21b85af38c9628abd80442de"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/db.go": {
+    "mtime": 1779967147.8394694,
+    "ast_hash": "874741c8a416ae52dc93c8382948d776",
+    "semantic_hash": "874741c8a416ae52dc93c8382948d776"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/db_test.go": {
+    "mtime": 1779967147.8427413,
+    "ast_hash": "70fc10d1f5a3d426b395c6a3cad853a0",
+    "semantic_hash": "70fc10d1f5a3d426b395c6a3cad853a0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/frecent.go": {
+    "mtime": 1779967147.842872,
+    "ast_hash": "a7b1926385358663eebb3a552641e5d1",
+    "semantic_hash": "a7b1926385358663eebb3a552641e5d1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/frecent_test.go": {
+    "mtime": 1779967147.8429933,
+    "ast_hash": "221dc8437c6ebc790247c88ed6be75f3",
+    "semantic_hash": "221dc8437c6ebc790247c88ed6be75f3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/messages.go": {
+    "mtime": 1779967147.8431687,
+    "ast_hash": "e224a70690810795ee520d237579eb7f",
+    "semantic_hash": "e224a70690810795ee520d237579eb7f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/messages_test.go": {
+    "mtime": 1779967147.8434463,
+    "ast_hash": "0e81d25fed96d253822a02e23daa26bd",
+    "semantic_hash": "0e81d25fed96d253822a02e23daa26bd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/reactions.go": {
+    "mtime": 1779967147.8435862,
+    "ast_hash": "497ae753418230945271148113c96625",
+    "semantic_hash": "497ae753418230945271148113c96625"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/reactions_test.go": {
+    "mtime": 1779967147.8437123,
+    "ast_hash": "64bccaa521c59a2f906e5abc1bcb13a3",
+    "semantic_hash": "64bccaa521c59a2f906e5abc1bcb13a3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/thread_subscriptions.go": {
+    "mtime": 1779967147.8438737,
+    "ast_hash": "39470f8c4cd4a2b5893b80a13e8bdacf",
+    "semantic_hash": "39470f8c4cd4a2b5893b80a13e8bdacf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/thread_subscriptions_test.go": {
+    "mtime": 1779967147.844051,
+    "ast_hash": "57b8b6399a9f7dc653ec60d8acd4c8f3",
+    "semantic_hash": "57b8b6399a9f7dc653ec60d8acd4c8f3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/threads.go": {
+    "mtime": 1779967147.844227,
+    "ast_hash": "821fb81a1877ecfc018e64fcb5369060",
+    "semantic_hash": "821fb81a1877ecfc018e64fcb5369060"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/threads_test.go": {
+    "mtime": 1779967147.8445065,
+    "ast_hash": "b4f26e4c65239a9d5338624fb8a08f7a",
+    "semantic_hash": "b4f26e4c65239a9d5338624fb8a08f7a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/users.go": {
+    "mtime": 1779967147.8446603,
+    "ast_hash": "5c4b5184f549f93ff56de50c5d855b9f",
+    "semantic_hash": "5c4b5184f549f93ff56de50c5d855b9f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/users_test.go": {
+    "mtime": 1779967147.8449845,
+    "ast_hash": "2dbd1d836481a917a7ec020581f67ccb",
+    "semantic_hash": "2dbd1d836481a917a7ec020581f67ccb"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/workspaces.go": {
+    "mtime": 1779967147.8452287,
+    "ast_hash": "c268ceb88829d6cc4d747cd3e38517e4",
+    "semantic_hash": "c268ceb88829d6cc4d747cd3e38517e4"
+  },
+  "/Users/siltala/dev/personal/slk/internal/cache/workspaces_test.go": {
+    "mtime": 1779967147.8454251,
+    "ast_hash": "a730629f988f4cf737987a21da0e37f7",
+    "semantic_hash": "a730629f988f4cf737987a21da0e37f7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/config/config.go": {
+    "mtime": 1780036938.610457,
+    "ast_hash": "9ffb0ec4545e98ceed78b4c08c6bfcdb",
+    "semantic_hash": "9ffb0ec4545e98ceed78b4c08c6bfcdb"
+  },
+  "/Users/siltala/dev/personal/slk/internal/config/config_test.go": {
+    "mtime": 1780036938.6107862,
+    "ast_hash": "d572d41d2950e8f3a112f94e48dcbeb7",
+    "semantic_hash": "d572d41d2950e8f3a112f94e48dcbeb7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/config/ordering.go": {
+    "mtime": 1779967147.8461647,
+    "ast_hash": "815501344151626f95d8ef37ca1bddcf",
+    "semantic_hash": "815501344151626f95d8ef37ca1bddcf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/config/ordering_test.go": {
+    "mtime": 1779967147.8462906,
+    "ast_hash": "a8583634b98ef66d0c1f280b49932036",
+    "semantic_hash": "a8583634b98ef66d0c1f280b49932036"
+  },
+  "/Users/siltala/dev/personal/slk/internal/config/workspaces.go": {
+    "mtime": 1779967147.8464086,
+    "ast_hash": "4bb46fa108b544d17de96b1cbfdf93af",
+    "semantic_hash": "4bb46fa108b544d17de96b1cbfdf93af"
+  },
+  "/Users/siltala/dev/personal/slk/internal/config/workspaces_test.go": {
+    "mtime": 1779967147.8465147,
+    "ast_hash": "3aa9d4f7e93b7b89be2d07c6683012f5",
+    "semantic_hash": "3aa9d4f7e93b7b89be2d07c6683012f5"
+  },
+  "/Users/siltala/dev/personal/slk/internal/debuglog/debuglog.go": {
+    "mtime": 1779967147.8467193,
+    "ast_hash": "e2bc40f5bcf979ad01e4cf0e76dcd801",
+    "semantic_hash": "e2bc40f5bcf979ad01e4cf0e76dcd801"
+  },
+  "/Users/siltala/dev/personal/slk/internal/debuglog/debuglog_test.go": {
+    "mtime": 1779967147.8468676,
+    "ast_hash": "6382f06fcbd0d238f7247b667802c804",
+    "semantic_hash": "6382f06fcbd0d238f7247b667802c804"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/entries.go": {
+    "mtime": 1779967147.847291,
+    "ast_hash": "9d19d0b686bed5fe48f630d5123ffdb7",
+    "semantic_hash": "9d19d0b686bed5fe48f630d5123ffdb7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/entries_test.go": {
+    "mtime": 1779967147.8473988,
+    "ast_hash": "3cc4f29ca58139d46d9d31ffc18f5d88",
+    "semantic_hash": "3cc4f29ca58139d46d9d31ffc18f5d88"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/fuse.go": {
+    "mtime": 1779967147.8477843,
+    "ast_hash": "a8dac7db26817d834f5412ca2d4c2def",
+    "semantic_hash": "a8dac7db26817d834f5412ca2d4c2def"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/fuse_test.go": {
+    "mtime": 1779967147.848044,
+    "ast_hash": "ac34a83b1aa33588741ca2aecd80fff5",
+    "semantic_hash": "ac34a83b1aa33588741ca2aecd80fff5"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/imagemode.go": {
+    "mtime": 1780036938.6109803,
+    "ast_hash": "1ea3d5998ec573187c365d31f57476d4",
+    "semantic_hash": "1ea3d5998ec573187c365d31f57476d4"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/imagemode_test.go": {
+    "mtime": 1780036938.611172,
+    "ast_hash": "6f211ff17c5d19dcfd9856d5805242b3",
+    "semantic_hash": "6f211ff17c5d19dcfd9856d5805242b3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/place.go": {
+    "mtime": 1780036938.611609,
+    "ast_hash": "6dbf3b52e6fd728677784f770b2622f8",
+    "semantic_hash": "6dbf3b52e6fd728677784f770b2622f8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/place_test.go": {
+    "mtime": 1780036938.6119647,
+    "ast_hash": "c5f2067f867817035fa1ab6b6789fd21",
+    "semantic_hash": "c5f2067f867817035fa1ab6b6789fd21"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/render.go": {
+    "mtime": 1779967147.848805,
+    "ast_hash": "fc57562f8274b939be5b086077634067",
+    "semantic_hash": "fc57562f8274b939be5b086077634067"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/render_test.go": {
+    "mtime": 1779967147.8489134,
+    "ast_hash": "d7955bfb234813d342e9dc28cd994435",
+    "semantic_hash": "d7955bfb234813d342e9dc28cd994435"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/shouldrender.go": {
+    "mtime": 1779967147.8490288,
+    "ast_hash": "78a0f2e7fa29e19979c8613ebaaa8a19",
+    "semantic_hash": "78a0f2e7fa29e19979c8613ebaaa8a19"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/shouldrender_test.go": {
+    "mtime": 1779967147.8491461,
+    "ast_hash": "9fe3bc745da1bc3b1a27fcb0100a41ab",
+    "semantic_hash": "9fe3bc745da1bc3b1a27fcb0100a41ab"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/testdata/slack_urls.json": {
+    "mtime": 1780036938.6122453,
+    "ast_hash": "74499473e31425ce5568cd0ca5bb7b90",
+    "semantic_hash": "74499473e31425ce5568cd0ca5bb7b90"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/url.go": {
+    "mtime": 1780036938.61342,
+    "ast_hash": "544a998850b02fffe564e321d65ace9c",
+    "semantic_hash": "544a998850b02fffe564e321d65ace9c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/url_test.go": {
+    "mtime": 1780036938.6137605,
+    "ast_hash": "44590eb8db655c615e70a814a0722d25",
+    "semantic_hash": "44590eb8db655c615e70a814a0722d25"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/width.go": {
+    "mtime": 1780036938.6140292,
+    "ast_hash": "9e3c833fdcfaabe24b61d6c07c9a8494",
+    "semantic_hash": "9e3c833fdcfaabe24b61d6c07c9a8494"
+  },
+  "/Users/siltala/dev/personal/slk/internal/emoji/width_test.go": {
+    "mtime": 1780036938.6142578,
+    "ast_hash": "c81f7a963b75cef2936dc3542f3b1fa3",
+    "semantic_hash": "c81f7a963b75cef2936dc3542f3b1fa3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/export/markdown.go": {
+    "mtime": 1780052084.2250502,
+    "ast_hash": "cea95ed8c69b5dab4f436a0352e549fd",
+    "semantic_hash": "cea95ed8c69b5dab4f436a0352e549fd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/export/markdown_test.go": {
+    "mtime": 1780052084.2252774,
+    "ast_hash": "803b3ec7f7f2abee17ec57575282593c",
+    "semantic_hash": "803b3ec7f7f2abee17ec57575282593c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ids/ids.go": {
+    "mtime": 1779967147.8497577,
+    "ast_hash": "e8744addf850c4a28928d2fd613eb9dd",
+    "semantic_hash": "e8744addf850c4a28928d2fd613eb9dd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/auth_url_test.go": {
+    "mtime": 1779967147.8499532,
+    "ast_hash": "049ad73bebfc2925d6eca18acf331028",
+    "semantic_hash": "049ad73bebfc2925d6eca18acf331028"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/cache.go": {
+    "mtime": 1779967147.8501112,
+    "ast_hash": "b616922a4d54e02ff14477da92cc8005",
+    "semantic_hash": "b616922a4d54e02ff14477da92cc8005"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/cache_test.go": {
+    "mtime": 1779967147.8502166,
+    "ast_hash": "66398f8c657e7b02a353505e8348e61f",
+    "semantic_hash": "66398f8c657e7b02a353505e8348e61f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/capability.go": {
+    "mtime": 1779967147.8503568,
+    "ast_hash": "04fc9dede1d3df295da930b3a175ac12",
+    "semantic_hash": "04fc9dede1d3df295da930b3a175ac12"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/capability_test.go": {
+    "mtime": 1779967147.8505065,
+    "ast_hash": "9133ffa36341c850ca3226b96575c7a0",
+    "semantic_hash": "9133ffa36341c850ca3226b96575c7a0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/cellmetrics.go": {
+    "mtime": 1779967147.8506317,
+    "ast_hash": "b0639a730d313d6c144d268424255fb8",
+    "semantic_hash": "b0639a730d313d6c144d268424255fb8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/cellmetrics_test.go": {
+    "mtime": 1779967147.8507407,
+    "ast_hash": "4d584f6bd0813c92db9e94118487a3c5",
+    "semantic_hash": "4d584f6bd0813c92db9e94118487a3c5"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/cellmetrics_unix.go": {
+    "mtime": 1779967147.8510191,
+    "ast_hash": "0490b7fe3ae81e22e475d885f6ba4818",
+    "semantic_hash": "0490b7fe3ae81e22e475d885f6ba4818"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/cellmetrics_windows.go": {
+    "mtime": 1779967147.8511226,
+    "ast_hash": "003e940afc75c5965c697d56ca6fd8fc",
+    "semantic_hash": "003e940afc75c5965c697d56ca6fd8fc"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/fetcher.go": {
+    "mtime": 1779967147.8512685,
+    "ast_hash": "65bbe844f3160ca47d0e0ab17f1e1bee",
+    "semantic_hash": "65bbe844f3160ca47d0e0ab17f1e1bee"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/fetcher_reqid_test.go": {
+    "mtime": 1779967147.8513951,
+    "ast_hash": "90f894f12d9076490a77c77404937bfe",
+    "semantic_hash": "90f894f12d9076490a77c77404937bfe"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/fetcher_test.go": {
+    "mtime": 1779967147.8515997,
+    "ast_hash": "a353e7960fadfa26990fae698a6d4804",
+    "semantic_hash": "a353e7960fadfa26990fae698a6d4804"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/halfblock.go": {
+    "mtime": 1779967147.8516972,
+    "ast_hash": "63d0fb8b00e12722694ca6f1a8b7a6db",
+    "semantic_hash": "63d0fb8b00e12722694ca6f1a8b7a6db"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/halfblock_test.go": {
+    "mtime": 1779967147.8518074,
+    "ast_hash": "ca32ce013746c8fddbd7122fb18671de",
+    "semantic_hash": "ca32ce013746c8fddbd7122fb18671de"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/kitty.go": {
+    "mtime": 1779967147.8520136,
+    "ast_hash": "7a97e3e8d146ff7febad45904e6c8566",
+    "semantic_hash": "7a97e3e8d146ff7febad45904e6c8566"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/kitty_test.go": {
+    "mtime": 1779967147.8522675,
+    "ast_hash": "dae23ffe3dc726c8d444f7722353c83a",
+    "semantic_hash": "dae23ffe3dc726c8d444f7722353c83a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/migrate.go": {
+    "mtime": 1779967147.8523762,
+    "ast_hash": "87e4e0534be438d6e1bac9f2c5d517d0",
+    "semantic_hash": "87e4e0534be438d6e1bac9f2c5d517d0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/migrate_test.go": {
+    "mtime": 1779967147.8524828,
+    "ast_hash": "f63cbebfd71a185dc073ffb82820b8b6",
+    "semantic_hash": "f63cbebfd71a185dc073ffb82820b8b6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/preview.go": {
+    "mtime": 1779967147.8527231,
+    "ast_hash": "a5e5fc9ec3bd24d8bb332d6687488b55",
+    "semantic_hash": "a5e5fc9ec3bd24d8bb332d6687488b55"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/preview_test.go": {
+    "mtime": 1779967147.8528202,
+    "ast_hash": "6950edb90d349d7a7813c803ffd643d8",
+    "semantic_hash": "6950edb90d349d7a7813c803ffd643d8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/probe.go": {
+    "mtime": 1780244649.922756,
+    "ast_hash": "a21e21e9719eb03b790b6e4a85e44aa4",
+    "semantic_hash": "a21e21e9719eb03b790b6e4a85e44aa4"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/probe_other.go": {
+    "mtime": 1780244649.923093,
+    "ast_hash": "a20e48b16c363c1a11ad62f4dbd2ff78",
+    "semantic_hash": "a20e48b16c363c1a11ad62f4dbd2ff78"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/probe_test.go": {
+    "mtime": 1780244649.9234033,
+    "ast_hash": "35ddf6b247f284a463f46e911d1c0c1b",
+    "semantic_hash": "35ddf6b247f284a463f46e911d1c0c1b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/probe_unix.go": {
+    "mtime": 1780244649.9236095,
+    "ast_hash": "df609f043aa1d16303721bb044935086",
+    "semantic_hash": "df609f043aa1d16303721bb044935086"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/registry.go": {
+    "mtime": 1779967147.853088,
+    "ast_hash": "c83ad0a5939c25e5c13a15a21e326976",
+    "semantic_hash": "c83ad0a5939c25e5c13a15a21e326976"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/registry_test.go": {
+    "mtime": 1779967147.8531845,
+    "ast_hash": "ba0e979f289eb322226ed70eaf3821d9",
+    "semantic_hash": "ba0e979f289eb322226ed70eaf3821d9"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/renderer.go": {
+    "mtime": 1779967147.8533254,
+    "ast_hash": "bbf772b9d6f27321298e9b68507fc15c",
+    "semantic_hash": "bbf772b9d6f27321298e9b68507fc15c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/renderer_test.go": {
+    "mtime": 1779967147.8534236,
+    "ast_hash": "fb7c092064e6e5b519ffad022be6ba81",
+    "semantic_hash": "fb7c092064e6e5b519ffad022be6ba81"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/sixel.go": {
+    "mtime": 1779967147.8535194,
+    "ast_hash": "bd8984e4d68ed271ae1ca99cd14efc76",
+    "semantic_hash": "bd8984e4d68ed271ae1ca99cd14efc76"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/sixel_test.go": {
+    "mtime": 1779967147.8536081,
+    "ast_hash": "a9dde11ba11eb93d8a6407a896c73295",
+    "semantic_hash": "a9dde11ba11eb93d8a6407a896c73295"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/thumb_test.go": {
+    "mtime": 1779967147.853857,
+    "ast_hash": "690591b69aa4f3d51ffe42124f3f834d",
+    "semantic_hash": "690591b69aa4f3d51ffe42124f3f834d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/notify/notifier.go": {
+    "mtime": 1779967147.8540165,
+    "ast_hash": "823cf0be8c1aca86bd7fa13dfaccd885",
+    "semantic_hash": "823cf0be8c1aca86bd7fa13dfaccd885"
+  },
+  "/Users/siltala/dev/personal/slk/internal/notify/notifier_test.go": {
+    "mtime": 1779967147.85415,
+    "ast_hash": "1d407dc2d9069432f255ac35bcf46d3c",
+    "semantic_hash": "1d407dc2d9069432f255ac35bcf46d3c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/messages.go": {
+    "mtime": 1779967147.8543274,
+    "ast_hash": "f1abff468f65232d6269e51fcda07a58",
+    "semantic_hash": "f1abff468f65232d6269e51fcda07a58"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/messages_test.go": {
+    "mtime": 1779967147.8544214,
+    "ast_hash": "6c364cf1783f2ddb4e1b17c69ccc41c0",
+    "semantic_hash": "6c364cf1783f2ddb4e1b17c69ccc41c0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/mutestore.go": {
+    "mtime": 1779967147.8545535,
+    "ast_hash": "273ffca84d8430dbdea099841cd3865d",
+    "semantic_hash": "273ffca84d8430dbdea099841cd3865d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/mutestore_test.go": {
+    "mtime": 1779967147.8546853,
+    "ast_hash": "6bb5053d3b5cb859ea2e3fd557c13f7e",
+    "semantic_hash": "6bb5053d3b5cb859ea2e3fd557c13f7e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/sectionstore.go": {
+    "mtime": 1779967147.8549235,
+    "ast_hash": "69adccc5b2908304f404a4b5e637b937",
+    "semantic_hash": "69adccc5b2908304f404a4b5e637b937"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/sectionstore_test.go": {
+    "mtime": 1779967147.8551848,
+    "ast_hash": "175bb68ed6376fc34c60ea5dba4899aa",
+    "semantic_hash": "175bb68ed6376fc34c60ea5dba4899aa"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/workspace.go": {
+    "mtime": 1779967147.8552954,
+    "ast_hash": "16f300c91455c3d252a007415e3c48cd",
+    "semantic_hash": "16f300c91455c3d252a007415e3c48cd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/service/workspace_test.go": {
+    "mtime": 1779967147.8554006,
+    "ast_hash": "096dcc0e90f9ba3639194a71ecfbe32e",
+    "semantic_hash": "096dcc0e90f9ba3639194a71ecfbe32e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/auth.go": {
+    "mtime": 1779967147.8555603,
+    "ast_hash": "08de7f17e876d5325e107245cfd6a74d",
+    "semantic_hash": "08de7f17e876d5325e107245cfd6a74d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/auth_test.go": {
+    "mtime": 1779967147.855649,
+    "ast_hash": "5b5c22bb5c47a5dd725d668d8f1d23e1",
+    "semantic_hash": "5b5c22bb5c47a5dd725d668d8f1d23e1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/client.go": {
+    "mtime": 1780820538.429369,
+    "ast_hash": "c7189d9b09b43e323bca1af54c375980",
+    "semantic_hash": "c7189d9b09b43e323bca1af54c375980"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/client_test.go": {
+    "mtime": 1780820538.4297888,
+    "ast_hash": "604d71e2d77a4482d5e8cbe6a84b530c",
+    "semantic_hash": "604d71e2d77a4482d5e8cbe6a84b530c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/connection.go": {
+    "mtime": 1779967147.8561108,
+    "ast_hash": "6d8e350447cc0bd4e3ea06422396b24f",
+    "semantic_hash": "6d8e350447cc0bd4e3ea06422396b24f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/connection_test.go": {
+    "mtime": 1779967147.856196,
+    "ast_hash": "a95d42928489c4c21efebe500fc4a794",
+    "semantic_hash": "a95d42928489c4c21efebe500fc4a794"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/events.go": {
+    "mtime": 1779967147.8563266,
+    "ast_hash": "78c478be4ef8b3b2d8fc895cb400891e",
+    "semantic_hash": "78c478be4ef8b3b2d8fc895cb400891e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/events_test.go": {
+    "mtime": 1779967147.8564672,
+    "ast_hash": "e98127a1321148c561dbc8f9f6f99f80",
+    "semantic_hash": "e98127a1321148c561dbc8f9f6f99f80"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/membership/manager.go": {
+    "mtime": 1779967147.8566759,
+    "ast_hash": "7f6a165280e1d3e64676220f9e2ff3fb",
+    "semantic_hash": "7f6a165280e1d3e64676220f9e2ff3fb"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/membership/manager_test.go": {
+    "mtime": 1779967147.8569133,
+    "ast_hash": "76f8cb1ace468903964363d19e5af253",
+    "semantic_hash": "76f8cb1ace468903964363d19e5af253"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/mrkdwn/convert.go": {
+    "mtime": 1779967147.8570678,
+    "ast_hash": "cf0e16c1f3a3bd3a3d1f03cb438469d6",
+    "semantic_hash": "cf0e16c1f3a3bd3a3d1f03cb438469d6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/mrkdwn/convert_test.go": {
+    "mtime": 1779967147.8571913,
+    "ast_hash": "c7f57efef97709d36a6a5dfdfae51b00",
+    "semantic_hash": "c7f57efef97709d36a6a5dfdfae51b00"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/mrkdwn/doc.go": {
+    "mtime": 1779967147.8572912,
+    "ast_hash": "d2af14c9a7e424500a05b9f01fb89e76",
+    "semantic_hash": "d2af14c9a7e424500a05b9f01fb89e76"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/mrkdwn/walk.go": {
+    "mtime": 1779967147.8576624,
+    "ast_hash": "cf3f72a29609693e77514e63c809ad82",
+    "semantic_hash": "cf3f72a29609693e77514e63c809ad82"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/sections.go": {
+    "mtime": 1779967147.8577998,
+    "ast_hash": "be006868aee6c07dc930e8d0fb856fdf",
+    "semantic_hash": "be006868aee6c07dc930e8d0fb856fdf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/sections_test.go": {
+    "mtime": 1779967147.8578925,
+    "ast_hash": "f65f7093add00ce86f9b6cfa657fd13e",
+    "semantic_hash": "f65f7093add00ce86f9b6cfa657fd13e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/testdata/sections_rest_truelist.json": {
+    "mtime": 1779967147.8581967,
+    "ast_hash": "f66e663683bab00d26138f981dae00e0",
+    "semantic_hash": "f66e663683bab00d26138f981dae00e0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/testdata/ws_channels_removed.json": {
+    "mtime": 1779967147.8582964,
+    "ast_hash": "ffe8078ba825711a3e90e77f5dc8fc23",
+    "semantic_hash": "ffe8078ba825711a3e90e77f5dc8fc23"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/testdata/ws_channels_upserted.json": {
+    "mtime": 1779967147.8583918,
+    "ast_hash": "5b55c0b310394da5c25707936269acec",
+    "semantic_hash": "5b55c0b310394da5c25707936269acec"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/testdata/ws_section_deleted.json": {
+    "mtime": 1779967147.8584812,
+    "ast_hash": "5b93c2539a927ff557f57d47ac4d285b",
+    "semantic_hash": "5b93c2539a927ff557f57d47ac4d285b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slack/testdata/ws_section_upserted.json": {
+    "mtime": 1779967147.858729,
+    "ast_hash": "09a7357eb6e9d873386b6867190e3518",
+    "semantic_hash": "09a7357eb6e9d873386b6867190e3518"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slackfmt/mpdm.go": {
+    "mtime": 1779967147.858887,
+    "ast_hash": "86c80f62868526e4271eaa75e9833dd7",
+    "semantic_hash": "86c80f62868526e4271eaa75e9833dd7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slackfmt/mpdm_test.go": {
+    "mtime": 1779967147.8589823,
+    "ast_hash": "680b300f6af9fe90229034e04aacb4d8",
+    "semantic_hash": "680b300f6af9fe90229034e04aacb4d8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slackhttp/transport.go": {
+    "mtime": 1779967147.8591735,
+    "ast_hash": "dbbb17e9eb8f21fc0c8ae8f3da610d40",
+    "semantic_hash": "dbbb17e9eb8f21fc0c8ae8f3da610d40"
+  },
+  "/Users/siltala/dev/personal/slk/internal/slackhttp/transport_test.go": {
+    "mtime": 1779967147.8593056,
+    "ast_hash": "6adb8252ac991ed30d661ad499213612",
+    "semantic_hash": "6adb8252ac991ed30d661ad499213612"
+  },
+  "/Users/siltala/dev/personal/slk/internal/text/fold.go": {
+    "mtime": 1779967147.8597462,
+    "ast_hash": "8c60980fc1e7943b83ac6880fb309130",
+    "semantic_hash": "8c60980fc1e7943b83ac6880fb309130"
+  },
+  "/Users/siltala/dev/personal/slk/internal/text/fold_test.go": {
+    "mtime": 1779967147.859848,
+    "ast_hash": "ecc0656d71dd1725a7f3e362c24567b9",
+    "semantic_hash": "ecc0656d71dd1725a7f3e362c24567b9"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app.go": {
+    "mtime": 1780820538.4301822,
+    "ast_hash": "8ca497a9857f452415a978b18fae9b5e",
+    "semantic_hash": "8ca497a9857f452415a978b18fae9b5e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_bench_test.go": {
+    "mtime": 1779967147.8603117,
+    "ast_hash": "052fc02bbd2c39e07d7f7f2323b1fcb0",
+    "semantic_hash": "052fc02bbd2c39e07d7f7f2323b1fcb0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_emoji_debounce_test.go": {
+    "mtime": 1780036938.6149876,
+    "ast_hash": "06c123bab7392f3581f44f2e1b56d2d7",
+    "semantic_hash": "06c123bab7392f3581f44f2e1b56d2d7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_imagepreview_test.go": {
+    "mtime": 1779967147.8604453,
+    "ast_hash": "531086e82beeec52f353900cfcc0e2aa",
+    "semantic_hash": "531086e82beeec52f353900cfcc0e2aa"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_loading_test.go": {
+    "mtime": 1779967147.8605714,
+    "ast_hash": "6abac2f9a4cbc97bea9efc7b9e72f1e0",
+    "semantic_hash": "6abac2f9a4cbc97bea9efc7b9e72f1e0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_olderfetch_spinner_test.go": {
+    "mtime": 1779967147.8606758,
+    "ast_hash": "b74974c21c304c5d5e1f07a62dc73765",
+    "semantic_hash": "b74974c21c304c5d5e1f07a62dc73765"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_panelat_test.go": {
+    "mtime": 1779967147.860819,
+    "ast_hash": "5d93cc543c4e07d2833b22ace4641ff0",
+    "semantic_hash": "5d93cc543c4e07d2833b22ace4641ff0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_panelcache_test.go": {
+    "mtime": 1779967147.8609111,
+    "ast_hash": "9d60eba901c26ad54d4bfa0fd54dae9d",
+    "semantic_hash": "9d60eba901c26ad54d4bfa0fd54dae9d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_paste_test.go": {
+    "mtime": 1779967147.8610065,
+    "ast_hash": "1bcce6d53a700312141b7b88d6fae1fd",
+    "semantic_hash": "1bcce6d53a700312141b7b88d6fae1fd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_presence_test.go": {
+    "mtime": 1779967147.861136,
+    "ast_hash": "ddb76679bac3c88732d10840a34b280f",
+    "semantic_hash": "ddb76679bac3c88732d10840a34b280f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_reaction_click_test.go": {
+    "mtime": 1779967147.8612626,
+    "ast_hash": "71eef09882950d8ca86c9421020e612a",
+    "semantic_hash": "71eef09882950d8ca86c9421020e612a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_sanitize_test.go": {
+    "mtime": 1780052084.2261913,
+    "ast_hash": "c881c7d625afe3f080c937d30fe97e86",
+    "semantic_hash": "c881c7d625afe3f080c937d30fe97e86"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_selection_test.go": {
+    "mtime": 1779967147.8613846,
+    "ast_hash": "ebf1adedba88edc73338953d9f2d86e8",
+    "semantic_hash": "ebf1adedba88edc73338953d9f2d86e8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_test.go": {
+    "mtime": 1779967147.8616967,
+    "ast_hash": "be81dcd1972d7e959073246fe38f35d0",
+    "semantic_hash": "be81dcd1972d7e959073246fe38f35d0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_thread_image_test.go": {
+    "mtime": 1779967147.8618157,
+    "ast_hash": "913f9f51e98bdd179da710dfb3ec1659",
+    "semantic_hash": "913f9f51e98bdd179da710dfb3ec1659"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_threads_debounce_test.go": {
+    "mtime": 1779967147.8619533,
+    "ast_hash": "6649924b284c20b9afd74b56f94f71c2",
+    "semantic_hash": "6649924b284c20b9afd74b56f94f71c2"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_title.go": {
+    "mtime": 1779967147.8620508,
+    "ast_hash": "a4bcf0ebbf9a4fdf5f74bb530620db7e",
+    "semantic_hash": "a4bcf0ebbf9a4fdf5f74bb530620db7e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_title_test.go": {
+    "mtime": 1779967147.8621485,
+    "ast_hash": "450328b4885b7962eca31dd4862e0fe8",
+    "semantic_hash": "450328b4885b7962eca31dd4862e0fe8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/app_workspace_click_test.go": {
+    "mtime": 1779967147.8622394,
+    "ast_hash": "6219a826ca6cea109ff5bd793bf73d9d",
+    "semantic_hash": "6219a826ca6cea109ff5bd793bf73d9d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/bootstrap.go": {
+    "mtime": 1779967147.8623726,
+    "ast_hash": "2c0af08b37d3a74dc10d82f0575a9522",
+    "semantic_hash": "2c0af08b37d3a74dc10d82f0575a9522"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/callbacks.go": {
+    "mtime": 1779967147.8625057,
+    "ast_hash": "e1f39e7288bf239566672db0a40b04cd",
+    "semantic_hash": "e1f39e7288bf239566672db0a40b04cd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/channelfinder/model.go": {
+    "mtime": 1779967147.8626933,
+    "ast_hash": "54a6870da1e78bb7ae8b3b284df7bdc2",
+    "semantic_hash": "54a6870da1e78bb7ae8b3b284df7bdc2"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/channelfinder/model_test.go": {
+    "mtime": 1779967147.8628325,
+    "ast_hash": "eaa7b7f7986856c4c64da8a8b9df9609",
+    "semantic_hash": "eaa7b7f7986856c4c64da8a8b9df9609"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/channelpicker/model.go": {
+    "mtime": 1779967147.8630016,
+    "ast_hash": "492253c8074018bed4ad397e1acd43eb",
+    "semantic_hash": "492253c8074018bed4ad397e1acd43eb"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/channelpicker/model_test.go": {
+    "mtime": 1779967147.8631072,
+    "ast_hash": "7c94310a468fbf6e8df9e9fb7c0e4bed",
+    "semantic_hash": "7c94310a468fbf6e8df9e9fb7c0e4bed"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/clipboard_wayland.go": {
+    "mtime": 1779967147.863211,
+    "ast_hash": "fcf709e70622cf1cf7860cd3354513a1",
+    "semantic_hash": "fcf709e70622cf1cf7860cd3354513a1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/compose/channel_test.go": {
+    "mtime": 1779967147.8633916,
+    "ast_hash": "cb51d2f045ae7bdb7ad5b64b6229c20b",
+    "semantic_hash": "cb51d2f045ae7bdb7ad5b64b6229c20b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/compose/model.go": {
+    "mtime": 1780036938.6154606,
+    "ast_hash": "8d6bd0e109381b3e8c6fb5055c57f086",
+    "semantic_hash": "8d6bd0e109381b3e8c6fb5055c57f086"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/compose/model_test.go": {
+    "mtime": 1779967147.8636935,
+    "ast_hash": "856bd5152973950cb0fcf463997243f3",
+    "semantic_hash": "856bd5152973950cb0fcf463997243f3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/confirmprompt/model.go": {
+    "mtime": 1779967147.8639235,
+    "ast_hash": "d4ad4f79692ca715a73fc82b2a00a034",
+    "semantic_hash": "d4ad4f79692ca715a73fc82b2a00a034"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/confirmprompt/model_test.go": {
+    "mtime": 1779967147.8640382,
+    "ast_hash": "12cbbb539c65c272c2ef5ca70a6a0b7c",
+    "semantic_hash": "12cbbb539c65c272c2ef5ca70a6a0b7c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/drag.go": {
+    "mtime": 1779967147.8642645,
+    "ast_hash": "ee48ccaca1086c0975e1241bb2642194",
+    "semantic_hash": "ee48ccaca1086c0975e1241bb2642194"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/edit.go": {
+    "mtime": 1779967147.8643813,
+    "ast_hash": "53963c5c37c240a37c325dfc7c64ff83",
+    "semantic_hash": "53963c5c37c240a37c325dfc7c64ff83"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/emojipicker/model.go": {
+    "mtime": 1780036938.6160579,
+    "ast_hash": "3c5e045cefbbc31a196c9ceabbe15ad5",
+    "semantic_hash": "3c5e045cefbbc31a196c9ceabbe15ad5"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/emojipicker/model_test.go": {
+    "mtime": 1780036938.6165736,
+    "ast_hash": "778e69b68fa97eb99232eb221522b96b",
+    "semantic_hash": "778e69b68fa97eb99232eb221522b96b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/help/model.go": {
+    "mtime": 1779967147.8649979,
+    "ast_hash": "47237c1d4632da37e56d83f7e9f72f09",
+    "semantic_hash": "47237c1d4632da37e56d83f7e9f72f09"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/help/model_test.go": {
+    "mtime": 1779967147.8651497,
+    "ast_hash": "50323fec6ade217794d0909c0dbb946a",
+    "semantic_hash": "50323fec6ade217794d0909c0dbb946a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/imagepreview.go": {
+    "mtime": 1779967147.865299,
+    "ast_hash": "ec1624bdc69ed458e2bd484f0fb0beb1",
+    "semantic_hash": "ec1624bdc69ed458e2bd484f0fb0beb1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/imgrender/imgrender.go": {
+    "mtime": 1779967147.865598,
+    "ast_hash": "721e4182a355dc7fdd90ec575c06dbb5",
+    "semantic_hash": "721e4182a355dc7fdd90ec575c06dbb5"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/imgrender/imgrender_test.go": {
+    "mtime": 1779967147.8657587,
+    "ast_hash": "1e18d8cd3450211222127bdf49e6e5a1",
+    "semantic_hash": "1e18d8cd3450211222127bdf49e6e5a1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/imgrender/reqid_test.go": {
+    "mtime": 1779967147.8658664,
+    "ast_hash": "73a4e6071dbea31d5590ff7d3a464d3b",
+    "semantic_hash": "73a4e6071dbea31d5590ff7d3a464d3b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/keys.go": {
+    "mtime": 1780052084.2268503,
+    "ast_hash": "49fe602651d4afead5e5ef5d9589c7f3",
+    "semantic_hash": "49fe602651d4afead5e5ef5d9589c7f3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mentionpicker/model.go": {
+    "mtime": 1779967147.8662732,
+    "ast_hash": "5a9b71f47939244ff63d0fd56dbe5872",
+    "semantic_hash": "5a9b71f47939244ff63d0fd56dbe5872"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mentionpicker/model_test.go": {
+    "mtime": 1779967147.8664334,
+    "ast_hash": "8962f9858f8ebbbe7dbdb2d521ac5921",
+    "semantic_hash": "8962f9858f8ebbbe7dbdb2d521ac5921"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/bench_test.go": {
+    "mtime": 1779967147.8666177,
+    "ast_hash": "7cfd6c3e52f2b298d6a1f8eb95a70097",
+    "semantic_hash": "7cfd6c3e52f2b298d6a1f8eb95a70097"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/attachments.go": {
+    "mtime": 1779967147.8668456,
+    "ast_hash": "76f1a067031de7f269346d1a17386559",
+    "semantic_hash": "76f1a067031de7f269346d1a17386559"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/attachments_test.go": {
+    "mtime": 1779967147.8670125,
+    "ast_hash": "cbdda0a7837df418856b97a37cc5f670",
+    "semantic_hash": "cbdda0a7837df418856b97a37cc5f670"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/color.go": {
+    "mtime": 1779967147.8671207,
+    "ast_hash": "15aa854f6909ba0008a1054895327880",
+    "semantic_hash": "15aa854f6909ba0008a1054895327880"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/color_test.go": {
+    "mtime": 1779967147.867231,
+    "ast_hash": "b63c2a9a5c355bfaed3c283e4036952e",
+    "semantic_hash": "b63c2a9a5c355bfaed3c283e4036952e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/image.go": {
+    "mtime": 1779967147.8674788,
+    "ast_hash": "ab7828bdd51309f94f16d430cb7761d6",
+    "semantic_hash": "ab7828bdd51309f94f16d430cb7761d6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/integration_test.go": {
+    "mtime": 1779967147.867575,
+    "ast_hash": "17b9759708e6f8338008889ac822f56d",
+    "semantic_hash": "17b9759708e6f8338008889ac822f56d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/parse.go": {
+    "mtime": 1779967147.8677092,
+    "ast_hash": "c0d8936faf59d92635d6054c3994eb09",
+    "semantic_hash": "c0d8936faf59d92635d6054c3994eb09"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/parse_test.go": {
+    "mtime": 1779967147.8679807,
+    "ast_hash": "f6e3bce87589ec79b1ae59e66add0ff8",
+    "semantic_hash": "f6e3bce87589ec79b1ae59e66add0ff8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/render.go": {
+    "mtime": 1779967147.8683844,
+    "ast_hash": "fe8f204b27324cffb98b7a7620e51a5e",
+    "semantic_hash": "fe8f204b27324cffb98b7a7620e51a5e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/render_test.go": {
+    "mtime": 1779967147.8686054,
+    "ast_hash": "ffff8556d2c19d780ba6751e194c685a",
+    "semantic_hash": "ffff8556d2c19d780ba6751e194c685a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/reqid_test.go": {
+    "mtime": 1779967147.8687377,
+    "ast_hash": "df69e4b07c2ceedc3448d317c8b0c0fb",
+    "semantic_hash": "df69e4b07c2ceedc3448d317c8b0c0fb"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/richtext.go": {
+    "mtime": 1779967147.868908,
+    "ast_hash": "f34efb188dc1550ba49d8cae2202463b",
+    "semantic_hash": "f34efb188dc1550ba49d8cae2202463b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/richtext_test.go": {
+    "mtime": 1779967147.8691041,
+    "ast_hash": "8a6fe999924591122f59ed9927ad4669",
+    "semantic_hash": "8a6fe999924591122f59ed9927ad4669"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/styles.go": {
+    "mtime": 1779967147.8692253,
+    "ast_hash": "18b281ce1afa8a36cf49dd3adaa493ae",
+    "semantic_hash": "18b281ce1afa8a36cf49dd3adaa493ae"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/deploy_approval.json": {
+    "mtime": 1779967147.869435,
+    "ast_hash": "1c1859201a35202b0bbf5d5060172e24",
+    "semantic_hash": "1c1859201a35202b0bbf5d5060172e24"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/github_pending_review.json": {
+    "mtime": 1779967147.8696904,
+    "ast_hash": "9cdad9c0a489dba668b0e75aa3220cc1",
+    "semantic_hash": "9cdad9c0a489dba668b0e75aa3220cc1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/github_pr.json": {
+    "mtime": 1779967147.86981,
+    "ast_hash": "08f147c60d5720eb4c0f12856fc22ac9",
+    "semantic_hash": "08f147c60d5720eb4c0f12856fc22ac9"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/header_divider_section.json": {
+    "mtime": 1779967147.8699338,
+    "ast_hash": "f74645428f0e047b91d0dd0dbab0951c",
+    "semantic_hash": "f74645428f0e047b91d0dd0dbab0951c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/oncall_handoff.json": {
+    "mtime": 1779967147.8700442,
+    "ast_hash": "1d26e17db66b7ac865133d218d1651bf",
+    "semantic_hash": "1d26e17db66b7ac865133d218d1651bf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/pagerduty_alert.json": {
+    "mtime": 1779967147.870323,
+    "ast_hash": "4c1bb4675fdf127d6deb6e742951386f",
+    "semantic_hash": "4c1bb4675fdf127d6deb6e742951386f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/testdata/section_with_fields.json": {
+    "mtime": 1779967147.8704448,
+    "ast_hash": "d75722fa1ec72d05d8cce3cc8c478bde",
+    "semantic_hash": "d75722fa1ec72d05d8cce3cc8c478bde"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/types.go": {
+    "mtime": 1779967147.8706512,
+    "ast_hash": "03ec7490cd74224c9d5da670d4b60312",
+    "semantic_hash": "03ec7490cd74224c9d5da670d4b60312"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit/types_test.go": {
+    "mtime": 1779967147.8707867,
+    "ast_hash": "8a194ecc036902148745f86db1fd8768",
+    "semantic_hash": "8a194ecc036902148745f86db1fd8768"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/blockkit_integration_test.go": {
+    "mtime": 1779967147.8709586,
+    "ast_hash": "47d91271735e90bfe808e5e01fbcc71a",
+    "semantic_hash": "47d91271735e90bfe808e5e01fbcc71a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/model.go": {
+    "mtime": 1780820538.4306777,
+    "ast_hash": "b0814b4bf83de188ec02ab9a25395300",
+    "semantic_hash": "b0814b4bf83de188ec02ab9a25395300"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/model_test.go": {
+    "mtime": 1780036938.617531,
+    "ast_hash": "160122a561414f744823c1d75725a2b3",
+    "semantic_hash": "160122a561414f744823c1d75725a2b3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/plain_test.go": {
+    "mtime": 1779967147.871674,
+    "ast_hash": "f678a4dec421615e1631aab9a437cd9a",
+    "semantic_hash": "f678a4dec421615e1631aab9a437cd9a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/render.go": {
+    "mtime": 1780820538.4310424,
+    "ast_hash": "10eb5e53cdc8b159f32293b3254ff54a",
+    "semantic_hash": "10eb5e53cdc8b159f32293b3254ff54a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/render_test.go": {
+    "mtime": 1780820538.4314325,
+    "ast_hash": "2e1fbc72bab6368c5d9ef54aec89dd85",
+    "semantic_hash": "2e1fbc72bab6368c5d9ef54aec89dd85"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/scrollbar_test.go": {
+    "mtime": 1779967147.8760495,
+    "ast_hash": "4da1e557097c5af1694a98ccf000c994",
+    "semantic_hash": "4da1e557097c5af1694a98ccf000c994"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/messages/selection_test.go": {
+    "mtime": 1779967147.8761988,
+    "ast_hash": "d3982d0753e55a0d9b648c20f5e01e0a",
+    "semantic_hash": "d3982d0753e55a0d9b648c20f5e01e0a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode.go": {
+    "mtime": 1779967147.876328,
+    "ast_hash": "694a691a791ab0f326c82d7442764957",
+    "semantic_hash": "694a691a791ab0f326c82d7442764957"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_channel_finder.go": {
+    "mtime": 1779967147.8764446,
+    "ast_hash": "7c2ef444158033165675a9f25a003895",
+    "semantic_hash": "7c2ef444158033165675a9f25a003895"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_command.go": {
+    "mtime": 1779967147.8765595,
+    "ast_hash": "9a9baaa81d56d7f003cfa13063bd2595",
+    "semantic_hash": "9a9baaa81d56d7f003cfa13063bd2595"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_confirm.go": {
+    "mtime": 1779967147.8766725,
+    "ast_hash": "8f139dc52903927448246496aa6c6ed5",
+    "semantic_hash": "8f139dc52903927448246496aa6c6ed5"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_handlers.go": {
+    "mtime": 1779967147.8768191,
+    "ast_hash": "78fd2fb85617f9208b4b08a8d49b2ca0",
+    "semantic_hash": "78fd2fb85617f9208b4b08a8d49b2ca0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_handlers_helpers_test.go": {
+    "mtime": 1779967147.87694,
+    "ast_hash": "4003a7f6f99975485fccbd944aa964f4",
+    "semantic_hash": "4003a7f6f99975485fccbd944aa964f4"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_help.go": {
+    "mtime": 1779967147.877056,
+    "ast_hash": "359d2aeb0071258b12455bcbd267a07a",
+    "semantic_hash": "359d2aeb0071258b12455bcbd267a07a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_insert.go": {
+    "mtime": 1779967147.877224,
+    "ast_hash": "9f9f8cf978bd52b7567e877575d82104",
+    "semantic_hash": "9f9f8cf978bd52b7567e877575d82104"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_new_message.go": {
+    "mtime": 1779967147.877354,
+    "ast_hash": "c657211f9f3469089117bea557fd65b2",
+    "semantic_hash": "c657211f9f3469089117bea557fd65b2"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_normal.go": {
+    "mtime": 1780052084.2282007,
+    "ast_hash": "8ec9788d6a5ab0cdb569c905eacd36c7",
+    "semantic_hash": "8ec9788d6a5ab0cdb569c905eacd36c7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_presence_menu.go": {
+    "mtime": 1779967147.8776727,
+    "ast_hash": "e176872223bdfbc1c46e5c576c3370b3",
+    "semantic_hash": "e176872223bdfbc1c46e5c576c3370b3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_presence_snooze.go": {
+    "mtime": 1779967147.877806,
+    "ast_hash": "f6e202f08f1b0cc2b70a06c207fb6635",
+    "semantic_hash": "f6e202f08f1b0cc2b70a06c207fb6635"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_reaction_picker.go": {
+    "mtime": 1779967147.8779333,
+    "ast_hash": "c766f41bdd818f0312ce457d07f7892d",
+    "semantic_hash": "c766f41bdd818f0312ce457d07f7892d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_theme_switcher.go": {
+    "mtime": 1779967147.8780613,
+    "ast_hash": "48830f68e9f35201924d5f6032b62713",
+    "semantic_hash": "48830f68e9f35201924d5f6032b62713"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/mode_workspace_finder.go": {
+    "mtime": 1779967147.878188,
+    "ast_hash": "a29641b772a4e64e280b1c70a245dbca",
+    "semantic_hash": "a29641b772a4e64e280b1c70a245dbca"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/msgs.go": {
+    "mtime": 1780820538.431697,
+    "ast_hash": "edc8501f9060b3c5089e6d802209641e",
+    "semantic_hash": "edc8501f9060b3c5089e6d802209641e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/navhistory.go": {
+    "mtime": 1779967147.8785512,
+    "ast_hash": "a3d9ac8f7a3912595fb12ff78403fbfa",
+    "semantic_hash": "a3d9ac8f7a3912595fb12ff78403fbfa"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/newmessagepicker/filter.go": {
+    "mtime": 1779967147.8787804,
+    "ast_hash": "8291ccc8f3aa6acded94255b4da5de85",
+    "semantic_hash": "8291ccc8f3aa6acded94255b4da5de85"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/newmessagepicker/model.go": {
+    "mtime": 1779967147.8789544,
+    "ast_hash": "c4267a6f46d19f8ebb315cf4070957f0",
+    "semantic_hash": "c4267a6f46d19f8ebb315cf4070957f0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/newmessagepicker/model_test.go": {
+    "mtime": 1779967147.8791633,
+    "ast_hash": "2e96e37349e0b27285eb6bce31ac86d9",
+    "semantic_hash": "2e96e37349e0b27285eb6bce31ac86d9"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/newmessagepicker/view.go": {
+    "mtime": 1779967147.8794162,
+    "ast_hash": "f5c70dfbf52b5e5b91ea57c55c1ccdd6",
+    "semantic_hash": "f5c70dfbf52b5e5b91ea57c55c1ccdd6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/overlay/overlay.go": {
+    "mtime": 1780036938.6188662,
+    "ast_hash": "091aae8d3b0b87ba7fdc32c5494a48ba",
+    "semantic_hash": "091aae8d3b0b87ba7fdc32c5494a48ba"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/overlay/overlay_test.go": {
+    "mtime": 1779967147.8798068,
+    "ast_hash": "93767dac13d0251c9d703f62677e5f4d",
+    "semantic_hash": "93767dac13d0251c9d703f62677e5f4d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/overlay/overlay_widechar_test.go": {
+    "mtime": 1779967147.8799214,
+    "ast_hash": "031b76767b0b20a433b4b4bf85b471c4",
+    "semantic_hash": "031b76767b0b20a433b4b4bf85b471c4"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/panelcache.go": {
+    "mtime": 1779967147.8800356,
+    "ast_hash": "5bde908eeaef92e239c20f42a7fba150",
+    "semantic_hash": "5bde908eeaef92e239c20f42a7fba150"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/panellayout.go": {
+    "mtime": 1779967147.880211,
+    "ast_hash": "e16ae27ae3a5c9d2cb762ada32c0efa6",
+    "semantic_hash": "e16ae27ae3a5c9d2cb762ada32c0efa6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/presence.go": {
+    "mtime": 1779967147.880389,
+    "ast_hash": "445816cb6e7ea3a0b3faddc667d539cf",
+    "semantic_hash": "445816cb6e7ea3a0b3faddc667d539cf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/presencemenu/model.go": {
+    "mtime": 1779967147.8807335,
+    "ast_hash": "ab92c1026f96f889923c281c806e71ce",
+    "semantic_hash": "ab92c1026f96f889923c281c806e71ce"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/presencemenu/model_test.go": {
+    "mtime": 1779967147.880848,
+    "ast_hash": "daf313a7df6968adab7e054269b5b447",
+    "semantic_hash": "daf313a7df6968adab7e054269b5b447"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reactionpicker/glyph_render_test.go": {
+    "mtime": 1780036938.619485,
+    "ast_hash": "9a8fca82c14ebc0335a6f60918d96be3",
+    "semantic_hash": "9a8fca82c14ebc0335a6f60918d96be3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reactionpicker/model.go": {
+    "mtime": 1780036938.6198854,
+    "ast_hash": "f2dcf13a9631ead914ae003a8c62f0fa",
+    "semantic_hash": "f2dcf13a9631ead914ae003a8c62f0fa"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reactionpicker/model_test.go": {
+    "mtime": 1780036938.620411,
+    "ast_hash": "269c4c6bb2eb42953a768712f08777d8",
+    "semantic_hash": "269c4c6bb2eb42953a768712f08777d8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_channels.go": {
+    "mtime": 1779967147.8818192,
+    "ast_hash": "1b8b9ca76c970ee5609d15a7c060a3ef",
+    "semantic_hash": "1b8b9ca76c970ee5609d15a7c060a3ef"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_io.go": {
+    "mtime": 1780052084.228818,
+    "ast_hash": "d19c00e3bbc4b53a332f317de42577d0",
+    "semantic_hash": "d19c00e3bbc4b53a332f317de42577d0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_mouse.go": {
+    "mtime": 1779967147.8824441,
+    "ast_hash": "aca61929f1a1eefcdd74b66f24414a70",
+    "semantic_hash": "aca61929f1a1eefcdd74b66f24414a70"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_new_message.go": {
+    "mtime": 1779967147.8826084,
+    "ast_hash": "0bc7e1acb7a2e3a9986e6aac740a5b80",
+    "semantic_hash": "0bc7e1acb7a2e3a9986e6aac740a5b80"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_new_message_test.go": {
+    "mtime": 1779967147.8827693,
+    "ast_hash": "29c7c7b907e670a29fe090565625ac92",
+    "semantic_hash": "29c7c7b907e670a29fe090565625ac92"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_reactions.go": {
+    "mtime": 1779967147.882862,
+    "ast_hash": "d3761927f65f0980b82ef0c074bf1f73",
+    "semantic_hash": "d3761927f65f0980b82ef0c074bf1f73"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_send.go": {
+    "mtime": 1779967147.8830543,
+    "ast_hash": "ac44c0084856db6da154ecc4d667dd0d",
+    "semantic_hash": "ac44c0084856db6da154ecc4d667dd0d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_threads.go": {
+    "mtime": 1779967147.8833082,
+    "ast_hash": "fc8eaa30705e561840bd302e68a56dd3",
+    "semantic_hash": "fc8eaa30705e561840bd302e68a56dd3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducer_workspace.go": {
+    "mtime": 1780820538.4320393,
+    "ast_hash": "5dda46034852affdf53b93da1a506dd8",
+    "semantic_hash": "5dda46034852affdf53b93da1a506dd8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/reducers.go": {
+    "mtime": 1779967147.8836915,
+    "ast_hash": "0ef4f2c51dccd00d78189e4859fcf245",
+    "semantic_hash": "0ef4f2c51dccd00d78189e4859fcf245"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/scrollbar/scrollbar.go": {
+    "mtime": 1779967147.8838866,
+    "ast_hash": "616d19ef9698624f451f79dc861eccec",
+    "semantic_hash": "616d19ef9698624f451f79dc861eccec"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/scrollbar/scrollbar_test.go": {
+    "mtime": 1779967147.8839972,
+    "ast_hash": "8a292f9c0b031aaad9b469b690bd1406",
+    "semantic_hash": "8a292f9c0b031aaad9b469b690bd1406"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/selection/doc.go": {
+    "mtime": 1779967147.8841658,
+    "ast_hash": "5a84475cff75db0381a20f061a47f395",
+    "semantic_hash": "5a84475cff75db0381a20f061a47f395"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/selection/selection.go": {
+    "mtime": 1779967147.8842795,
+    "ast_hash": "ad03ec2e71307fa8ee1f65c73c350dde",
+    "semantic_hash": "ad03ec2e71307fa8ee1f65c73c350dde"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/selection/selection_test.go": {
+    "mtime": 1779967147.8843925,
+    "ast_hash": "10dc9503d630f07897fecccfde45009b",
+    "semantic_hash": "10dc9503d630f07897fecccfde45009b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/selfsend.go": {
+    "mtime": 1779967147.8845434,
+    "ast_hash": "e7dc88975ce90920fdbec7b358509cd3",
+    "semantic_hash": "e7dc88975ce90920fdbec7b358509cd3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/services.go": {
+    "mtime": 1779967147.8846688,
+    "ast_hash": "45b7693e8afe2954daf8f1e3b5587b4e",
+    "semantic_hash": "45b7693e8afe2954daf8f1e3b5587b4e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/services_helpers_test.go": {
+    "mtime": 1779967147.884802,
+    "ast_hash": "c066093afbffa7fdd24661116f0b918c",
+    "semantic_hash": "c066093afbffa7fdd24661116f0b918c"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/bench_test.go": {
+    "mtime": 1779967147.8849835,
+    "ast_hash": "b8b19aeb5cba6b153ad253950e5ae731",
+    "semantic_hash": "b8b19aeb5cba6b153ad253950e5ae731"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/collapse_test.go": {
+    "mtime": 1779967147.8851426,
+    "ast_hash": "2dce17e5d8ac50c58000be60f2fcc5cf",
+    "semantic_hash": "2dce17e5d8ac50c58000be60f2fcc5cf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/model.go": {
+    "mtime": 1780036938.621226,
+    "ast_hash": "0f602706e0b1987a21c2d938c082db38",
+    "semantic_hash": "0f602706e0b1987a21c2d938c082db38"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/model_test.go": {
+    "mtime": 1780036938.6215212,
+    "ast_hash": "5fbe53940e249cd2a5d7c12a421940d9",
+    "semantic_hash": "5fbe53940e249cd2a5d7c12a421940d9"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/muted_test.go": {
+    "mtime": 1779967147.8856423,
+    "ast_hash": "7111f9c08b076e70b3650c5a08bbe142",
+    "semantic_hash": "7111f9c08b076e70b3650c5a08bbe142"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/section_nav_test.go": {
+    "mtime": 1779967147.8857858,
+    "ast_hash": "04bcc090eafff4bc9b3b0cb946dd79cc",
+    "semantic_hash": "04bcc090eafff4bc9b3b0cb946dd79cc"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/sections_provider.go": {
+    "mtime": 1779967147.8858953,
+    "ast_hash": "9291fd933fe31ecbdaf4d6b4de60489f",
+    "semantic_hash": "9291fd933fe31ecbdaf4d6b4de60489f"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/staleness.go": {
+    "mtime": 1779967147.8859985,
+    "ast_hash": "78bfa89538cbfa1fe91ce6e0ca0e425e",
+    "semantic_hash": "78bfa89538cbfa1fe91ce6e0ca0e425e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/sidebar/staleness_test.go": {
+    "mtime": 1779967147.886133,
+    "ast_hash": "44121d9e28ba657039b63cf15bd07bcb",
+    "semantic_hash": "44121d9e28ba657039b63cf15bd07bcb"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/statusbar/model.go": {
+    "mtime": 1780052084.2293081,
+    "ast_hash": "5284eb7aeaf39ff11dd7d26890893105",
+    "semantic_hash": "5284eb7aeaf39ff11dd7d26890893105"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/statusbar/model_test.go": {
+    "mtime": 1779967147.8866124,
+    "ast_hash": "1615c0a82d9c25bf500c79f03e2f6bc1",
+    "semantic_hash": "1615c0a82d9c25bf500c79f03e2f6bc1"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/spinner.go": {
+    "mtime": 1779967147.8867936,
+    "ast_hash": "cba0fc5be457fe016095abed43ce6775",
+    "semantic_hash": "cba0fc5be457fe016095abed43ce6775"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/styles.go": {
+    "mtime": 1779967147.886984,
+    "ast_hash": "f63b83dba54528cf59f78d74a8e91994",
+    "semantic_hash": "f63b83dba54528cf59f78d74a8e91994"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/styles_test.go": {
+    "mtime": 1779967147.8871322,
+    "ast_hash": "856cbf50ce37030c0ccffbd23643ca44",
+    "semantic_hash": "856cbf50ce37030c0ccffbd23643ca44"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/themes.go": {
+    "mtime": 1779967147.887247,
+    "ast_hash": "5d88382cb9cdb1882ee500db07bf1f74",
+    "semantic_hash": "5d88382cb9cdb1882ee500db07bf1f74"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/themes_test.go": {
+    "mtime": 1779967147.8874083,
+    "ast_hash": "cd00a9afbe247ea47596fbacbaf4c26b",
+    "semantic_hash": "cd00a9afbe247ea47596fbacbaf4c26b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/tint.go": {
+    "mtime": 1779967147.887517,
+    "ast_hash": "e9e85032390c49fc0570dc30af7b7cdf",
+    "semantic_hash": "e9e85032390c49fc0570dc30af7b7cdf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/styles/tint_test.go": {
+    "mtime": 1779967147.887622,
+    "ast_hash": "7e6dca878af5885002a6148b67e9819a",
+    "semantic_hash": "7e6dca878af5885002a6148b67e9819a"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/themeswitcher/model.go": {
+    "mtime": 1779967147.887942,
+    "ast_hash": "6e39e3cd21454c145f278039ac26594b",
+    "semantic_hash": "6e39e3cd21454c145f278039ac26594b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/themeswitcher/model_test.go": {
+    "mtime": 1779967147.8880372,
+    "ast_hash": "269d64271d5f60dd41f9a5b1f83cdf23",
+    "semantic_hash": "269d64271d5f60dd41f9a5b1f83cdf23"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/thread/bench_test.go": {
+    "mtime": 1779967147.8881974,
+    "ast_hash": "2b3f8e0736a74a729f85d5e8efeb8cb8",
+    "semantic_hash": "2b3f8e0736a74a729f85d5e8efeb8cb8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/thread/model.go": {
+    "mtime": 1780820538.4324272,
+    "ast_hash": "eaed8f240bd430b67086461208726db9",
+    "semantic_hash": "eaed8f240bd430b67086461208726db9"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/thread/model_test.go": {
+    "mtime": 1780036938.6222923,
+    "ast_hash": "1b493148683e3777580f89eb1e4ab6cd",
+    "semantic_hash": "1b493148683e3777580f89eb1e4ab6cd"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/thread/render_test.go": {
+    "mtime": 1779967147.8886573,
+    "ast_hash": "261320b69dc2ba08ba9d4618416d6e49",
+    "semantic_hash": "261320b69dc2ba08ba9d4618416d6e49"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/thread/selection_test.go": {
+    "mtime": 1779967147.888818,
+    "ast_hash": "c741db32d7f4bfee8492d0f067612fb0",
+    "semantic_hash": "c741db32d7f4bfee8492d0f067612fb0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/threadsview/bench_test.go": {
+    "mtime": 1779967147.8889997,
+    "ast_hash": "177431cb04e2d67c9ba15170666d4018",
+    "semantic_hash": "177431cb04e2d67c9ba15170666d4018"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/threadsview/model.go": {
+    "mtime": 1780820538.4327204,
+    "ast_hash": "8133e58c53dc9755793b11bdd1b1ff5e",
+    "semantic_hash": "8133e58c53dc9755793b11bdd1b1ff5e"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/threadsview/model_test.go": {
+    "mtime": 1779967147.8892877,
+    "ast_hash": "8e9a75322d57034d4f5f5b9664f851c3",
+    "semantic_hash": "8e9a75322d57034d4f5f5b9664f851c3"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/typing.go": {
+    "mtime": 1779967147.8895538,
+    "ast_hash": "c0858412a7f2f44504ed48012f7119bf",
+    "semantic_hash": "c0858412a7f2f44504ed48012f7119bf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_early.go": {
+    "mtime": 1779967147.8896499,
+    "ast_hash": "e7e15ba1e3437f034e80ad596b96cbf6",
+    "semantic_hash": "e7e15ba1e3437f034e80ad596b96cbf6"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_helpers.go": {
+    "mtime": 1779967147.8897595,
+    "ast_hash": "c674b688a9e66631e5173dee5df25ba8",
+    "semantic_hash": "c674b688a9e66631e5173dee5df25ba8"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_messages.go": {
+    "mtime": 1779967147.8900135,
+    "ast_hash": "192b4ad4e98215c5c5462223ccbfb311",
+    "semantic_hash": "192b4ad4e98215c5c5462223ccbfb311"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_overlays.go": {
+    "mtime": 1779967147.8902953,
+    "ast_hash": "ec439a08c7cec34b50ca4bb9fdf2367d",
+    "semantic_hash": "ec439a08c7cec34b50ca4bb9fdf2367d"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_preview.go": {
+    "mtime": 1779967147.8903923,
+    "ast_hash": "8ada8ed080315d270ab0018827250bc4",
+    "semantic_hash": "8ada8ed080315d270ab0018827250bc4"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_rail.go": {
+    "mtime": 1779967147.8904839,
+    "ast_hash": "a1411a1e7e01fdd2d52e1a0c980bd4c7",
+    "semantic_hash": "a1411a1e7e01fdd2d52e1a0c980bd4c7"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_sidebar.go": {
+    "mtime": 1779967147.890577,
+    "ast_hash": "14d8128aea9ddaebb6f40d8088903bdf",
+    "semantic_hash": "14d8128aea9ddaebb6f40d8088903bdf"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_status.go": {
+    "mtime": 1779967147.8906708,
+    "ast_hash": "38f8a7c5b4962b90398ee2716d4870ed",
+    "semantic_hash": "38f8a7c5b4962b90398ee2716d4870ed"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/view_thread.go": {
+    "mtime": 1779967147.8907976,
+    "ast_hash": "6aa3677df6b5ce1d50be79973ecb6514",
+    "semantic_hash": "6aa3677df6b5ce1d50be79973ecb6514"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/workspace/model.go": {
+    "mtime": 1779967147.890996,
+    "ast_hash": "48c99543b4802eba28b9edf40e586909",
+    "semantic_hash": "48c99543b4802eba28b9edf40e586909"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/workspace/model_test.go": {
+    "mtime": 1779967147.8910935,
+    "ast_hash": "01061fc830572f79ddd7c70d3d62b017",
+    "semantic_hash": "01061fc830572f79ddd7c70d3d62b017"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/workspacefinder/model.go": {
+    "mtime": 1779967147.8913288,
+    "ast_hash": "e117f3809e20eb382d861f94ade6709b",
+    "semantic_hash": "e117f3809e20eb382d861f94ade6709b"
+  },
+  "/Users/siltala/dev/personal/slk/internal/ui/workspacefinder/model_test.go": {
+    "mtime": 1779967147.8914657,
+    "ast_hash": "f7ee862d74e5062bfccc9478736977d2",
+    "semantic_hash": "f7ee862d74e5062bfccc9478736977d2"
+  },
+  "/Users/siltala/dev/personal/slk/internal/wake/detector.go": {
+    "mtime": 1779967147.891625,
+    "ast_hash": "fca0f9529b9d1d8c45160202d293d0cc",
+    "semantic_hash": "fca0f9529b9d1d8c45160202d293d0cc"
+  },
+  "/Users/siltala/dev/personal/slk/internal/wake/detector_test.go": {
+    "mtime": 1779967147.8917553,
+    "ast_hash": "e77f989165d326d182f7500cd831403e",
+    "semantic_hash": "e77f989165d326d182f7500cd831403e"
+  },
+  "/Users/siltala/dev/personal/slk/.github/workflows/ci.yml": {
+    "mtime": 1779967147.8010569,
+    "ast_hash": "18fec0428ffaee6be3d833c218b9ca10",
+    "semantic_hash": "18fec0428ffaee6be3d833c218b9ca10"
+  },
+  "/Users/siltala/dev/personal/slk/.github/workflows/release.yml": {
+    "mtime": 1779967147.8013957,
+    "ast_hash": "6b3fa16dba51c37b64cd1e26a5f8a2fb",
+    "semantic_hash": "6b3fa16dba51c37b64cd1e26a5f8a2fb"
+  },
+  "/Users/siltala/dev/personal/slk/.golangci.yml": {
+    "mtime": 1779967147.8016114,
+    "ast_hash": "c199967bf28b190510dc17f2368cdf80",
+    "semantic_hash": "c199967bf28b190510dc17f2368cdf80"
+  },
+  "/Users/siltala/dev/personal/slk/.goreleaser.yaml": {
+    "mtime": 1779967147.8017526,
+    "ast_hash": "45aeea304397ed54d98e228c0b94fd5f",
+    "semantic_hash": "45aeea304397ed54d98e228c0b94fd5f"
+  },
+  "/Users/siltala/dev/personal/slk/README.md": {
+    "mtime": 1779967147.8021064,
+    "ast_hash": "1a9ed504d66d9662a4376c8e9ccb3bb9",
+    "semantic_hash": "1a9ed504d66d9662a4376c8e9ccb3bb9"
+  },
+  "/Users/siltala/dev/personal/slk/docs/STATUS.md": {
+    "mtime": 1779967147.8051775,
+    "ast_hash": "a126c545ee552b034e3e29264c88da1a",
+    "semantic_hash": "a126c545ee552b034e3e29264c88da1a"
+  },
+  "/Users/siltala/dev/personal/slk/docs/plans/2026-05-17-sync-watermark.md": {
+    "mtime": 1779967147.8064344,
+    "ast_hash": "3f976cd0bebb52dca8bc36642ef096f3",
+    "semantic_hash": "3f976cd0bebb52dca8bc36642ef096f3"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/notes/2026-05-12-subscriptions-thread-endpoint.md": {
+    "mtime": 1779967147.8067024,
+    "ast_hash": "fdfa68f5cddd49c13754dc5f508499f8",
+    "semantic_hash": "fdfa68f5cddd49c13754dc5f508499f8"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-23-slack-tui-mvp.md": {
+    "mtime": 1779967147.8070102,
+    "ast_hash": "f21947b15bc0fcabbdf4aa0b8e823e64",
+    "semantic_hash": "f21947b15bc0fcabbdf4aa0b8e823e64"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-24-browser-cookie-auth.md": {
+    "mtime": 1779967147.8072205,
+    "ast_hash": "a1f4b4e3a75fc51d45c59e13292476f4",
+    "semantic_hash": "a1f4b4e3a75fc51d45c59e13292476f4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-25-fuzzy-channel-finder.md": {
+    "mtime": 1779967147.8073676,
+    "ast_hash": "14321d386ea7271dbac9cce4e2412a8a",
+    "semantic_hash": "14321d386ea7271dbac9cce4e2412a8a"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-25-qol-ui-fixes.md": {
+    "mtime": 1779967147.8075776,
+    "ast_hash": "fb9f869b9eab13bf3cb6729a9b71432d",
+    "semantic_hash": "fb9f869b9eab13bf3cb6729a9b71432d"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-25-reflow-viewport-refactor.md": {
+    "mtime": 1779967147.807788,
+    "ast_hash": "b61d0c6bc93a3d8250745d5aaa2df7a4",
+    "semantic_hash": "b61d0c6bc93a3d8250745d5aaa2df7a4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-25-thread-panel.md": {
+    "mtime": 1779967147.8079383,
+    "ast_hash": "8fe8fb419a4cca30d1ac5eb342c07eed",
+    "semantic_hash": "8fe8fb419a4cca30d1ac5eb342c07eed"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-compose-mentions.md": {
+    "mtime": 1779967147.8080823,
+    "ast_hash": "3bdd06bf3266749027b784278c633cb4",
+    "semantic_hash": "3bdd06bf3266749027b784278c633cb4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-customizable-themes.md": {
+    "mtime": 1779967147.808308,
+    "ast_hash": "4d164277e6e5f5acab5f9c678a6c8449",
+    "semantic_hash": "4d164277e6e5f5acab5f9c678a6c8449"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-desktop-notifications.md": {
+    "mtime": 1779967147.80849,
+    "ast_hash": "ac7d1428cc260ec39bc61c92dd776e3b",
+    "semantic_hash": "ac7d1428cc260ec39bc61c92dd776e3b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-reaction-picker.md": {
+    "mtime": 1779967147.808681,
+    "ast_hash": "c6a5d1b56f8c13756ff82160f79cc1a3",
+    "semantic_hash": "c6a5d1b56f8c13756ff82160f79cc1a3"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-reconnection-and-landmark.md": {
+    "mtime": 1779967147.808822,
+    "ast_hash": "b913cc084ab88fecb2fe804fdb419986",
+    "semantic_hash": "b913cc084ab88fecb2fe804fdb419986"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-typing-indicators.md": {
+    "mtime": 1779967147.8089995,
+    "ast_hash": "ab5b77e58979c6515309460c2583ec44",
+    "semantic_hash": "ab5b77e58979c6515309460c2583ec44"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-26-workspace-switching.md": {
+    "mtime": 1779967147.8091366,
+    "ast_hash": "835a87d36a46d906af03cfdc3133b0cf",
+    "semantic_hash": "835a87d36a46d906af03cfdc3133b0cf"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-27-customizable-themes.md": {
+    "mtime": 1779967147.80925,
+    "ast_hash": "5644a50adb567273fce43525ac9d1a34",
+    "semantic_hash": "5644a50adb567273fce43525ac9d1a34"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-27-displaywidth-fix.md": {
+    "mtime": 1779967147.809408,
+    "ast_hash": "7bd49f63ec6dc79289f33ac9a20f947f",
+    "semantic_hash": "7bd49f63ec6dc79289f33ac9a20f947f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-27-emoji-width-probing.md": {
+    "mtime": 1780036938.6077156,
+    "ast_hash": "b4886a7a4b4f681f9be2475c9188bb87",
+    "semantic_hash": "b4886a7a4b4f681f9be2475c9188bb87"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-27-lipgloss-v2-migration.md": {
+    "mtime": 1779967147.809746,
+    "ast_hash": "002c8fe8dc6f9ab0c368475a2c66abb8",
+    "semantic_hash": "002c8fe8dc6f9ab0c368475a2c66abb8"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-27-ui-fixes-batch.md": {
+    "mtime": 1779967147.809874,
+    "ast_hash": "ab2098b7431110082e673127877287a2",
+    "semantic_hash": "ab2098b7431110082e673127877287a2"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-28-copy-message-permalink.md": {
+    "mtime": 1779967147.8100193,
+    "ast_hash": "b61f37899256cc99c23342934e60811d",
+    "semantic_hash": "b61f37899256cc99c23342934e60811d"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-28-inline-emoji-selector.md": {
+    "mtime": 1779967147.810207,
+    "ast_hash": "e9d2f902bb350ac564b64bcbdd17c9fa",
+    "semantic_hash": "e9d2f902bb350ac564b64bcbdd17c9fa"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-28-message-text-selection.md": {
+    "mtime": 1779967147.8104172,
+    "ast_hash": "85e6693f3900fa8c4dcb3bfd5fe3c89a",
+    "semantic_hash": "85e6693f3900fa8c4dcb3bfd5fe3c89a"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-28-themes-and-per-workspace.md": {
+    "mtime": 1779967147.810572,
+    "ast_hash": "17325324c666009774b9da9ff9559904",
+    "semantic_hash": "17325324c666009774b9da9ff9559904"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-28-threads-view.md": {
+    "mtime": 1779967147.8107915,
+    "ast_hash": "8a5f5811327da35bbc95b72f526d3c79",
+    "semantic_hash": "8a5f5811327da35bbc95b72f526d3c79"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-edit-delete-messages.md": {
+    "mtime": 1779967147.8109956,
+    "ast_hash": "8b8e0fcd4e9e83109a976054529ce0d3",
+    "semantic_hash": "8b8e0fcd4e9e83109a976054529ce0d3"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/00-overview.md": {
+    "mtime": 1779967147.8112156,
+    "ast_hash": "6add7e9136e3d47a9563a8b0d9391fca",
+    "semantic_hash": "6add7e9136e3d47a9563a8b0d9391fca"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/01-image-package-foundation.md": {
+    "mtime": 1779967147.8113694,
+    "ast_hash": "d1d45e353493bd156ebbe77e538bf8ef",
+    "semantic_hash": "d1d45e353493bd156ebbe77e538bf8ef"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/02-avatar-refactor.md": {
+    "mtime": 1779967147.8115675,
+    "ast_hash": "0fe01a65499c08f90a1dbcfe0efd4707",
+    "semantic_hash": "0fe01a65499c08f90a1dbcfe0efd4707"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/03-kitty-renderer.md": {
+    "mtime": 1779967147.8116913,
+    "ast_hash": "74a525c9586b96b087cb486430dff5d4",
+    "semantic_hash": "74a525c9586b96b087cb486430dff5d4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/04-sixel-renderer.md": {
+    "mtime": 1779967147.8118424,
+    "ast_hash": "84aaa5f53108426b9d989808fe7cdb5f",
+    "semantic_hash": "84aaa5f53108426b9d989808fe7cdb5f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/05-inline-images-messages-pane.md": {
+    "mtime": 1779967147.8119755,
+    "ast_hash": "5368cec5a262e5972500ce090b60e034",
+    "semantic_hash": "5368cec5a262e5972500ce090b60e034"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/06-wire-kitty-sixel.md": {
+    "mtime": 1779967147.8123283,
+    "ast_hash": "3a8ec5ad01af3c82bd8c4d10e52831e0",
+    "semantic_hash": "3a8ec5ad01af3c82bd8c4d10e52831e0"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/07-fullscreen-preview.md": {
+    "mtime": 1779967147.8125088,
+    "ast_hash": "b90460fded302b06676443d1bfb784f0",
+    "semantic_hash": "b90460fded302b06676443d1bfb784f0"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-inline-images/08-docs.md": {
+    "mtime": 1779967147.8126452,
+    "ast_hash": "bfa2ec7e535174c4bdd21be6ce71dcc1",
+    "semantic_hash": "bfa2ec7e535174c4bdd21be6ce71dcc1"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-paste-image-upload.md": {
+    "mtime": 1779967147.812833,
+    "ast_hash": "0c95705c40b00936f60e324bfbbb049e",
+    "semantic_hash": "0c95705c40b00936f60e324bfbbb049e"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-29-presence-and-dnd.md": {
+    "mtime": 1779967147.8130214,
+    "ast_hash": "3fde1568914ec8e8387e80372bb9d910",
+    "semantic_hash": "3fde1568914ec8e8387e80372bb9d910"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-block-kit-rendering/00-overview.md": {
+    "mtime": 1779967147.8132653,
+    "ast_hash": "e22c560d7d45c196fcd9b412f564d28b",
+    "semantic_hash": "e22c560d7d45c196fcd9b412f564d28b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-block-kit-rendering/01-data-model-and-parsing.md": {
+    "mtime": 1779967147.8134046,
+    "ast_hash": "6dfe2bae758cd9987be1045412962395",
+    "semantic_hash": "6dfe2bae758cd9987be1045412962395"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-block-kit-rendering/02-simple-blocks.md": {
+    "mtime": 1779967147.8135393,
+    "ast_hash": "39bf18850c903682d80c8431bbfed2a6",
+    "semantic_hash": "39bf18850c903682d80c8431bbfed2a6"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-block-kit-rendering/03-actions-and-images.md": {
+    "mtime": 1779967147.8136752,
+    "ast_hash": "a16501127eaa4faac855e208654cd778",
+    "semantic_hash": "a16501127eaa4faac855e208654cd778"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-block-kit-rendering/04-legacy-attachments.md": {
+    "mtime": 1779967147.8138094,
+    "ast_hash": "84443ef0b0f31cdbeef485dd35579be7",
+    "semantic_hash": "84443ef0b0f31cdbeef485dd35579be7"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-block-kit-rendering/05-integration.md": {
+    "mtime": 1779967147.8139434,
+    "ast_hash": "07f353eade1f8d0d2ceaff193a7d3fd9",
+    "semantic_hash": "07f353eade1f8d0d2ceaff193a7d3fd9"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-per-workspace-config-sections.md": {
+    "mtime": 1779967147.8141134,
+    "ast_hash": "65c7c31da08b2c5233be5125fbcf9e77",
+    "semantic_hash": "65c7c31da08b2c5233be5125fbcf9e77"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-04-30-thread-perf-fixes.md": {
+    "mtime": 1779967147.8145132,
+    "ast_hash": "2261b7e80ac3c402eb6cff7eac181af5",
+    "semantic_hash": "2261b7e80ac3c402eb6cff7eac181af5"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-01-commonmark-compose.md": {
+    "mtime": 1779967147.814722,
+    "ast_hash": "c2974c58e3e2d6d1212f63dad3616e33",
+    "semantic_hash": "c2974c58e3e2d6d1212f63dad3616e33"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-01-image-pipeline-followups.md": {
+    "mtime": 1779967147.8149104,
+    "ast_hash": "d08f6c218a857be3776d219ff5242ab3",
+    "semantic_hash": "d08f6c218a857be3776d219ff5242ab3"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-01-image-pipeline-perf.md": {
+    "mtime": 1779967147.8150706,
+    "ast_hash": "c67891ebf405f22e00bdd8d4aee9ebac",
+    "semantic_hash": "c67891ebf405f22e00bdd8d4aee9ebac"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-01-mark-unread.md": {
+    "mtime": 1779967147.8152778,
+    "ast_hash": "1271547a590c4d4f5d590642d2ae5023",
+    "semantic_hash": "1271547a590c4d4f5d590642d2ae5023"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-01-mpdm-unread-indicator.md": {
+    "mtime": 1779967147.8154602,
+    "ast_hash": "0cc8411479b6947cf4988c353aebf331",
+    "semantic_hash": "0cc8411479b6947cf4988c353aebf331"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-01-workspace-ordering.md": {
+    "mtime": 1779967147.815638,
+    "ast_hash": "3c5ccbbf5d68d91ed3d023baabcb5546",
+    "semantic_hash": "3c5ccbbf5d68d91ed3d023baabcb5546"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-02-mode-and-selection-and-thread-images.md": {
+    "mtime": 1779967147.8158402,
+    "ast_hash": "1d813d34b1f4a7625c7efd73b3a3215c",
+    "semantic_hash": "1d813d34b1f4a7625c7efd73b3a3215c"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-02-slack-native-sections.md": {
+    "mtime": 1779967147.8160675,
+    "ast_hash": "d181ea61be326c36201d772c93e83dae",
+    "semantic_hash": "d181ea61be326c36201d772c93e83dae"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-03-cache-first-message-loading.md": {
+    "mtime": 1779967147.8162303,
+    "ast_hash": "b9623149499175595d845cb892a019be",
+    "semantic_hash": "b9623149499175595d845cb892a019be"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-09-channel-history-and-recency.md": {
+    "mtime": 1779967147.8164172,
+    "ast_hash": "1d599d6fa5ad61184f12d4e1aecbbdfd",
+    "semantic_hash": "1d599d6fa5ad61184f12d4e1aecbbdfd"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-09-debug-logging-cache.md": {
+    "mtime": 1779967147.8165736,
+    "ast_hash": "f6ca93d6738bf9db609663e880f8fc57",
+    "semantic_hash": "f6ca93d6738bf9db609663e880f8fc57"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-09-debug-logging-foundation.md": {
+    "mtime": 1779967147.8167279,
+    "ast_hash": "938f6f8d7b6bda55b85e0cdf8f986072",
+    "semantic_hash": "938f6f8d7b6bda55b85e0cdf8f986072"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-09-debug-logging-images.md": {
+    "mtime": 1779967147.8169084,
+    "ast_hash": "b966a6dfdc8f76ad39282d15c2281b86",
+    "semantic_hash": "b966a6dfdc8f76ad39282d15c2281b86"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-10-messages-cache-integrity.md": {
+    "mtime": 1779967147.8171158,
+    "ast_hash": "85c66624977f44318a5c244462954f9d",
+    "semantic_hash": "85c66624977f44318a5c244462954f9d"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-11-reconnect-backfill-and-threads-sort.md": {
+    "mtime": 1779967147.817312,
+    "ast_hash": "bbb725348777bdfdc316e7621b977bf5",
+    "semantic_hash": "bbb725348777bdfdc316e7621b977bf5"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-12-subscriptions-thread.md": {
+    "mtime": 1779967147.8176017,
+    "ast_hash": "e3ab1038ba0e5d0aad1c43458e96ecf0",
+    "semantic_hash": "e3ab1038ba0e5d0aad1c43458e96ecf0"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-17-read-state-sync.md": {
+    "mtime": 1779967147.8178284,
+    "ast_hash": "eb1d4a2744e9c843a5f92f94dce53b6f",
+    "semantic_hash": "eb1d4a2744e9c843a5f92f94dce53b6f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-19-accent-insensitive-matching.md": {
+    "mtime": 1779967147.81798,
+    "ast_hash": "4d660bd325f21973ea4e9326ec8e7230",
+    "semantic_hash": "4d660bd325f21973ea4e9326ec8e7230"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-20-browser-like-headers-verification-notes.md": {
+    "mtime": 1779967147.8180952,
+    "ast_hash": "91cbd9e5c744218f1d844f164281f938",
+    "semantic_hash": "91cbd9e5c744218f1d844f164281f938"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-20-browser-like-headers.md": {
+    "mtime": 1779967147.8182373,
+    "ast_hash": "a7ffc87433155b9fc311e71bcb476089",
+    "semantic_hash": "a7ffc87433155b9fc311e71bcb476089"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-21-tab-title-unread-indicator.md": {
+    "mtime": 1779967147.81838,
+    "ast_hash": "0fa93b5c48ea7b36f1afcc7e08031e90",
+    "semantic_hash": "0fa93b5c48ea7b36f1afcc7e08031e90"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-23-app-go-solid-refactor.md": {
+    "mtime": 1779967147.8185656,
+    "ast_hash": "382497d74ff02bd817bd549cbe6e4414",
+    "semantic_hash": "382497d74ff02bd817bd549cbe6e4414"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-24-emoji-shortcode-fallback.md": {
+    "mtime": 1779967147.8187082,
+    "ast_hash": "76d8664eaa93ffb89d37de067b3f7c8c",
+    "semantic_hash": "76d8664eaa93ffb89d37de067b3f7c8c"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-ansi-palette-themes.md": {
+    "mtime": 1779967147.8188636,
+    "ast_hash": "a5b49f6ad3d1ba66952242ed86447869",
+    "semantic_hash": "a5b49f6ad3d1ba66952242ed86447869"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature.md": {
+    "mtime": 1779967147.8190148,
+    "ast_hash": "e31e5aa7d0395b09af201f6a57bbc350",
+    "semantic_hash": "e31e5aa7d0395b09af201f6a57bbc350"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/naming.md": {
+    "mtime": 1779967147.8191707,
+    "ast_hash": "728bf877ea1eeb627506ced969b771cf",
+    "semantic_hash": "728bf877ea1eeb627506ced969b771cf"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-01-slack-client.md": {
+    "mtime": 1779967147.8193197,
+    "ast_hash": "a35f0564b8a81121e5bd2ae89d608260",
+    "semantic_hash": "a35f0564b8a81121e5bd2ae89d608260"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-02-picker-skeleton.md": {
+    "mtime": 1779967147.8194609,
+    "ast_hash": "70011447cf32d2857020dd2f4c5c7224",
+    "semantic_hash": "70011447cf32d2857020dd2f4c5c7224"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-03-picker-filter.md": {
+    "mtime": 1779967147.8197072,
+    "ast_hash": "e78e8eb3180501d299feb64f540452e2",
+    "semantic_hash": "e78e8eb3180501d299feb64f540452e2"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-04-picker-selection.md": {
+    "mtime": 1779967147.8199604,
+    "ast_hash": "f93f79f2c0febc5f15b16b7c03ad8bf0",
+    "semantic_hash": "f93f79f2c0febc5f15b16b7c03ad8bf0"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-05-picker-submit.md": {
+    "mtime": 1779967147.8200986,
+    "ast_hash": "75b1a74988f1f294443535e183908023",
+    "semantic_hash": "75b1a74988f1f294443535e183908023"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-06-picker-view.md": {
+    "mtime": 1779967147.8203423,
+    "ast_hash": "7d38050cfdb1e10d111540902ab27260",
+    "semantic_hash": "7d38050cfdb1e10d111540902ab27260"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-07-mode-and-msgs.md": {
+    "mtime": 1779967147.8204498,
+    "ast_hash": "6f7749de3facd6eec795c30f35a928fa",
+    "semantic_hash": "6f7749de3facd6eec795c30f35a928fa"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-08-channel-service.md": {
+    "mtime": 1779967147.8205516,
+    "ast_hash": "c681122834fe5f0d0cbebbf21eaa50a4",
+    "semantic_hash": "c681122834fe5f0d0cbebbf21eaa50a4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-09-app-wiring.md": {
+    "mtime": 1779967147.8206918,
+    "ast_hash": "3ec3987c2371ae67c2553249aa8eeb95",
+    "semantic_hash": "3ec3987c2371ae67c2553249aa8eeb95"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-10-user-list-recency.md": {
+    "mtime": 1779967147.8208246,
+    "ast_hash": "5c1a1149548ad269e4aa483f6783e640",
+    "semantic_hash": "5c1a1149548ad269e4aa483f6783e640"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-11-reducer.md": {
+    "mtime": 1779967147.8212614,
+    "ast_hash": "d9835a9b2b8367c7782d571a22c64f9e",
+    "semantic_hash": "d9835a9b2b8367c7782d571a22c64f9e"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-12-cache-hydration.md": {
+    "mtime": 1779967147.8214395,
+    "ast_hash": "b5bb782df08dfd52ed82dc76abdb0dd4",
+    "semantic_hash": "b5bb782df08dfd52ed82dc76abdb0dd4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-13-main-wiring.md": {
+    "mtime": 1779967147.8215628,
+    "ast_hash": "0f9980ced898a1ed9e78385c5a455597",
+    "semantic_hash": "0f9980ced898a1ed9e78385c5a455597"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-25-new-message-feature/task-14-e2e.md": {
+    "mtime": 1779967147.8217196,
+    "ast_hash": "a70094c9f4b38647485676b1828739d1",
+    "semantic_hash": "a70094c9f4b38647485676b1828739d1"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/00-overview.md": {
+    "mtime": 1779967147.8220685,
+    "ast_hash": "932b22eb27892f02295a7169b6b545a4",
+    "semantic_hash": "932b22eb27892f02295a7169b6b545a4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/01-config.md": {
+    "mtime": 1779967147.8223453,
+    "ast_hash": "a58a0070da839d90425612496c3e878b",
+    "semantic_hash": "a58a0070da839d90425612496c3e878b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/02-url-building.md": {
+    "mtime": 1780036938.6083565,
+    "ast_hash": "ca592ce2afe7ea809578b12455f21734",
+    "semantic_hash": "ca592ce2afe7ea809578b12455f21734"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/04-width-and-probe.md": {
+    "mtime": 1780036938.6087604,
+    "ast_hash": "69d2b7c4137377b537de889b7b3e4478",
+    "semantic_hash": "69d2b7c4137377b537de889b7b3e4478"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/05-place-helper.md": {
+    "mtime": 1779967147.8229668,
+    "ast_hash": "6a0bc6036e393109f83c99051891188a",
+    "semantic_hash": "6a0bc6036e393109f83c99051891188a"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/06-messages-and-reactions.md": {
+    "mtime": 1779967147.8231428,
+    "ast_hash": "812db403700675f6334739bab5f3c141",
+    "semantic_hash": "812db403700675f6334739bab5f3c141"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/07-thread-pane.md": {
+    "mtime": 1779967147.8233612,
+    "ast_hash": "bc0db24b94efe20ccf5af6e273793a75",
+    "semantic_hash": "bc0db24b94efe20ccf5af6e273793a75"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/08-picker.md": {
+    "mtime": 1779967147.8236227,
+    "ast_hash": "0c479850ea2a3b3c56670be0d04861a6",
+    "semantic_hash": "0c479850ea2a3b3c56670be0d04861a6"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/09-autocomplete.md": {
+    "mtime": 1779967147.8238974,
+    "ast_hash": "777b06068ec1575a534de01b6ac098cf",
+    "semantic_hash": "777b06068ec1575a534de01b6ac098cf"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/10-yank-and-search.md": {
+    "mtime": 1779967147.8241649,
+    "ast_hash": "69c6a7d93bda6c40551771ec7f0dc372",
+    "semantic_hash": "69c6a7d93bda6c40551771ec7f0dc372"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-emoji-as-images/11-docs.md": {
+    "mtime": 1779967147.8244572,
+    "ast_hash": "12f0a5593320eed7dce874a11741de33",
+    "semantic_hash": "12f0a5593320eed7dce874a11741de33"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/plans/2026-05-27-version-and-attribution.md": {
+    "mtime": 1779967147.8246114,
+    "ast_hash": "e1418154854bf45d04ab3495ef877a6e",
+    "semantic_hash": "e1418154854bf45d04ab3495ef877a6e"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-23-slack-tui-design.md": {
+    "mtime": 1779967147.8262084,
+    "ast_hash": "4da97725268e7e4f986073ed306c73f4",
+    "semantic_hash": "4da97725268e7e4f986073ed306c73f4"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-24-browser-cookie-auth.md": {
+    "mtime": 1779967147.8263793,
+    "ast_hash": "c0178e090a1fb4cc758bada47283069f",
+    "semantic_hash": "c0178e090a1fb4cc758bada47283069f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-25-fuzzy-channel-finder.md": {
+    "mtime": 1779967147.8265386,
+    "ast_hash": "a559458b61379031235344caa4d03705",
+    "semantic_hash": "a559458b61379031235344caa4d03705"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-25-qol-ui-fixes.md": {
+    "mtime": 1779967147.8266995,
+    "ast_hash": "0fc92699c3b97ff2588de122d0cc0ff7",
+    "semantic_hash": "0fc92699c3b97ff2588de122d0cc0ff7"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-25-reflow-viewport-refactor.md": {
+    "mtime": 1779967147.8268619,
+    "ast_hash": "e45e252bd1d9ec5ac8983f163735ff6f",
+    "semantic_hash": "e45e252bd1d9ec5ac8983f163735ff6f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-25-thread-panel-design.md": {
+    "mtime": 1779967147.8271232,
+    "ast_hash": "a83fd82edbd448950e9d2bf5dd34d791",
+    "semantic_hash": "a83fd82edbd448950e9d2bf5dd34d791"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-compose-mentions-design.md": {
+    "mtime": 1779967147.827287,
+    "ast_hash": "a0ac53475b326d183d14f127cdf131cd",
+    "semantic_hash": "a0ac53475b326d183d14f127cdf131cd"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-customizable-themes-design.md": {
+    "mtime": 1779967147.8274584,
+    "ast_hash": "fddec962370f5943610d2dea78560d1e",
+    "semantic_hash": "fddec962370f5943610d2dea78560d1e"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-desktop-notifications-design.md": {
+    "mtime": 1779967147.8276117,
+    "ast_hash": "49bb1ee2b4069b1255f6e69f74fbe674",
+    "semantic_hash": "49bb1ee2b4069b1255f6e69f74fbe674"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-reaction-picker-design.md": {
+    "mtime": 1779967147.8278387,
+    "ast_hash": "b167e24eafe9f68be9c842f6662be552",
+    "semantic_hash": "b167e24eafe9f68be9c842f6662be552"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-reconnection-and-new-message-landmark.md": {
+    "mtime": 1779967147.8281155,
+    "ast_hash": "b4dd6cddecf3810b1a0067dcb6518c41",
+    "semantic_hash": "b4dd6cddecf3810b1a0067dcb6518c41"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-typing-indicators-design.md": {
+    "mtime": 1779967147.8282733,
+    "ast_hash": "15303e953f90762fc695474fa5f2c919",
+    "semantic_hash": "15303e953f90762fc695474fa5f2c919"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-26-workspace-switching.md": {
+    "mtime": 1779967147.8285327,
+    "ast_hash": "33cb7551c624809749c44c7eb662298e",
+    "semantic_hash": "33cb7551c624809749c44c7eb662298e"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-27-emoji-width-findings.md": {
+    "mtime": 1779967147.8287015,
+    "ast_hash": "bc50f588d8fb184a02ffba8e16ea2498",
+    "semantic_hash": "bc50f588d8fb184a02ffba8e16ea2498"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-27-emoji-width-investigation.md": {
+    "mtime": 1779967147.8289888,
+    "ast_hash": "6c329d0d6079030e7666a6eafa691d92",
+    "semantic_hash": "6c329d0d6079030e7666a6eafa691d92"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-27-emoji-width-probing-design.md": {
+    "mtime": 1780036938.609403,
+    "ast_hash": "a6e8e94a2210c802f6037ac3d6b4590b",
+    "semantic_hash": "a6e8e94a2210c802f6037ac3d6b4590b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-27-lipgloss-v2-migration-design.md": {
+    "mtime": 1779967147.8293872,
+    "ast_hash": "5fd234c4ae4d4882f41bfb879524e765",
+    "semantic_hash": "5fd234c4ae4d4882f41bfb879524e765"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-27-ui-fixes-batch.md": {
+    "mtime": 1779967147.829545,
+    "ast_hash": "a87cff86c174a14d97bd80bb38578615",
+    "semantic_hash": "a87cff86c174a14d97bd80bb38578615"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-28-copy-message-permalink-design.md": {
+    "mtime": 1779967147.829708,
+    "ast_hash": "53956e5ab731e0735ffb254f98d6b9c8",
+    "semantic_hash": "53956e5ab731e0735ffb254f98d6b9c8"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-28-inline-emoji-selector-design.md": {
+    "mtime": 1779967147.829942,
+    "ast_hash": "55007af13fda53ba6ca5e3cd7a7f87ee",
+    "semantic_hash": "55007af13fda53ba6ca5e3cd7a7f87ee"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-28-message-text-selection-design.md": {
+    "mtime": 1779967147.8301501,
+    "ast_hash": "25fb34db9e850fa931c4ea101016d13c",
+    "semantic_hash": "25fb34db9e850fa931c4ea101016d13c"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-28-themes-and-per-workspace-design.md": {
+    "mtime": 1779967147.8303874,
+    "ast_hash": "f435eddbf04bf10374a7f26d50fb6169",
+    "semantic_hash": "f435eddbf04bf10374a7f26d50fb6169"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-28-threads-view-design.md": {
+    "mtime": 1779967147.830619,
+    "ast_hash": "41a3b928120a999a2f6c1924516d2a82",
+    "semantic_hash": "41a3b928120a999a2f6c1924516d2a82"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-29-edit-delete-messages-design.md": {
+    "mtime": 1779967147.83077,
+    "ast_hash": "1dc7f7e68b60185650b0597e6a41aad9",
+    "semantic_hash": "1dc7f7e68b60185650b0597e6a41aad9"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-29-inline-image-rendering-design.md": {
+    "mtime": 1779967147.830954,
+    "ast_hash": "1d2e5c30938a822e3823c1112bb1ee0b",
+    "semantic_hash": "1d2e5c30938a822e3823c1112bb1ee0b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-29-paste-image-upload-design.md": {
+    "mtime": 1779967147.8311357,
+    "ast_hash": "2170700c7188e274c7375171783bc4b2",
+    "semantic_hash": "2170700c7188e274c7375171783bc4b2"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-29-presence-and-dnd-design.md": {
+    "mtime": 1779967147.8313668,
+    "ast_hash": "d509f6e715bea3bfe163a9d2ad2daea2",
+    "semantic_hash": "d509f6e715bea3bfe163a9d2ad2daea2"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-30-block-kit-rendering-design.md": {
+    "mtime": 1779967147.8316357,
+    "ast_hash": "1cd3919b99a5230460dec96189a88a5f",
+    "semantic_hash": "1cd3919b99a5230460dec96189a88a5f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-04-30-per-workspace-config-sections-design.md": {
+    "mtime": 1779967147.8318043,
+    "ast_hash": "68abf5a8bc10a190216e096cab21900a",
+    "semantic_hash": "68abf5a8bc10a190216e096cab21900a"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-01-commonmark-compose-design.md": {
+    "mtime": 1779967147.8319702,
+    "ast_hash": "3aefba8b9f58c3405adc8cdf8d125d39",
+    "semantic_hash": "3aefba8b9f58c3405adc8cdf8d125d39"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-01-mark-unread-design.md": {
+    "mtime": 1779967147.832139,
+    "ast_hash": "79d9e38e7b4e8fb1ab27a2bef031783e",
+    "semantic_hash": "79d9e38e7b4e8fb1ab27a2bef031783e"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-01-workspace-ordering-design.md": {
+    "mtime": 1779967147.8323205,
+    "ast_hash": "4a5b3505a9c765006d7dc75d67e06157",
+    "semantic_hash": "4a5b3505a9c765006d7dc75d67e06157"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-02-mode-and-selection-and-thread-images-design.md": {
+    "mtime": 1779967147.8325913,
+    "ast_hash": "3a16149b6a01843a9275eb00d54da2e9",
+    "semantic_hash": "3a16149b6a01843a9275eb00d54da2e9"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-02-slack-native-sections-design.md": {
+    "mtime": 1779967147.8327453,
+    "ast_hash": "56f5df748b57fff1c20c02be178b01f1",
+    "semantic_hash": "56f5df748b57fff1c20c02be178b01f1"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-03-1.0-readiness-design.md": {
+    "mtime": 1779967147.8329,
+    "ast_hash": "ffd15d3d3249733daf806f5e94b21272",
+    "semantic_hash": "ffd15d3d3249733daf806f5e94b21272"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-03-cache-first-message-loading-design.md": {
+    "mtime": 1779967147.8331113,
+    "ast_hash": "f12383206055f7ef9e465961777f274b",
+    "semantic_hash": "f12383206055f7ef9e465961777f274b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-09-channel-history-and-recency-design.md": {
+    "mtime": 1779967147.8333275,
+    "ast_hash": "3e03c5bf3254394699ba3d16b28ddbac",
+    "semantic_hash": "3e03c5bf3254394699ba3d16b28ddbac"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-09-comprehensive-debug-logging-design.md": {
+    "mtime": 1779967147.8334866,
+    "ast_hash": "3cd940f1c651990bd4d2fd2a9d86cd61",
+    "semantic_hash": "3cd940f1c651990bd4d2fd2a9d86cd61"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-10-messages-cache-integrity-design.md": {
+    "mtime": 1779967147.833664,
+    "ast_hash": "6d3b1b914c8a92be9ceb849b2f9d9425",
+    "semantic_hash": "6d3b1b914c8a92be9ceb849b2f9d9425"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-11-reconnect-backfill-and-threads-sort-design.md": {
+    "mtime": 1779967147.8338828,
+    "ast_hash": "888d0047ce87b94620379d41950ba58c",
+    "semantic_hash": "888d0047ce87b94620379d41950ba58c"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-12-subscriptions-thread-design.md": {
+    "mtime": 1779967147.8340876,
+    "ast_hash": "b87558fbd5b02f7678501de29f88e95f",
+    "semantic_hash": "b87558fbd5b02f7678501de29f88e95f"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-17-read-state-sync-design.md": {
+    "mtime": 1779967147.8343534,
+    "ast_hash": "00604b96b64849e3036a35ed67a463ff",
+    "semantic_hash": "00604b96b64849e3036a35ed67a463ff"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-19-accent-insensitive-matching-design.md": {
+    "mtime": 1779967147.8345723,
+    "ast_hash": "b265d7d58a576c18bd82ae24c1a198c9",
+    "semantic_hash": "b265d7d58a576c18bd82ae24c1a198c9"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-20-mention-picker-channel-membership-design.md": {
+    "mtime": 1779967147.834716,
+    "ast_hash": "872fc7b6a00e7b9fcb8a2c1c6cd8e6e2",
+    "semantic_hash": "872fc7b6a00e7b9fcb8a2c1c6cd8e6e2"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-21-tab-title-unread-indicator-design.md": {
+    "mtime": 1779967147.8349972,
+    "ast_hash": "64d1c3990e11a9afe38c772615393938",
+    "semantic_hash": "64d1c3990e11a9afe38c772615393938"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-24-emoji-shortcode-fallback-design.md": {
+    "mtime": 1779967147.8351629,
+    "ast_hash": "e9aef8a16a2efc63ceb00c431b52872b",
+    "semantic_hash": "e9aef8a16a2efc63ceb00c431b52872b"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-25-ansi-palette-themes-design.md": {
+    "mtime": 1779967147.8354201,
+    "ast_hash": "e519ab1d29b281e1fa4dba3d9161c5c9",
+    "semantic_hash": "e519ab1d29b281e1fa4dba3d9161c5c9"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-25-new-message-feature-design.md": {
+    "mtime": 1779967147.8356268,
+    "ast_hash": "2f50fe8920b685421b3a0a1a9325e017",
+    "semantic_hash": "2f50fe8920b685421b3a0a1a9325e017"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-27-emoji-as-images-design.md": {
+    "mtime": 1780036938.610004,
+    "ast_hash": "e1b56529a0de49a919c07a2d2d061f24",
+    "semantic_hash": "e1b56529a0de49a919c07a2d2d061f24"
+  },
+  "/Users/siltala/dev/personal/slk/docs/superpowers/specs/2026-05-27-version-and-attribution-design.md": {
+    "mtime": 1779967147.8361266,
+    "ast_hash": "4d413f6b4757e65ecd6242e0ea409bf4",
+    "semantic_hash": "4d413f6b4757e65ecd6242e0ea409bf4"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Architecture.md": {
+    "mtime": 1779967147.8919082,
+    "ast_hash": "03b1578a571f4467ed44be6ef8a90aa2",
+    "semantic_hash": "03b1578a571f4467ed44be6ef8a90aa2"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Clipboard-and-OSC-52.md": {
+    "mtime": 1779967147.8920481,
+    "ast_hash": "491eff61455eab6ebf384c5ab4759d48",
+    "semantic_hash": "491eff61455eab6ebf384c5ab4759d48"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Configuration.md": {
+    "mtime": 1780036938.622761,
+    "ast_hash": "ca537df57b5856d9dc2b25a17d8acc86",
+    "semantic_hash": "ca537df57b5856d9dc2b25a17d8acc86"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Features.md": {
+    "mtime": 1780036938.6233442,
+    "ast_hash": "6d7a7306a35ec2e4f716fb8c09e7b45b",
+    "semantic_hash": "6d7a7306a35ec2e4f716fb8c09e7b45b"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Home.md": {
+    "mtime": 1779967147.892421,
+    "ast_hash": "3319ee2193e9946900d178ecbaf6f800",
+    "semantic_hash": "3319ee2193e9946900d178ecbaf6f800"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Installation.md": {
+    "mtime": 1779967147.892517,
+    "ast_hash": "fc0a88abe9028edde200dc3debcbf786",
+    "semantic_hash": "fc0a88abe9028edde200dc3debcbf786"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Keybindings.md": {
+    "mtime": 1780052084.2302659,
+    "ast_hash": "402c2f8910016f57dce29007b15eb1cb",
+    "semantic_hash": "402c2f8910016f57dce29007b15eb1cb"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Setup.md": {
+    "mtime": 1779967147.892858,
+    "ast_hash": "000696157bfc50eac5f50ed16344b0e7",
+    "semantic_hash": "000696157bfc50eac5f50ed16344b0e7"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Terminal-Compatibility.md": {
+    "mtime": 1779967147.8929772,
+    "ast_hash": "3b96256a6b5e6995a410ea410c4403b9",
+    "semantic_hash": "3b96256a6b5e6995a410ea410c4403b9"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/Tradeoffs-and-Non-Goals.md": {
+    "mtime": 1779967147.8930814,
+    "ast_hash": "9493348bd2014f87272f623c7578d3c7",
+    "semantic_hash": "9493348bd2014f87272f623c7578d3c7"
+  },
+  "/Users/siltala/dev/personal/slk/wiki/_Sidebar.md": {
+    "mtime": 1779967147.8933244,
+    "ast_hash": "b4db61e039a1b1b082bf9382a2c8bbff",
+    "semantic_hash": "b4db61e039a1b1b082bf9382a2c8bbff"
+  },
+  "/Users/siltala/dev/personal/slk/docs/assets/screenshot.png": {
+    "mtime": 1779967147.8061275,
+    "ast_hash": "0cd6fbd937d28a263ddec081647223e0",
+    "semantic_hash": "0cd6fbd937d28a263ddec081647223e0"
+  },
+  "/Users/siltala/dev/personal/slk/internal/image/testdata/tiny.webp": {
+    "mtime": 1779967147.853754,
+    "ast_hash": "3511c6e233b40f4b11c38b4ee23a02bb",
+    "semantic_hash": "3511c6e233b40f4b11c38b4ee23a02bb"
+  }
+}

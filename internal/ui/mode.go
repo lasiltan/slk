@@ -10,6 +10,7 @@ const (
 	ModeSearch
 	ModeChannelFinder
 	ModeReactionPicker
+	ModeReactionsView
 	ModeWorkspaceFinder
 	ModeThemeSwitcher
 	ModePresenceMenu
@@ -33,6 +34,8 @@ func (m Mode) String() string {
 		return "FIND"
 	case ModeReactionPicker:
 		return "REACT"
+	case ModeReactionsView:
+		return "REACTIONS"
 	case ModeWorkspaceFinder:
 		return "WORKSPACE"
 	case ModeThemeSwitcher:

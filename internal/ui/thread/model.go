@@ -99,9 +99,7 @@ type Model struct {
 	userNames         map[string]string
 	channelNames      map[string]string
 	groupNames        map[string]string
-	vp                viewport.Model
-	reactionNavActive bool
-	reactionNavIndex  int
+	vp viewport.Model
 
 	// Render cache -- pre-rendered reply entries (unbordered content
 	// captured per reply; borders are applied later when assembling
@@ -695,9 +693,6 @@ func (m *Model) ViewportAtTop() bool {
 }
 
 func (m *Model) MoveUp() {
-	if m.reactionNavActive {
-		m.ExitReactionNav()
-	}
 	if m.selected > 0 {
 		m.selected--
 		m.dirty()
@@ -706,9 +701,6 @@ func (m *Model) MoveUp() {
 
 // MoveDown moves the selection cursor down one reply.
 func (m *Model) MoveDown() {
-	if m.reactionNavActive {
-		m.ExitReactionNav()
-	}
 	if m.selected < len(m.replies)-1 {
 		m.selected++
 		m.dirty()
@@ -735,76 +727,6 @@ func (m *Model) GoToBottom() {
 	}
 }
 
-// EnterReactionNav activates reaction navigation on the selected reply.
-func (m *Model) EnterReactionNav() {
-	if reply := m.SelectedReply(); reply != nil && len(reply.Reactions) > 0 {
-		m.reactionNavActive = true
-		m.reactionNavIndex = 0
-		m.InvalidateCache()
-	}
-}
-
-// ExitReactionNav deactivates reaction navigation.
-func (m *Model) ExitReactionNav() {
-	m.reactionNavActive = false
-	m.reactionNavIndex = 0
-	m.InvalidateCache()
-}
-
-// ReactionNavActive returns whether reaction navigation is active.
-func (m *Model) ReactionNavActive() bool {
-	return m.reactionNavActive
-}
-
-// ReactionNavLeft moves the reaction cursor left with wrapping.
-func (m *Model) ReactionNavLeft() {
-	reply := m.SelectedReply()
-	if reply == nil {
-		return
-	}
-	total := len(reply.Reactions) + 1
-	m.reactionNavIndex = (m.reactionNavIndex - 1 + total) % total
-	m.InvalidateCache()
-}
-
-// ReactionNavRight moves the reaction cursor right with wrapping.
-func (m *Model) ReactionNavRight() {
-	reply := m.SelectedReply()
-	if reply == nil {
-		return
-	}
-	total := len(reply.Reactions) + 1
-	m.reactionNavIndex = (m.reactionNavIndex + 1) % total
-	m.InvalidateCache()
-}
-
-// SelectedReaction returns the currently highlighted reaction emoji name,
-// or isPlus=true if the "+" button is highlighted.
-func (m *Model) SelectedReaction() (emojiName string, isPlus bool) {
-	reply := m.SelectedReply()
-	if reply == nil {
-		return "", false
-	}
-	if m.reactionNavIndex >= len(reply.Reactions) {
-		return "", true
-	}
-	return reply.Reactions[m.reactionNavIndex].Emoji, false
-}
-
-// ClampReactionNav ensures the reaction nav index is within bounds.
-func (m *Model) ClampReactionNav() {
-	reply := m.SelectedReply()
-	if reply == nil || len(reply.Reactions) == 0 {
-		m.ExitReactionNav()
-		return
-	}
-	total := len(reply.Reactions) + 1
-	if m.reactionNavIndex >= total {
-		m.reactionNavIndex = total - 1
-	}
-	m.InvalidateCache()
-}
-
 // UpdateReaction updates the reaction state for a specific message in the thread.
 func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool) {
 	for i, reply := range m.replies {
@@ -813,6 +735,7 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 				for j, r := range reply.Reactions {
 					if r.Emoji == emojiName {
 						r.Count--
+						r.UserIDs = removeReactionUserID(r.UserIDs, userID)
 						if r.Count <= 0 {
 							m.replies[i].Reactions = append(reply.Reactions[:j], reply.Reactions[j+1:]...)
 						} else {
@@ -828,6 +751,7 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 					if r.Emoji == emojiName {
 						r.Count++
 						r.HasReacted = true
+						r.UserIDs = appendReactionUserID(r.UserIDs, userID)
 						m.replies[i].Reactions[j] = r
 						found = true
 						break
@@ -838,16 +762,38 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 						Emoji:      emojiName,
 						Count:      1,
 						HasReacted: true,
+						UserIDs:    []string{userID},
 					})
 				}
 			}
 			m.InvalidateCache()
-			if m.reactionNavActive {
-				m.ClampReactionNav()
-			}
 			return
 		}
 	}
+}
+
+func appendReactionUserID(ids []string, uid string) []string {
+	if uid == "" {
+		return ids
+	}
+	for _, existing := range ids {
+		if existing == uid {
+			return ids
+		}
+	}
+	return append(ids, uid)
+}
+
+func removeReactionUserID(ids []string, uid string) []string {
+	if uid == "" {
+		return ids
+	}
+	for i, existing := range ids {
+		if existing == uid {
+			return append(ids[:i], ids[i+1:]...)
+		}
+	}
+	return ids
 }
 
 // ClickAt handles a mouse click at the given y-coordinate (the pane-local
@@ -1316,16 +1262,14 @@ func (m *Model) View(height, width int) string {
 	// Rebuild render cache if replies or width changed
 	//
 	// Per-reply cache rebuild predicate intentionally excludes m.selected,
-	// m.focused, m.reactionNavActive/Index, and theme version. The cache
-	// holds renderThreadMessage output, which depends on those fields, so
-	// any state that can change rendered output for a given (reply, width)
-	// MUST call InvalidateCache() on its mutation path. EnterReactionNav /
-	// ExitReactionNav / ReactionNavLeft / ReactionNavRight all do this
-	// today; MoveUp/MoveDown call ExitReactionNav before mutating selected.
-	// If you add a new visual feature gated on mutable model state, either
-	// invalidate on the relevant transition or add the state to this
-	// predicate. Adding to the predicate forces a full cache rebuild on the
-	// transition, which defeats the j/k speedup — prefer invalidation.
+	// m.focused, and theme version. The cache holds renderThreadMessage
+	// output, which depends on those fields, so any state that can change
+	// rendered output for a given (reply, width) MUST call InvalidateCache()
+	// on its mutation path. If you add a new visual feature gated on
+	// mutable model state, either invalidate on the relevant transition or
+	// add the state to this predicate. Adding to the predicate forces a
+	// full cache rebuild on the transition, which defeats the j/k speedup
+	// — prefer invalidation.
 	if m.cache == nil || m.cacheWidth != width || m.cacheReplyLen != len(m.replies) {
 		var perfReason string
 		var perfStart time.Time
@@ -1361,15 +1305,10 @@ func (m *Model) View(height, width int) string {
 			BorderBackground(styles.SelectionTintColor(m.focused)).
 			Background(styles.SelectionTintColor(m.focused))
 		for i, reply := range m.replies {
-			// renderThreadMessage's last arg ("isSelected") drives reaction-
-			// nav pill highlighting (lines 1040, 1049): when reaction nav
-			// is active on the selected reply, the navigated pill / "+"
-			// button gets a distinct style. We MUST forward i==m.selected
-			// here (not a constant false) to preserve that UX. EnterReactionNav
-			// / ReactionNavLeft / ReactionNavRight all call InvalidateCache(),
-			// so the cache rebuilds whenever the highlighted index changes.
-			// This matches the messages-pane convention
-			// (internal/ui/messages/model.go:1050).
+			// renderThreadMessage's last arg ("isSelected") drives
+			// per-message selection styling (border, fill). Forward
+			// i==m.selected so the selected reply gets the focused
+			// styling. Matches the messages-pane convention.
 			rendered, attachFlushes, reactHits := m.renderThreadMessage(reply, width, m.userNames, m.channelNames, i == m.selected)
 			// Two filled variants — see internal/ui/messages/model.go for the
 			// rationale. Without per-variant fills, the trailing whitespace of
@@ -1756,7 +1695,7 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 		if pillCells <= 0 {
 			pillCells = 2
 		}
-		for i, r := range msg.Reactions {
+		for _, r := range msg.Reactions {
 			// Image path: pass r.Emoji directly (including any skin-tone
 			// suffix) — URLForShortcode composes the per-tone CDN URL
 			// natively. Stripping skin tone was a workaround for
@@ -1792,9 +1731,7 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 			}
 			pillText := fmt.Sprintf("%s%d", emojiStr, r.Count)
 			var style lipgloss.Style
-			if isSelected && m.reactionNavActive && i == m.reactionNavIndex {
-				style = styles.ReactionPillSelected
-			} else if r.HasReacted {
+			if r.HasReacted {
 				style = styles.ReactionPillOwn
 			} else {
 				style = styles.ReactionPillOther
@@ -1806,14 +1743,6 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 			if placedFlush != nil {
 				flushes = append(flushes, placedFlush)
 			}
-		}
-		if isSelected && m.reactionNavActive {
-			plusStyle := styles.ReactionPillPlus
-			if m.reactionNavIndex >= len(msg.Reactions) {
-				plusStyle = styles.ReactionPillSelected
-			}
-			pills = append(pills, plusStyle.Render("+"))
-			pillEmojis = append(pillEmojis, "")
 		}
 		bgSpace := lipgloss.NewStyle().Background(styles.Background).Render(" ")
 		var reactionLines []string

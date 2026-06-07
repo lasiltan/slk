@@ -77,9 +77,10 @@ type ThumbSpec struct {
 type AvatarFunc func(userID string) string
 
 type ReactionItem struct {
-	Emoji      string // emoji name without colons, e.g. "thumbsup"
+	Emoji      string   // emoji name without colons, e.g. "thumbsup"
 	Count      int
-	HasReacted bool // whether the current user has reacted with this emoji
+	HasReacted bool     // whether the current user has reacted with this emoji
+	UserIDs    []string // Slack user IDs that reacted with this emoji
 }
 
 // viewEntry is a pre-rendered row in the message list (message or date separator).
@@ -275,9 +276,6 @@ type Model struct {
 	// can adjust yOffset to keep it on screen.
 	selectedStartLine int
 	selectedEndLine   int
-
-	reactionNavActive bool
-	reactionNavIndex  int
 
 	lastReadTS string
 
@@ -841,9 +839,6 @@ func (m *Model) LastHitsForTest() []HitRect {
 }
 
 func (m *Model) MoveUp() {
-	if m.reactionNavActive {
-		m.ExitReactionNav()
-	}
 	if m.selected > 0 {
 		m.selected--
 		m.dirty()
@@ -882,9 +877,6 @@ func (m *Model) ScrollDown(n int) {
 }
 
 func (m *Model) MoveDown() {
-	if m.reactionNavActive {
-		m.ExitReactionNav()
-	}
 	if m.selected < len(m.messages)-1 {
 		m.selected++
 		m.dirty()
@@ -940,76 +932,6 @@ func (m *Model) PrependMessages(msgs []MessageItem) {
 	m.messages = append(msgs, m.messages...)
 	m.selected += count
 	m.cache = nil // invalidate cache
-	m.dirty()
-}
-
-func (m *Model) EnterReactionNav() {
-	if msg, ok := m.SelectedMessage(); ok && len(msg.Reactions) > 0 {
-		m.reactionNavActive = true
-		m.reactionNavIndex = 0
-		m.cache = nil
-		m.dirty()
-	}
-}
-
-func (m *Model) ExitReactionNav() {
-	if !m.reactionNavActive && m.reactionNavIndex == 0 {
-		return
-	}
-	m.reactionNavActive = false
-	m.reactionNavIndex = 0
-	m.cache = nil
-	m.dirty()
-}
-
-func (m *Model) ReactionNavActive() bool {
-	return m.reactionNavActive
-}
-
-func (m *Model) ReactionNavLeft() {
-	msg, ok := m.SelectedMessage()
-	if !ok {
-		return
-	}
-	total := len(msg.Reactions) + 1 // +1 for [+] pill
-	m.reactionNavIndex = (m.reactionNavIndex - 1 + total) % total
-	m.cache = nil
-	m.dirty()
-}
-
-func (m *Model) ReactionNavRight() {
-	msg, ok := m.SelectedMessage()
-	if !ok {
-		return
-	}
-	total := len(msg.Reactions) + 1
-	m.reactionNavIndex = (m.reactionNavIndex + 1) % total
-	m.cache = nil
-	m.dirty()
-}
-
-func (m *Model) SelectedReaction() (emoji string, isPlus bool) {
-	msg, ok := m.SelectedMessage()
-	if !ok {
-		return "", false
-	}
-	if m.reactionNavIndex >= len(msg.Reactions) {
-		return "", true
-	}
-	return msg.Reactions[m.reactionNavIndex].Emoji, false
-}
-
-func (m *Model) ClampReactionNav() {
-	msg, ok := m.SelectedMessage()
-	if !ok || len(msg.Reactions) == 0 {
-		m.ExitReactionNav()
-		return
-	}
-	total := len(msg.Reactions) + 1
-	if m.reactionNavIndex >= total {
-		m.reactionNavIndex = total - 1
-	}
-	m.cache = nil
 	m.dirty()
 }
 
@@ -1129,6 +1051,7 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 				for j, r := range msg.Reactions {
 					if r.Emoji == emojiName {
 						r.Count--
+						r.UserIDs = removeUserID(r.UserIDs, userID)
 						if r.Count <= 0 {
 							m.messages[i].Reactions = append(msg.Reactions[:j], msg.Reactions[j+1:]...)
 						} else {
@@ -1144,6 +1067,7 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 					if r.Emoji == emojiName {
 						r.Count++
 						r.HasReacted = true
+						r.UserIDs = appendUserID(r.UserIDs, userID)
 						m.messages[i].Reactions[j] = r
 						found = true
 						break
@@ -1154,14 +1078,12 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 						Emoji:      emojiName,
 						Count:      1,
 						HasReacted: true,
+						UserIDs:    []string{userID},
 					})
 				}
 			}
 			m.cache = nil
 			m.dirty()
-			if m.reactionNavActive {
-				m.ClampReactionNav()
-			}
 			// Re-anchor the viewport bottom if it was at the bottom before.
 			// We need the new totalLines, which only buildCache computes;
 			// rebuild now (cheap, and the next View() would do it anyway).
@@ -1184,6 +1106,30 @@ func (m *Model) UpdateReaction(messageTS, emojiName, userID string, remove bool)
 			return
 		}
 	}
+}
+
+func appendUserID(ids []string, uid string) []string {
+	if uid == "" {
+		return ids
+	}
+	for _, existing := range ids {
+		if existing == uid {
+			return ids
+		}
+	}
+	return append(ids, uid)
+}
+
+func removeUserID(ids []string, uid string) []string {
+	if uid == "" {
+		return ids
+	}
+	for i, existing := range ids {
+		if existing == uid {
+			return append(ids[:i], ids[i+1:]...)
+		}
+	}
+	return ids
 }
 
 func (m *Model) SetLoading(loading bool) {
@@ -1874,7 +1820,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 		if pillCells <= 0 {
 			pillCells = 2
 		}
-		for i, r := range msg.Reactions {
+		for _, r := range msg.Reactions {
 			// Image path: pass r.Emoji directly (including any skin-tone
 			// suffix) — URLForShortcode composes the per-tone CDN URL
 			// natively. Stripping skin tone was a workaround for
@@ -1910,9 +1856,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 			}
 			pillText := fmt.Sprintf("%s%d", emojiStr, r.Count)
 			var style lipgloss.Style
-			if isSelected && m.reactionNavActive && i == m.reactionNavIndex {
-				style = styles.ReactionPillSelected
-			} else if r.HasReacted {
+			if r.HasReacted {
 				style = styles.ReactionPillOwn
 			} else {
 				style = styles.ReactionPillOther
@@ -1925,14 +1869,6 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 			if placedFlush != nil {
 				flushes = append(flushes, placedFlush)
 			}
-		}
-		if isSelected && m.reactionNavActive {
-			plusStyle := styles.ReactionPillPlus
-			if m.reactionNavIndex >= len(msg.Reactions) {
-				plusStyle = styles.ReactionPillSelected
-			}
-			pills = append(pills, plusStyle.Render("+"))
-			pillEmojis = append(pillEmojis, "")
 		}
 		// Join pills with wrapping. emojiutil.Width() consults the
 		// terminal-probed width cache so wrapping decisions match what
