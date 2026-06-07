@@ -230,6 +230,7 @@ type Model struct {
 	avatarFn     AvatarFunc        // optional: returns half-block avatar for a userID
 	userNames    map[string]string // user ID -> display name for mention resolution
 	channelNames map[string]string // channel ID -> name for bare <#CID> resolution
+	groupNames   map[string]string // usergroup ID -> handle for <!subteam^…> resolution
 
 	// Render cache -- invalidated when messages or width change.
 	// Each entry holds pre-bordered variants so selection movement does not
@@ -1269,6 +1270,16 @@ func (m *Model) SetChannelNames(names map[string]string) {
 	m.dirty()
 }
 
+// SetGroupNames sets the usergroup ID -> handle map used to resolve
+// <!subteam^Sxxx> mentions delivered without an embedded |@handle.
+// Slack's rich-text blocks carry only the usergroup ID, so this map is
+// the only source of truth for the displayed handle in that path.
+func (m *Model) SetGroupNames(names map[string]string) {
+	m.groupNames = names
+	m.cache = nil
+	m.dirty()
+}
+
 // EmojiContext bundles the emoji-image rendering dependencies. Held
 // by the Model and threaded through RenderSlackMarkdownWith when
 // building each message's body and reaction pills.
@@ -1748,6 +1759,7 @@ func (m *Model) blockkitContext(msg MessageItem, userNames, channelNames map[str
 			return RenderSlackMarkdownWith(s, RenderSlackMarkdownOpts{
 				UserNames:    un,
 				ChannelNames: channelNames,
+				GroupNames:   m.groupNames,
 				PlaceCtx:     m.emojiCtx.PlaceCtx,
 				EmojiCells:   m.emojiCtx.Cells,
 				Customs:      m.emojiCtx.Customs,
@@ -1805,6 +1817,7 @@ func (m *Model) renderMessagePlain(msg MessageItem, width int, avatarStr string,
 	bodyOpts := RenderSlackMarkdownOpts{
 		UserNames:    userNames,
 		ChannelNames: channelNames,
+		GroupNames:   m.groupNames,
 		PlaceCtx:     m.emojiCtx.PlaceCtx,
 		EmojiCells:   m.emojiCtx.Cells,
 		Customs:      m.emojiCtx.Customs,

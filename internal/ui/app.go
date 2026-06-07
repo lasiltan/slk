@@ -1723,6 +1723,17 @@ func openInSystemViewerCmd(path string) tea.Cmd {
 	}
 }
 
+// SetGroupNames passes the usergroup ID -> handle map (e.g.
+// "S0123" -> "platform") to every panel that renders message text.
+// Slack rich-text blocks deliver only the usergroup ID, so this map is
+// the only source of truth for the displayed handle on those messages.
+// Populate from usergroups.list.
+func (a *App) SetGroupNames(names map[string]string) {
+	a.messagepane.SetGroupNames(names)
+	a.threadPanel.SetGroupNames(names)
+	a.threadsView.SetGroupNames(names)
+}
+
 // SetUserNames passes the user ID -> display name map to the message pane for mention resolution.
 func (a *App) SetUserNames(names map[string]string) {
 	a.userNames = names

@@ -85,7 +85,8 @@ type Model struct {
 	summaries  []cache.ThreadSummary
 	userNames    map[string]string
 	channelNames map[string]string
-	selfUserID string
+	groupNames   map[string]string
+	selfUserID   string
 
 	selected int
 	yOffset  int
@@ -120,6 +121,7 @@ func New(userNames map[string]string, selfUserID string) Model {
 		userNames:              userNames,
 		selfUserID:             selfUserID,
 		channelNames:           map[string]string{},
+		groupNames:             map[string]string{},
 		subscriptionsAvailable: true,
 	}
 }
@@ -175,6 +177,21 @@ func (m *Model) SetChannelNames(names map[string]string) {
 		return
 	}
 	m.channelNames = names
+	m.dirty()
+}
+
+// SetGroupNames sets the usergroup ID -> handle map used to resolve
+// <!subteam^Sxxx> mentions in parent-text previews. No-op when the new
+// map matches the current one (keeps the App-level panel cache hot on
+// idle re-renders).
+func (m *Model) SetGroupNames(names map[string]string) {
+	if names == nil {
+		names = map[string]string{}
+	}
+	if stringMapsEqual(m.groupNames, names) {
+		return
+	}
+	m.groupNames = names
 	m.dirty()
 }
 
@@ -640,7 +657,11 @@ func (m *Model) renderCard(s cache.ThreadSummary, width int, selected bool) []st
 	if s.ParentText == "" && s.ParentUserID == "" {
 		previewBody = mutedStyle().Render("(parent not loaded)")
 	} else {
-		preview := messages.RenderSlackMarkdown(s.ParentText, m.userNames, m.channelNames)
+		preview := messages.RenderSlackMarkdownWith(s.ParentText, messages.RenderSlackMarkdownOpts{
+			UserNames:    m.userNames,
+			ChannelNames: m.channelNames,
+			GroupNames:   m.groupNames,
+		})
 		preview = strings.ReplaceAll(preview, "\n", " ")
 		previewMax := contentWidth - 4
 		if previewMax < 0 {

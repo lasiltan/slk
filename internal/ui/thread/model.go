@@ -98,6 +98,7 @@ type Model struct {
 	avatarFn          messages.AvatarFunc
 	userNames         map[string]string
 	channelNames      map[string]string
+	groupNames        map[string]string
 	vp                viewport.Model
 	reactionNavActive bool
 	reactionNavIndex  int
@@ -628,6 +629,15 @@ func (m *Model) PatchUserName(userID, displayName string) {
 func (m *Model) SetChannelNames(names map[string]string) {
 	m.channelNames = names
 	m.channelNamesV++
+	m.InvalidateCache()
+}
+
+// SetGroupNames sets the usergroup ID -> handle map used to resolve
+// <!subteam^Sxxx> mentions in thread replies. Rich-text blocks deliver
+// only the usergroup ID, so this map is the only source of truth for
+// the displayed handle in that path.
+func (m *Model) SetGroupNames(names map[string]string) {
+	m.groupNames = names
 	m.InvalidateCache()
 }
 
@@ -1712,6 +1722,7 @@ func (m *Model) renderThreadMessage(msg messages.MessageItem, width int, userNam
 	bodyOpts := messages.RenderSlackMarkdownOpts{
 		UserNames:    userNames,
 		ChannelNames: channelNames,
+		GroupNames:   m.groupNames,
 		PlaceCtx:     m.emojiCtx.PlaceCtx,
 		EmojiCells:   m.emojiCtx.Cells,
 		Customs:      m.emojiCtx.Customs,

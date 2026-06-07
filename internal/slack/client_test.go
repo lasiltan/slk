@@ -2119,6 +2119,10 @@ func (m *mockSlackAPI) OpenConversationContext(ctx context.Context, params *slac
 	return nil, false, false, nil
 }
 
+func (m *mockSlackAPI) GetUserGroupsContext(ctx context.Context, options ...slack.GetUserGroupsOption) ([]slack.UserGroup, error) {
+	return nil, nil
+}
+
 func TestOpenConversation_SingleUserReturnsIMChannelID(t *testing.T) {
 	mock := &mockSlackAPI{
 		openConversationContextFn: func(ctx context.Context, params *slack.OpenConversationParameters) (*slack.Channel, bool, bool, error) {

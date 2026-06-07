@@ -213,15 +213,49 @@ func TestBareChannelMentionUnresolvedFallsBack(t *testing.T) {
 	}
 }
 
-// TestUnlabeledNonHTTPLinkSurvives confirms that <url|text> patterns where the
-// URL is NOT http(s) don't get gobbled by linkWithLabelRe. (Slack uses
-// <!subteam^S123|@team> for groups, etc.)
-func TestNonHTTPBracketedSurvives(t *testing.T) {
-	// Should not panic, should not render as a link. We only assert it doesn't
-	// crash and the output is non-empty.
+// TestSubteamMentionLabeled asserts that the labeled wire form
+// <!subteam^S123|@team> renders as "@team" (no raw <!subteam…> token
+// leaking into the visible output) so users see a readable handle when
+// a group is mentioned in a message.
+func TestSubteamMentionLabeled(t *testing.T) {
 	out := RenderSlackMarkdown("ping <!subteam^S123|@team> please", nil, nil)
-	if out == "" {
-		t.Error("expected non-empty output")
+	plain := ansi.Strip(out)
+	if !strings.Contains(plain, "@team") {
+		t.Errorf("expected handle '@team' in output, got %q", plain)
+	}
+	if strings.Contains(plain, "<!subteam") || strings.Contains(plain, "S123") {
+		t.Errorf("raw subteam token leaked into output: %q", plain)
+	}
+}
+
+// TestSubteamMentionUnlabeledResolvedFromMap covers the rich-text path:
+// blockkit emits <!subteam^Sxxx> without an embedded label because
+// slack-go's UserGroupElement only carries the ID. The render layer
+// must fall back to RenderSlackMarkdownOpts.GroupNames to get a handle.
+func TestSubteamMentionUnlabeledResolvedFromMap(t *testing.T) {
+	out := RenderSlackMarkdownWith("hey <!subteam^S0PLATFORM>!", RenderSlackMarkdownOpts{
+		GroupNames: map[string]string{"S0PLATFORM": "platform"},
+	})
+	plain := ansi.Strip(out)
+	if !strings.Contains(plain, "@platform") {
+		t.Errorf("expected resolved '@platform' in output, got %q", plain)
+	}
+	if strings.Contains(plain, "<!subteam") || strings.Contains(plain, "S0PLATFORM") {
+		t.Errorf("raw subteam token leaked into output: %q", plain)
+	}
+}
+
+// TestSubteamMentionUnlabeledFallback asserts that when the wire form
+// carries no embedded label AND the ID isn't in GroupNames, we render
+// "@group" rather than letting the raw <!subteam^…> token through.
+func TestSubteamMentionUnlabeledFallback(t *testing.T) {
+	out := RenderSlackMarkdown("yo <!subteam^SUNKNOWN>", nil, nil)
+	plain := ansi.Strip(out)
+	if !strings.Contains(plain, "@group") {
+		t.Errorf("expected fallback '@group' in output, got %q", plain)
+	}
+	if strings.Contains(plain, "<!subteam") || strings.Contains(plain, "SUNKNOWN") {
+		t.Errorf("raw subteam token leaked into output: %q", plain)
 	}
 }
 

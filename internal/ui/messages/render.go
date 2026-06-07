@@ -48,6 +48,15 @@ var (
 	// raw <#CID> token.
 	channelMentionRe = regexp.MustCompile(`<#([A-Z0-9]+)(?:\|([^>]+))?>`)
 
+	// User-group (subteam) mentions: <!subteam^S123|@team> or bare
+	// <!subteam^S123>. The labeled form is what Slack delivers for
+	// mrkdwn-rendered messages; the bare form is what our blockkit
+	// rich-text translator emits (slack-go's UserGroupElement only
+	// carries the ID). Group 1 is the ID; group 2 (optional) is the
+	// embedded handle, which may have a leading '@'. Fallback order:
+	// embedded label → opts.GroupNames lookup → "group".
+	subteamMentionRe = regexp.MustCompile(`<!subteam\^([A-Z0-9]+)(?:\|@?([^>]*))?>`)
+
 	// Slack escapes &, <, > in user-typed text per
 	// https://api.slack.com/reference/surfaces/formatting#escaping.
 	// We decode AFTER all markup regexes (which consume legitimate
@@ -609,6 +618,7 @@ func SidebarMutedFgANSI() string {
 type RenderSlackMarkdownOpts struct {
 	UserNames    map[string]string
 	ChannelNames map[string]string
+	GroupNames   map[string]string // usergroup ID -> handle (without leading @)
 
 	// Emoji-image opts (zero values disable the image path).
 	PlaceCtx     emojiutil.PlaceContext
@@ -681,6 +691,7 @@ func RenderSlackMarkdownWith(text string, opts RenderSlackMarkdownOpts) string {
 func renderInlineFormattingWith(text string, opts RenderSlackMarkdownOpts) string {
 	userNames := opts.UserNames
 	channelNames := opts.ChannelNames
+	groupNames := opts.GroupNames
 	// Inline code (before bold/italic to avoid conflicts inside code)
 	text = inlineCodeRe.ReplaceAllStringFunc(text, func(match string) string {
 		inner := inlineCodeRe.FindStringSubmatch(match)[1]
@@ -748,6 +759,28 @@ func renderInlineFormattingWith(text string, opts RenderSlackMarkdownOpts) strin
 			name = "unknown"
 		}
 		return mentionStyle().Render("#" + name)
+	})
+
+	// User-group mentions: <!subteam^S123|@team> -> @team, or bare
+	// <!subteam^S123> -> @resolved-handle (via groupNames map). When
+	// the group can't be resolved we render "@group" so the user sees
+	// something readable rather than the raw <!subteam^…> token.
+	text = subteamMentionRe.ReplaceAllStringFunc(text, func(match string) string {
+		groups := subteamMentionRe.FindStringSubmatch(match)
+		groupID := groups[1]
+		name := ""
+		if len(groups) > 2 {
+			name = groups[2]
+		}
+		if name == "" && groupNames != nil {
+			if resolved, ok := groupNames[groupID]; ok {
+				name = resolved
+			}
+		}
+		if name == "" {
+			name = "group"
+		}
+		return mentionStyle().Render("@" + name)
 	})
 
 	// User mentions: <@U1234> -> @DisplayName (or @U1234 if not resolved)
