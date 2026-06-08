@@ -25,6 +25,14 @@ const (
 	// matching the behavior of the official Slack desktop client. Falls
 	// between "Direct Messages" (humans) and "Channels" (firehose).
 	defaultAppsSection = "Apps"
+	// defaultUnreadSection renders ABOVE the default fallback sections
+	// (DMs / Apps / Channels) and BELOW any user-defined custom sections.
+	// It contains channels that are visibly unread AND have no explicit
+	// custom Section assignment. Items in custom sections never appear
+	// here — they're already pinned. Channels listed here ALSO render in
+	// their normal default section; the Unread row is a duplicate stop.
+	// Config-glob mode only; never injected in Slack-native sections mode.
+	defaultUnreadSection = "Unread"
 )
 
 type ChannelItem struct {
@@ -180,6 +188,12 @@ type navItem struct {
 	kind   navKind
 	header string // section name when kind == navHeader
 	fi     int    // index into m.filtered when kind == navChannel
+	// section names which section bucket this row belongs to. For
+	// navChannel rows in config mode, the same channel can appear under
+	// both the Unread section and its default fallback section; this
+	// field disambiguates the duplicate so cursor tracking can keep the
+	// user on the correct copy across rebuilds.
+	section string
 }
 
 type Model struct {
@@ -314,7 +328,15 @@ func (m *Model) UnreadChannelCount() int {
 
 // Invalidate forces the next View() call to re-read read state from
 // the installed reader. Called by App.Update on ReadStateChangedMsg.
+// Also rebuilds filter + nav because the Unread section's membership
+// is read-state-derived: when a channel newly becomes unread at
+// runtime, the Unread section header / channel rows would otherwise
+// render via buildCache (which recomputes sectionOrder fresh) while
+// m.nav still reflects the pre-unread state — leaving the new rows
+// with navIdx=-1 and unreachable by j/k.
 func (m *Model) Invalidate() {
+	m.rebuildFilter()
+	m.rebuildNavPreserveCursor()
 	m.cacheValid = false
 	m.dirty()
 }
@@ -369,13 +391,93 @@ func (m *Model) sectionFor(item ChannelItem) string {
 	return sectionForLegacy(item)
 }
 
+// orderedSectionsConfig is modelOrderedSections's config-mode body. It
+// mirrors orderedSectionsLegacy but additionally injects the "Unread"
+// section between custom sections and the default fallback sections
+// when at least one uncategorized item (Section == "") is visibly
+// unread per readStateReader. Lives on *Model because the Unread test
+// requires read-state access; the package-level orderedSectionsLegacy
+// stays as the back-compat shim for callers without a Model.
+func (m *Model) orderedSectionsConfig(filtered []int) []string {
+	type customInfo struct {
+		name      string
+		order     int
+		firstSeen int
+	}
+	var customs []customInfo
+	customSeen := map[string]int{}
+	hasChannels := false
+	hasDMs := false
+	hasApps := false
+	hasUnread := false
+
+	var readState map[string]cache.ReadState
+	if m.readStateReader != nil {
+		readState = m.readStateReader()
+	}
+
+	for pos, idx := range filtered {
+		item := m.items[idx]
+		name := sectionForLegacy(item)
+		if item.Section == "" && item.IsVisiblyUnread(readState[item.ID]) {
+			hasUnread = true
+		}
+		switch {
+		case item.Section != "":
+			if existing, ok := customSeen[name]; ok {
+				if item.SectionOrder < customs[existing].order {
+					customs[existing].order = item.SectionOrder
+				}
+				continue
+			}
+			customSeen[name] = len(customs)
+			customs = append(customs, customInfo{
+				name:      name,
+				order:     item.SectionOrder,
+				firstSeen: pos,
+			})
+		case name == defaultDMSection:
+			hasDMs = true
+		case name == defaultAppsSection:
+			hasApps = true
+		default:
+			hasChannels = true
+		}
+	}
+
+	sort.SliceStable(customs, func(i, j int) bool {
+		if customs[i].order != customs[j].order {
+			return customs[i].order < customs[j].order
+		}
+		return customs[i].firstSeen < customs[j].firstSeen
+	})
+
+	out := make([]string, 0, len(customs)+4)
+	for _, c := range customs {
+		out = append(out, c.name)
+	}
+	if hasUnread {
+		out = append(out, defaultUnreadSection)
+	}
+	if hasDMs {
+		out = append(out, defaultDMSection)
+	}
+	if hasApps {
+		out = append(out, defaultAppsSection)
+	}
+	if hasChannels {
+		out = append(out, defaultChannelsSection)
+	}
+	return out
+}
+
 // modelOrderedSections returns the section keys in display order for
 // the current model state. Slack mode: provider's verbatim list,
 // returning IDs of sections that have at least one filtered item OR
 // are standard-typed. Config mode: legacy algorithm.
 func (m *Model) modelOrderedSections(filtered []int) []string {
 	if !m.useSlackSections() {
-		return orderedSectionsLegacy(m.items, filtered)
+		return m.orderedSectionsConfig(filtered)
 	}
 	metas := m.sectionsProvider.OrderedSlackSections()
 	hasItem := map[string]bool{}
@@ -908,9 +1010,10 @@ func (m *Model) rebuildFilter() {
 // key up in the new nav and re-set the cursor so the user keeps their
 // place across collapse toggles, item refreshes, etc.
 type cursorKey struct {
-	kind   navKind
-	header string // for navHeader
-	id     string // channel ID for navChannel
+	kind    navKind
+	header  string // for navHeader
+	id      string // channel ID for navChannel
+	section string // for navChannel: disambiguates the Unread duplicate
 }
 
 func (m *Model) currentCursorKey() (cursorKey, bool) {
@@ -927,7 +1030,7 @@ func (m *Model) currentCursorKey() (cursorKey, bool) {
 		if n.fi < 0 || n.fi >= len(m.filtered) {
 			return cursorKey{}, false
 		}
-		return cursorKey{kind: navChannel, id: m.items[m.filtered[n.fi]].ID}, true
+		return cursorKey{kind: navChannel, id: m.items[m.filtered[n.fi]].ID, section: n.section}, true
 	}
 	return cursorKey{}, false
 }
@@ -939,22 +1042,36 @@ func (m *Model) currentCursorKey() (cursorKey, bool) {
 func (m *Model) rebuildNav() {
 	sectionOrder := m.modelOrderedSections(m.filtered)
 
-	// Bucket filter indices by section in display order.
+	var readState map[string]cache.ReadState
+	if m.readStateReader != nil {
+		readState = m.readStateReader()
+	}
+	unreadActive := !m.useSlackSections()
+
+	// Bucket filter indices by section in display order. In config mode,
+	// items that qualify for the Unread section are appended to BOTH
+	// their real section bucket and the Unread bucket — the cursor will
+	// see two distinct navChannel rows for the same channel, one per
+	// section.
 	bucket := map[string][]int{}
 	for fi, idx := range m.filtered {
-		key := m.sectionFor(m.items[idx])
+		item := m.items[idx]
+		key := m.sectionFor(item)
 		bucket[key] = append(bucket[key], fi)
+		if unreadActive && item.Section == "" && item.IsVisiblyUnread(readState[item.ID]) {
+			bucket[defaultUnreadSection] = append(bucket[defaultUnreadSection], fi)
+		}
 	}
 
 	nav := make([]navItem, 0, 1+len(sectionOrder))
 	nav = append(nav, navItem{kind: navThreads})
 	for _, name := range sectionOrder {
-		nav = append(nav, navItem{kind: navHeader, header: name})
+		nav = append(nav, navItem{kind: navHeader, header: name, section: name})
 		if m.IsCollapsed(name) {
 			continue
 		}
 		for _, fi := range bucket[name] {
-			nav = append(nav, navItem{kind: navChannel, fi: fi})
+			nav = append(nav, navItem{kind: navChannel, fi: fi, section: name})
 		}
 	}
 	m.nav = nav
@@ -973,6 +1090,13 @@ func (m *Model) rebuildNavPreserveCursor() {
 	if !hadKey {
 		return
 	}
+	// For navChannel keys we prefer an exact {id, section} match so the
+	// cursor stays on the right copy when a channel is duplicated under
+	// the "Unread" section. If only the same ID appears under a
+	// different section (e.g. the Unread copy disappeared after a
+	// mark-as-read), fall back to that row rather than dropping to
+	// Threads.
+	fallback := -1
 	for i, n := range m.nav {
 		switch {
 		case key.kind == navThreads && n.kind == navThreads:
@@ -982,11 +1106,24 @@ func (m *Model) rebuildNavPreserveCursor() {
 			m.cursor = i
 			return
 		case key.kind == navChannel && n.kind == navChannel:
-			if n.fi >= 0 && n.fi < len(m.filtered) && m.items[m.filtered[n.fi]].ID == key.id {
+			if n.fi < 0 || n.fi >= len(m.filtered) {
+				continue
+			}
+			if m.items[m.filtered[n.fi]].ID != key.id {
+				continue
+			}
+			if n.section == key.section {
 				m.cursor = i
 				return
 			}
+			if fallback < 0 {
+				fallback = i
+			}
 		}
+	}
+	if fallback >= 0 {
+		m.cursor = fallback
+		return
 	}
 	// Previous target gone (e.g. the channel was filtered out, or its
 	// section now collapsed). Fall back to the Threads row.
@@ -1010,6 +1147,22 @@ func (m *Model) aggregateUnreadForSection(section string) int {
 		readState = m.readStateReader()
 	}
 	total := 0
+	// Unread is a synthetic section: its membership is "every
+	// uncategorized item that's visibly unread", not the sectionFor()
+	// result. Count those directly so the header badge reflects the
+	// duplicated rows actually rendered under it.
+	if section == defaultUnreadSection {
+		for _, idx := range m.filtered {
+			item := m.items[idx]
+			if item.Section != "" {
+				continue
+			}
+			if item.IsVisiblyUnread(readState[item.ID]) {
+				total++
+			}
+		}
+		return total
+	}
 	for _, idx := range m.filtered {
 		item := m.items[idx]
 		if m.sectionFor(item) != section {
@@ -1083,11 +1236,17 @@ func (m *Model) buildCache(width int) {
 		readState = m.readStateReader()
 	}
 
-	// Reverse-index nav by section name and by filter idx so we can map
-	// each rendered row back to its nav index. Headers are uniquely
-	// keyed by section name; channels by their filter idx.
+	// Reverse-index nav by section name and by {filter idx, section} so we can
+	// map each rendered row back to its nav index. Headers are uniquely
+	// keyed by section name; channels by their (filter idx, section) pair
+	// — the same channel can appear under both the Unread section and
+	// its default fallback section, and each copy gets its own nav row.
+	type channelNavKey struct {
+		fi      int
+		section string
+	}
 	headerNavIdx := map[string]int{}
-	channelNavIdx := map[int]int{} // filter idx -> nav idx
+	channelNavIdx := map[channelNavKey]int{}
 	threadsIdx := -1
 	for i, n := range m.nav {
 		switch n.kind {
@@ -1096,7 +1255,7 @@ func (m *Model) buildCache(width int) {
 		case navHeader:
 			headerNavIdx[n.header] = i
 		case navChannel:
-			channelNavIdx[n.fi] = i
+			channelNavIdx[channelNavKey{fi: n.fi, section: n.section}] = i
 		}
 	}
 
@@ -1192,21 +1351,23 @@ func (m *Model) buildCache(width int) {
 		sectionMap[name] = &sectionGroup{name: name}
 	}
 
+	unreadActive := !m.useSlackSections()
 	for fi, idx := range m.filtered {
 		item := m.items[idx]
-		sectionName := m.sectionFor(item)
-		if m.IsCollapsed(sectionName) {
-			continue
-		}
-		// Defense-in-depth: if sectionFor returns a section name that
-		// modelOrderedSections didn't include (e.g. an item carries a
-		// stale Section ID for a section that has been deleted or
-		// filtered out as non-renderable), skip it rather than
-		// nil-dereferencing sectionMap[sectionName] below. The user
-		// will see the channel reappear once the next refresh cycle
-		// (WS event or workspace switch) re-resolves its Section.
-		if _, ok := sectionMap[sectionName]; !ok {
-			continue
+		realSection := m.sectionFor(item)
+
+		// Compute the list of section buckets this item renders under.
+		// In config mode an uncategorized + visibly-unread channel
+		// renders in BOTH the Unread section and its default fallback.
+		// Defense-in-depth: skip targets that modelOrderedSections
+		// didn't include (e.g. an item carries a stale Section ID for
+		// a section that has been deleted or filtered out as
+		// non-renderable). The user will see the channel reappear once
+		// the next refresh cycle (WS event or workspace switch)
+		// re-resolves its Section.
+		var targets []string
+		if _, ok := sectionMap[realSection]; ok && !m.IsCollapsed(realSection) {
+			targets = append(targets, realSection)
 		}
 
 		// hasUnread is the rendering-facing boolean: "should this row
@@ -1218,6 +1379,20 @@ func (m *Model) buildCache(width int) {
 		// read row visually. Predicate lives on ChannelItem so the
 		// App's tab-title counter and section aggregates agree.
 		hasUnread := item.IsVisiblyUnread(readState[item.ID])
+
+		// Items with no custom Section that are visibly unread also
+		// render under the synthetic "Unread" section (config mode
+		// only). The Unread copy is in addition to the default-section
+		// copy above — both rows share the same channelID + rendered
+		// strings, only navIdx differs.
+		if unreadActive && item.Section == "" && hasUnread {
+			if _, ok := sectionMap[defaultUnreadSection]; ok && !m.IsCollapsed(defaultUnreadSection) {
+				targets = append(targets, defaultUnreadSection)
+			}
+		}
+		if len(targets) == 0 {
+			continue
+		}
 
 		// Unread dot indicator (same regardless of selection state).
 		unreadDot := " "
@@ -1333,18 +1508,20 @@ func (m *Model) buildCache(width int) {
 		// is zero (which is the common case after MarkChannel runs).
 		rowActive := styles.ChannelSelected.Width(width - 2).Render(labelActive)
 
-		ni, ok := channelNavIdx[fi]
-		if !ok {
-			ni = -1
+		for _, target := range targets {
+			ni, ok := channelNavIdx[channelNavKey{fi: fi, section: target}]
+			if !ok {
+				ni = -1
+			}
+			sectionMap[target].rows = append(sectionMap[target].rows, renderRow{
+				normal:    rowNormal,
+				selected:  rowSelected,
+				active:    rowActive,
+				height:    1, // every channel row is exactly one line
+				navIdx:    ni,
+				channelID: item.ID,
+			})
 		}
-		sectionMap[sectionName].rows = append(sectionMap[sectionName].rows, renderRow{
-			normal:    rowNormal,
-			selected:  rowSelected,
-			active:    rowActive,
-			height:    1, // every channel row is exactly one line
-			navIdx:    ni,
-			channelID: item.ID,
-		})
 	}
 
 	// When there are no channel items at all, render a single muted

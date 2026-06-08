@@ -165,6 +165,13 @@ type App struct {
 	// sub-component's API.
 	userNames map[string]string
 
+	// Mirrors of the channel-id -> name and usergroup-id -> handle
+	// maps last forwarded to the renderers. Read by reactionPreview so
+	// the reactions-view header resolves <#C…> and <!subteam^…> the
+	// same way the main message pane does.
+	channelNames map[string]string
+	groupNames   map[string]string
+
 	// externalUsers tracks which user IDs are Slack Connect / shared-channel
 	// guests. Populated by main.go via SetExternalUsers as users are
 	// resolved. Read by SetUserNames when building the mention-picker User
@@ -599,10 +606,13 @@ func (a *App) openPickerFromThread() tea.Cmd {
 	return nil
 }
 
-// reactionPreview returns a single-line, ANSI-free summary of a message
-// suitable for the reactions-view overlay header. Falls back to "(no
-// text)" for blocks-only / attachment-only messages.
-func reactionPreview(text string) string {
+// reactionPreview returns a single-line summary of a message suitable
+// for the reactions-view overlay header. Runs the same Slack markdown
+// renderer the main pane uses so user / channel / usergroup mentions
+// resolve to readable names instead of leaking raw <@…>, <#…>, or
+// <!subteam^…> tokens. Falls back to "(no text)" for blocks-only /
+// attachment-only messages.
+func (a *App) reactionPreview(text string) string {
 	t := strings.TrimSpace(text)
 	t = strings.ReplaceAll(t, "\r", " ")
 	t = strings.ReplaceAll(t, "\n", " ")
@@ -613,7 +623,15 @@ func reactionPreview(text string) string {
 	if t == "" {
 		return "(no text)"
 	}
-	return t
+	rendered := messages.RenderSlackMarkdownWith(t, messages.RenderSlackMarkdownOpts{
+		UserNames:    a.userNames,
+		ChannelNames: a.channelNames,
+		GroupNames:   a.groupNames,
+	})
+	// RenderSlackMarkdownWith wraps fenced code blocks with newlines;
+	// collapse them so the preview stays single-line.
+	rendered = strings.ReplaceAll(rendered, "\n", " ")
+	return rendered
 }
 
 func (a *App) reactionTabsFor(reactions []messages.ReactionItem) []reactionsview.EmojiTab {
@@ -641,7 +659,7 @@ func (a *App) openReactionsViewFromMessage() tea.Cmd {
 	if !ok || len(msg.Reactions) == 0 {
 		return nil
 	}
-	a.reactionsView.Open(reactionPreview(msg.Text), a.reactionTabsFor(msg.Reactions))
+	a.reactionsView.Open(a.reactionPreview(msg.Text), a.reactionTabsFor(msg.Reactions))
 	a.SetMode(ModeReactionsView)
 	return nil
 }
@@ -651,7 +669,7 @@ func (a *App) openReactionsViewFromThread() tea.Cmd {
 	if reply == nil || len(reply.Reactions) == 0 {
 		return nil
 	}
-	a.reactionsView.Open(reactionPreview(reply.Text), a.reactionTabsFor(reply.Reactions))
+	a.reactionsView.Open(a.reactionPreview(reply.Text), a.reactionTabsFor(reply.Reactions))
 	a.SetMode(ModeReactionsView)
 	return nil
 }
@@ -1401,6 +1419,7 @@ func (a *App) SetChannels(items []sidebar.ChannelItem) {
 	}
 	a.compose.SetChannels(picks)
 	a.threadCompose.SetChannels(picks)
+	a.channelNames = names
 	a.messagepane.SetChannelNames(names)
 	a.threadPanel.SetChannelNames(names)
 	a.threadsView.SetChannelNames(names)
@@ -1753,6 +1772,7 @@ func openInSystemViewerCmd(path string) tea.Cmd {
 // the only source of truth for the displayed handle on those messages.
 // Populate from usergroups.list.
 func (a *App) SetGroupNames(names map[string]string) {
+	a.groupNames = names
 	a.messagepane.SetGroupNames(names)
 	a.threadPanel.SetGroupNames(names)
 	a.threadsView.SetGroupNames(names)

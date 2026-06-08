@@ -657,7 +657,8 @@ func TestCollapseByID_IndependentFromConfigMode(t *testing.T) {
 // indicator is driven by the readStateReader callback (the DB),
 // not by ChannelItem.UnreadCount. C1 has HasUnread=true via the
 // reader so its row should render the "●" glyph; C2 has
-// HasUnread=false and should not.
+// HasUnread=false and should not. C1 is also duplicated under the
+// "Unread" section, so two ● glyphs appear in total (one per copy).
 func TestView_RendersDotFromReadStateReader(t *testing.T) {
 	m := New([]ChannelItem{
 		{ID: "C1", Name: "general", Type: "channel"},
@@ -676,8 +677,8 @@ func TestView_RendersDotFromReadStateReader(t *testing.T) {
 
 	out := m.View(20, 30)
 	dotCount := strings.Count(out, "●")
-	if dotCount != 1 {
-		t.Errorf("expected exactly 1 unread dot, got %d. Output:\n%s", dotCount, out)
+	if dotCount != 2 {
+		t.Errorf("expected exactly 2 unread dots (one per C1 copy in Unread + Channels), got %d. Output:\n%s", dotCount, out)
 	}
 }
 
